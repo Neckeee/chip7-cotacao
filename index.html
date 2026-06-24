@@ -1,0 +1,2906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a2550">
+<title>Diagnóstico Tecnológico · Chip7</title>
+
+<!-- PWA / instalação -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+
+<!-- iPhone / iPad: ícone na tela de início + app em tela cheia -->
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chip7">
+<style>
+:root{
+  --brand:#0a2550; --brand2:#103a78; --accent:#8cc63f; --accent2:#1f7ec4;
+  --bg:#f4f6fb; --card:#ffffff; --line:#e4e9f2; --text:#1b2430; --muted:#6a7587;
+  --green:#16a34a; --yellow:#f59e0b; --red:#dc2626;
+  --shadow:0 1px 2px rgba(16,33,60,.06),0 6px 24px rgba(16,33,60,.06);
+  --radius:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;font-size:15px}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit;font-size:15px}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;
+  box-shadow:0 4px 18px rgba(10,37,64,.25)}
+.topbar-inner{max-width:1080px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding-top:calc(12px + env(safe-area-inset-top));
+  padding-left:calc(18px + env(safe-area-inset-left));padding-right:calc(18px + env(safe-area-inset-right))}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px;letter-spacing:.3px}
+.logo-badge{width:48px;height:48px;flex:none;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.logo .chip{background:var(--accent);color:#04232b;border-radius:7px;padding:3px 8px;font-weight:900}
+.logo small{display:block;font-size:11px;font-weight:500;opacity:.8;letter-spacing:.5px;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.score-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  padding:7px 14px;border-radius:999px;font-weight:700}
+.score-dot{width:12px;height:12px;border-radius:50%;background:#888;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+.score-num{font-size:18px;font-weight:900}
+.progress-wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 18px 10px}
+.progress-track{height:6px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+.progress-label{font-size:11px;opacity:.85;margin-top:4px}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:18px 18px 130px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-head{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none}
+.card-head .ico{width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:20px;
+  background:linear-gradient(135deg,#e9f7f7,#e7f1ff);color:var(--brand)}
+.card-head h2{margin:0;font-size:17px;font-weight:700}
+.card-head .meta{font-size:12px;color:var(--muted);font-weight:500}
+.card-head .chev{margin-left:auto;color:var(--muted);transition:transform .25s;font-size:14px}
+.card.collapsed .card-body{display:none}
+.card.collapsed .chev{transform:rotate(-90deg)}
+.card-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+
+.field{padding:12px 0;border-bottom:1px dashed var(--line)}
+.field:last-child{border-bottom:0}
+.field label.q{display:block;font-weight:600;margin-bottom:8px;font-size:14.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],input[type=password],textarea,select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fbfcfe;color:var(--text);outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,145,255,.12);background:#fff}
+textarea{min-height:60px;resize:vertical}
+
+/* yes/no segmented */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fbfcfe}
+.seg button{border:0;background:transparent;padding:9px 16px;font-weight:600;color:var(--muted);min-width:62px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on[data-v=sim]{background:var(--green);color:#fff}
+.seg button.on[data-v=nao]{background:var(--red);color:#fff}
+.seg button.on[data-v=na]{background:#64748b;color:#fff}
+.field.risk{background:#fff7f6;margin:0 -18px;padding:12px 18px;border-left:3px solid var(--red)}
+.risk-tag{display:none;font-size:11px;font-weight:700;color:var(--red);margin-left:8px}
+.field.risk .risk-tag{display:inline}
+
+/* opportunities table */
+.opps{width:100%;border-collapse:collapse}
+.opps th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:8px;border-bottom:2px solid var(--line)}
+.opps td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+.opps input,.opps select{padding:8px}
+.opps .del{background:#fee2e2;color:#b91c1c;border:0;border-radius:8px;width:34px;height:34px;font-size:16px}
+.prio-alta{color:var(--red);font-weight:700}.prio-media{color:var(--yellow);font-weight:700}.prio-baixa{color:var(--green);font-weight:700}
+.opp-total{display:flex;justify-content:space-between;align-items:center;padding:14px 4px 2px;font-weight:700}
+.opp-total span{font-size:20px;color:var(--brand)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--brand);padding:10px 16px;border-radius:10px;font-weight:700;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{border-color:var(--accent2)}
+.btn.primary{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border:0}
+.btn.accent{background:var(--accent);color:#04232b;border:0}
+.btn.ghost{background:transparent}
+
+/* summary dashboard */
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:6px}
+.kpi{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .lbl{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.kpi .val{font-size:18px;font-weight:800;margin-top:4px;display:flex;align-items:center;gap:8px}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff}
+.tag.g{background:var(--green)}.tag.y{background:var(--yellow)}.tag.r{background:var(--red)}
+.gauge{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#0a2540,#123a63);color:#fff;border-radius:14px;padding:18px;margin:14px 0}
+.gauge .big{font-size:46px;font-weight:900;line-height:1}
+.gauge .big small{font-size:18px;opacity:.7}
+
+/* bottom action bar */
+.actionbar{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);box-shadow:0 -4px 20px rgba(16,33,60,.08)}
+.actionbar-inner{max-width:1080px;margin:0 auto;padding:10px 14px;display:flex;gap:8px;overflow-x:auto;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.actionbar .btn{white-space:nowrap;flex:none}
+
+/* saved visits */
+.visit{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.visit b{display:block}.visit small{color:var(--muted)}
+.visit .spacer{flex:1}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;padding:12px 20px;border-radius:10px;
+  font-weight:600;z-index:200;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+
+/* aviso de instalação (iPhone) */
+.install-hint{display:none;align-items:center;gap:12px;background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;
+  margin:14px 18px 0;padding:14px 16px;border-radius:12px;box-shadow:var(--shadow);position:relative}
+.install-hint.show{display:flex}
+.install-hint .ih-ico{font-size:26px}
+.install-hint b{display:block}.install-hint small{opacity:.9;font-size:12.5px}
+.install-hint .ih-share{display:inline-block;background:#fff;color:var(--brand);border-radius:6px;padding:0 6px;font-weight:800}
+.install-hint .ih-x{position:absolute;top:8px;right:10px;background:transparent;border:0;color:#fff;opacity:.7;font-size:18px}
+
+/* ---------- Login ---------- */
+.login{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--brand),var(--brand2));padding:24px;
+  padding-top:calc(24px + env(safe-area-inset-top))}
+.login.show{display:flex}
+.login-card{background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:30px 26px;width:100%;max-width:360px;text-align:center}
+.login-logo{width:96px;height:96px;border-radius:50%;box-shadow:0 4px 16px rgba(10,37,80,.25);margin-bottom:8px}
+.login-card h1{font-size:18px;margin:6px 0 2px;color:var(--brand)}
+.login-card p{margin:0 0 16px;color:var(--muted);font-size:13px}
+.login-card label{display:block;text-align:left;font-weight:600;font-size:13px;margin:12px 0 4px}
+.login-card .btn{width:100%;justify-content:center;margin-top:20px;padding:13px;font-size:16px}
+.login-err{color:var(--red);font-size:13px;font-weight:600;min-height:18px;margin-top:10px}
+.login-foot{margin-top:16px;font-size:11px;color:var(--muted);line-height:1.6}
+.login-foot a{color:var(--accent2);text-decoration:none}
+.login-card{position:relative}
+.login-back{position:absolute;top:10px;left:12px;background:transparent;border:0;color:var(--muted);font-weight:600;cursor:pointer;font-size:13px}
+.login-back:hover{color:var(--brand)}
+
+/* ---------- Tela inicial / boas-vindas ---------- */
+.welcome{position:fixed;inset:0;z-index:1100;display:none;flex-direction:column;align-items:center;justify-content:flex-start;
+  background:radial-gradient(circle at 30% 15%, #16407e, #0a2550 62%);color:#fff;padding:24px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding-top:calc(24px + env(safe-area-inset-top));padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.welcome.show{display:flex;animation:welIn .5s ease}
+@keyframes welIn{from{opacity:0}to{opacity:1}}
+.wel-card{max-width:430px;width:100%;text-align:center;margin:auto}
+.wel-logo{width:122px;height:122px;border-radius:50%;box-shadow:0 12px 44px rgba(0,0,0,.45);animation:logoPop .9s cubic-bezier(.2,.8,.2,1.25)}
+@keyframes logoPop{0%{transform:scale(.3) rotate(-14deg);opacity:0}60%{transform:scale(1.08) rotate(0)}100%{transform:scale(1);opacity:1}}
+.wel-title{font-size:25px;font-weight:800;margin:16px 0 2px;animation:upFade .6s .25s both}
+.wel-tag{opacity:.82;margin:0 0 22px;font-size:14px;animation:upFade .6s .35s both}
+.wel-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;animation:upFade .6s .45s both}
+@media(max-width:380px){.wel-choice{grid-template-columns:1fr}}
+.wel-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:18px 12px;border-radius:16px;
+  border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;transition:.15s}
+.wel-btn:hover{background:rgba(255,255,255,.16);transform:translateY(-2px)}
+.wel-btn span{font-size:30px;line-height:1}
+.wel-btn b{font-size:15px}
+.wel-btn small{opacity:.78;font-size:11.5px}
+.wel-btn.func{border-color:var(--accent)}
+.wel-btn.cli{border-color:var(--accent2)}
+.wel-wa{margin:16px 0 2px;width:100%;background:#25D366;color:#fff;border:0;border-radius:12px;padding:13px;font-weight:700;font-size:15px;cursor:pointer;animation:upFade .6s .55s both}
+.wel-wa:hover{filter:brightness(1.06)}
+.wel-info{margin-top:18px;font-size:12px;opacity:.9;line-height:1.7;text-align:left;background:rgba(0,0,0,.2);border-radius:12px;padding:12px 14px;animation:upFade .6s .65s both}
+.wel-info .wi-row{display:flex;gap:7px;align-items:flex-start}
+.wel-info .wi-row+.wi-row{margin-top:3px}
+.wel-info a{color:#bfe3ff;text-decoration:none}
+@keyframes upFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- Tela de Cotação ---------- */
+.cot-screen{align-items:flex-start;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0}
+.cot-wrap{width:100%;max-width:560px;margin:0 auto;padding:18px 16px calc(40px + env(safe-area-inset-bottom))}
+.cot-head{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
+.cot-head .btn.ghost{background:rgba(255,255,255,.12);color:#fff}
+.cot-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
+.cot-lbl{display:block;font-weight:600;font-size:13px;margin:12px 0 4px;color:var(--text)}
+.cot-card input,.cot-card select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fbfcfe}
+.cot-row{display:flex;gap:8px}
+.cot-row input{flex:1;min-width:0}
+.cot-row .btn{flex:none}
+.cot-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:480px){.cot-grid{grid-template-columns:1fr}}
+.cot-msg{font-size:13px;color:rgba(255,255,255,.92);margin:8px 0 0;min-height:16px;font-weight:600}
+.cot-sep{text-align:center;color:var(--muted);font-size:12px;margin:2px 0 8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.cot-result{background:#fff;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
+.cot-result-empty{margin:0;color:var(--muted);font-size:13.5px;text-align:center}
+.cr-calc{background:#f4f6fb;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:13px}
+.cr-calc summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;list-style:none;outline:none}
+.cr-calc summary::-webkit-details-marker{display:none}
+.cr-calc[open] summary{margin-bottom:6px}
+.cr-calc .cr-line{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.cr-calc .cr-line:last-child{border-bottom:0;font-weight:800;color:var(--brand)}
+.cr-calc .cr-line span{color:var(--muted)}
+.cot-result .cr-venda{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cot-result .cr-venda b{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.cot-result .cr-venda.big{padding-bottom:12px;border-bottom:1px solid var(--line)}
+.cot-result .cr-venda.big span{font-size:34px;font-weight:900;color:var(--brand);line-height:1}
+.cot-result .cr-venda.parc{margin-top:12px}
+.cot-result .cr-venda.parc span{font-size:20px;font-weight:800;color:var(--text)}
+.cot-result .cr-sub{text-align:right;font-size:12px;color:var(--muted);margin-top:2px}
+.cr-pdf{width:100%;margin-top:16px;font-size:15px;padding:13px}
+.cr-pdf2{width:100%;margin-top:8px;font-size:13px;padding:9px}
+.cot-lojas{display:flex;flex-wrap:wrap;gap:6px}
+.loja-chip{display:inline-flex;align-items:center;gap:5px;background:#f1f5fb;border:1px solid var(--line);border-radius:20px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;user-select:none}
+.loja-chip:has(input:checked){background:var(--brand);border-color:var(--brand);color:#fff}
+.loja-chip input{width:auto!important;margin:0;accent-color:#fff}
+#cotResultados{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.prod-hit{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;cursor:pointer;transition:.12s;color:var(--text)}
+.prod-hit:hover{border-color:var(--brand);background:#f7faff}
+.prod-hit.sel{border-color:var(--accent2);background:#eefaf0;box-shadow:0 0 0 1px var(--accent2) inset}
+.prod-thumb{width:46px;height:46px;flex:none;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.prod-thumb.ph{background:#eef2f7}
+.ph-info{flex:1;min-width:0}
+.ph-info b{font-size:13.5px;display:block;line-height:1.25}
+.ph-info small{color:var(--muted);font-size:12px;display:block;margin-top:1px}
+.ph-go{font-weight:800;color:var(--brand);font-size:20px;flex:none}
+.ph-price{font-weight:800;color:var(--brand);white-space:nowrap;flex:none}
+.badge-min{display:inline-block;margin-top:2px;background:#e8f7ec;color:#15803d;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700}
+.prod-prodhead{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;font-weight:600}
+.prod-prodhead img{width:40px;height:40px;border-radius:7px;object-fit:contain;background:#fff;flex:none}
+.prod-back{font-size:13px;color:#bfe3ff;font-weight:700;cursor:pointer;padding:2px 0 4px}
+.prod-back:hover{text-decoration:underline}
+.cot-fallback{font-size:12px;color:rgba(255,255,255,.8);margin:6px 2px 0;line-height:1.5}
+.cot-or{text-align:center;color:rgba(255,255,255,.6);font-size:11.5px;margin:12px 0 8px;letter-spacing:.3px}
+.cot-card .cot-or{color:var(--muted)}
+.var-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.var-chip{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer;user-select:none}
+.var-chip.on{background:#fff;color:var(--brand);border-color:#fff}
+.ph-info small+small{margin-top:1px}
+.cot-addbar{display:flex;gap:8px;margin-top:12px}
+.cot-addbar input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff;color:var(--text)}
+.cot-addbar .btn{flex:none;white-space:nowrap}
+.cot-cart{background:#fff;border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
+.cart-head{font-weight:800;font-size:15px;color:var(--brand);margin-bottom:10px}
+.cart-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.cart-item img,.cart-ph{width:44px;height:44px;flex:none;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.ci-info{flex:1;min-width:0}
+.ci-info b{font-size:13px;display:block;line-height:1.25}
+.ci-info small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.ci-info small b{display:inline;color:var(--brand)}
+.ci-del{flex:none;background:#f4f6fb;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:30px;height:30px;font-size:14px;cursor:pointer}
+.ci-del:hover{background:#ffe9e9;color:#c0392b;border-color:#f3c2c2}
+.cart-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:2px solid var(--accent)}
+.cart-total span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.cart-total b{font-size:22px;font-weight:900;color:var(--brand)}
+.cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
+.cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
+.cart-clear{color:var(--muted)}
+.hist-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;color:var(--text)}
+.hi-info{flex:1;min-width:0}
+.hi-info b{font-size:13.5px;display:block}
+.hi-info small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.hi-acts{display:flex;align-items:center;gap:6px;flex:none}
+.hi-acts .btn{padding:7px 10px;font-size:12.5px}
+
+/* ---------- rodapé do app (dados Chip7) ---------- */
+.appfoot{display:flex;gap:14px;align-items:flex-start;margin-top:6px;padding:16px;border-top:2px solid var(--line);
+  color:var(--muted);font-size:12.5px;line-height:1.65}
+.appfoot-logo{width:54px;height:54px;flex:none;border-radius:50%}
+.appfoot b{color:var(--text);font-size:14px}
+.appfoot a{color:var(--accent2);text-decoration:none}
+.appfoot a:hover{text-decoration:underline}
+
+/* alertas inteligentes */
+.insights{margin-bottom:14px}
+.insight{background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #f59e0b;border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:14px;color:#7c2d12}
+
+/* CNPJ */
+.cnpj-row{display:flex;gap:8px}
+.cnpj-row input{flex:1;min-width:0}
+.cnpj-btn{flex:none;white-space:nowrap}
+
+/* painel de acesso do cliente */
+.client-panel{margin-top:16px;padding:14px 16px;border:1.5px solid var(--accent2);border-radius:12px;background:#f5fbff}
+.cp-title{font-weight:800;color:var(--brand);font-size:15px}
+.cp-cred{display:flex;gap:28px;flex-wrap:wrap;margin:8px 0 4px}
+.cp-cred .cp-lbl{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.cp-cred b{font-size:18px;color:var(--brand);font-family:ui-monospace,Consolas,monospace;letter-spacing:1px}
+.btn.wa{background:#25D366;color:#fff;border:0}
+.cloud-status{font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px;margin-bottom:12px}
+.cloud-status.ok{background:#eafaf0;color:#15803d}
+.cloud-status.err{background:#fff4e5;color:#b45309}
+.cloud-status.off{background:#f1f4f9;color:var(--muted)}
+
+/* validação de e-mail */
+input.invalid{border-color:var(--red)!important;background:#fff5f5}
+.field-err{color:var(--red);font-size:12px;margin-top:4px;font-weight:600}
+/* controles de oportunidades */
+.opp-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.opp-controls label{font-weight:600;font-size:13px}
+.opp-controls select{width:auto;min-width:150px}
+.opps tr.oppr-alta td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+.opps tr.oppr-media td:first-child{box-shadow:inset 4px 0 0 var(--yellow)}
+.opps tr.oppr-baixa td:first-child{box-shadow:inset 4px 0 0 var(--green)}
+/* contador de oportunidades */
+.opp-counts{font-size:13px;font-weight:700;margin:8px 0 2px}
+.opp-counts .oc-a{color:var(--red)}.opp-counts .oc-m{color:#b45309}.opp-counts .oc-b{color:var(--green)}
+/* fotos do inventário */
+.inv-fotos{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.foto-thumb{position:relative;width:62px;height:62px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.foto-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.foto-del{position:absolute;top:1px;right:1px;background:rgba(220,38,38,.92);color:#fff;border:0;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;padding:0;cursor:pointer}
+.foto-add{display:flex;align-items:center;justify-content:center;width:62px;height:62px;border:1.5px dashed var(--accent2);border-radius:8px;font-size:24px;cursor:pointer;color:var(--accent2);background:#f5fbff}
+.inv-rep-fotos{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.inv-rep-fotos img{width:92px;height:92px;object-fit:cover;border:1px solid #ccc;border-radius:4px}
+
+/* CRM / status */
+.crm-box{background:#f5fbff;border:1px solid var(--line);border-radius:12px;padding:4px 14px 10px;margin:8px 0}
+.status-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}
+.status-badge.st-lead{background:#64748b}
+.status-badge.st-prop{background:var(--accent2)}
+.status-badge.st-win{background:var(--green)}
+.status-badge.st-lost{background:var(--red)}
+/* modais genéricos */
+.modal-bg{position:fixed;inset:0;background:rgba(10,37,64,.55);z-index:320;display:grid;place-items:center;padding:18px}
+.modal-card{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:20px}
+.modal-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+/* catálogo */
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.cat-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;text-align:left}
+.cat-item:hover{border-color:var(--accent2);background:#f5fbff}
+.cat-item span{flex:1}.cat-item b{color:var(--brand);white-space:nowrap}
+/* painel da equipe */
+.pn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:6px 0 4px}
+.pn-kpi{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-radius:12px;padding:14px}
+.pn-k-l{font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.pn-k-v{font-size:22px;font-weight:900;margin-top:4px}
+.pn-h{font-size:14px;color:var(--brand);margin:18px 0 8px;border-left:4px solid var(--accent);padding-left:8px}
+.pn-statuses{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.pn-status{border-radius:12px;padding:12px;color:#fff;text-align:center}
+.pn-status.st-lead{background:#64748b}.pn-status.st-prop{background:var(--accent2)}.pn-status.st-win{background:var(--green)}.pn-status.st-lost{background:var(--red)}
+.pn-s-l{font-size:12px;font-weight:700;opacity:.95}.pn-s-c{font-size:24px;font-weight:900}.pn-s-v{font-size:12px;opacity:.95}
+.pn-table{width:100%;border-collapse:collapse}
+.pn-table th{text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted);padding:8px;border-bottom:2px solid var(--line)}
+.pn-table td{padding:8px;border-bottom:1px solid var(--line)}
+
+/* abas Diagnóstico / Documento */
+.tabbar{display:flex;background:#fff;border-bottom:1px solid var(--line);box-shadow:var(--shadow);overflow-x:auto}
+.tab-btn{flex:1 0 auto;border:0;background:transparent;padding:12px 12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;font-size:14px;white-space:nowrap}
+.tab-btn.active{color:var(--brand);border-bottom-color:var(--accent)}
+.tab-btn:hover{background:#f5fbff}
+/* área documento/proposta */
+.doc-card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-bottom:16px;padding:16px 18px}
+.doc-card h2{margin:0 0 2px;font-size:17px}
+.doc-toggle{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.doc-toggle:last-child{border-bottom:0}
+.doc-toggle input{width:20px;height:20px;flex:none}
+.doc-toggle .dt-label{flex:1}
+.doc-head-toggle{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.doc-head-toggle input{width:22px;height:22px}
+.sell-row{display:grid;grid-template-columns:1fr 64px 110px 34px;gap:8px;margin-bottom:8px;align-items:center}
+.sell-row input{padding:9px;min-width:0}
+@media(max-width:560px){.sell-row{grid-template-columns:1fr 1fr 34px}.sell-row .sr-modelo{grid-column:1/4}}
+.doc-total{display:flex;justify-content:space-between;align-items:center;font-weight:700;padding-top:10px;margin-top:6px;border-top:1px solid var(--line)}
+.doc-total span{color:var(--brand);font-size:18px}
+
+/* barra do relatório do cliente */
+.cr-bar{display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;
+  padding:12px 16px;margin:-24px -24px 18px;position:sticky;top:0;z-index:5;
+  padding-top:calc(12px + env(safe-area-inset-top))}
+.cr-bar img{width:36px;height:36px;border-radius:50%}
+.cr-bar b{font-size:15px}
+.cr-bar .btn{background:var(--accent);color:#173a05;border:0}
+
+/* ---------- Inventário de equipamentos ---------- */
+.inv-block{margin-top:10px;padding-top:14px;border-top:2px solid var(--line)}
+.inv-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.inv-title{font-weight:700;font-size:14px}
+.inv-count{background:var(--accent);color:#173a05;font-weight:800;border-radius:999px;padding:1px 11px;font-size:12px}
+.inv-list{display:flex;flex-direction:column;gap:10px}
+.inv-item{border:1px solid var(--line);border-radius:12px;padding:4px 14px 10px;background:#fbfcfe}
+.inv-item-head{display:flex;align-items:center;gap:8px;padding:9px 0 2px;border-bottom:1px dashed var(--line);margin-bottom:4px}
+.inv-item-head b{flex:1;color:var(--brand);font-size:14.5px}
+.inv-empty{color:var(--muted);font-size:13px;font-style:italic;padding:2px 0 6px}
+.add-inv{margin-top:12px;border:1.5px dashed var(--accent2);color:var(--accent2);background:#fff;font-weight:800;width:100%;justify-content:center;font-size:15px}
+.add-inv:hover{background:#eef6ff}
+#report .rep-inv-title{font-weight:700;color:var(--brand);margin:10px 0 4px;font-size:13px}
+#report .inv-rep{border:1px solid #ddd;border-radius:6px;padding:6px 9px;margin:4px 0;font-size:11px;line-height:1.6}
+#report .inv-rep span{display:inline-block;margin-right:4px}
+
+/* ---------- Report (print) ---------- */
+#report{display:none}
+@media print{
+  .topbar,.actionbar,.progress-wrap,.no-print{display:none!important}
+  body{background:#fff}
+  .app{display:none!important}
+  #report{display:block!important}
+  @page{margin:14mm}
+}
+#report{max-width:900px;margin:0 auto;padding:24px;color:#000;font-size:13px}
+#report h1{font-size:22px;margin:0 0 2px}
+#report .rep-head{display:flex;justify-content:space-between;border-bottom:3px solid var(--brand);padding-bottom:10px;margin-bottom:14px}
+#report h2{font-size:15px;border-left:4px solid var(--accent);padding-left:8px;margin:18px 0 6px;color:var(--brand)}
+#report table{width:100%;border-collapse:collapse;margin:6px 0}
+#report th,#report td{border:1px solid #ccc;padding:6px 8px;text-align:left;font-size:12px;vertical-align:top}
+#report th{background:#f1f4f9}
+#report .rep-kpis{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+#report .rep-kpi{flex:1;min-width:120px;border:1px solid #ddd;border-radius:8px;padding:8px}
+#report .rep-kpi .l{font-size:10px;text-transform:uppercase;color:#666}
+#report .rep-kpi .v{font-weight:800;font-size:14px}
+.hide{display:none!important}
+.muted{color:var(--muted)}
+.section-note{font-size:12px;color:var(--muted);margin:2px 0 8px}
+</style>
+</head>
+<body>
+
+<!-- TELA INICIAL / BOAS-VINDAS -->
+<div class="welcome" id="welcome">
+  <div class="wel-card">
+    <img src="logo-chip7.png" alt="Chip7 Informática" class="wel-logo">
+    <h1 class="wel-title">Diagnóstico Tecnológico</h1>
+    <p class="wel-tag">Chip7 Informática · Tecnologia e Inovação</p>
+    <div class="wel-choice">
+      <button class="wel-btn func" onclick="escolherFuncionario()"><span>👨‍💼</span><b>Sou Funcionário</b><small>Fazer diagnóstico</small></button>
+      <button class="wel-btn cli" onclick="escolherCliente()"><span>👤</span><b>Sou Cliente</b><small>Ver meu relatório</small></button>
+    </div>
+    <button class="wel-wa" onclick="whatsappLoja()">📱 Falar com a Chip7 no WhatsApp</button>
+    <div class="wel-info" id="welInfo"></div>
+  </div>
+</div>
+
+<!-- ESCOLHA DO MÓDULO (funcionário) -->
+<div class="welcome" id="chooser">
+  <div class="wel-card">
+    <img src="logo-chip7.png" alt="Chip7" class="wel-logo">
+    <h1 class="wel-title">Chip7 Informática</h1>
+    <p class="wel-tag">O que você quer fazer?</p>
+    <div class="wel-choice">
+      <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Preço de venda (Paraguai)</small></button>
+      <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
+    </div>
+    <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
+  </div>
+</div>
+
+<!-- TELA DE COTAÇÃO -->
+<div class="welcome cot-screen" id="cotacaoScreen">
+  <div class="cot-wrap">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">💰 Cotar Valores</h2>
+      <span style="flex:1"></span>
+      <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico</button>
+    </div>
+    <div class="cot-card">
+      <label class="cot-lbl">Categoria</label>
+      <select id="cotCategoria" onchange="onCategoria()">
+        <option value="placa-mae" data-mk="20">Placa-mãe</option>
+        <option value="iphone" data-mk="10">iPhone</option>
+        <option value="processador" data-mk="20">Processador</option>
+        <option value="placa-video" data-mk="20">Placa de vídeo</option>
+        <option value="ssd" data-mk="20">SSD / Armazenamento</option>
+        <option value="memoria" data-mk="20">Memória RAM</option>
+        <option value="notebook" data-mk="20">Notebook</option>
+        <option value="outro" data-mk="20">Outro</option>
+      </select>
+      <label class="cot-lbl">Lojas (comprasparaguai)</label>
+      <div class="cot-lojas" id="cotLojas"></div>
+      <label class="cot-lbl">Buscar produto</label>
+      <div class="cot-row">
+        <input id="cotBusca" placeholder="Ex.: placa mãe B550" onkeydown="if(event.key==='Enter')pesquisarProdutos()">
+        <button class="btn primary" onclick="pesquisarProdutos()">🔄 Pesquisar</button>
+      </div>
+      <div class="cot-or">— ou cole o link do Paraguai —</div>
+      <div class="cot-row">
+        <input id="cotLink" placeholder="https://www.comprasparaguai.com.br/..." onkeydown="if(event.key==='Enter')abrirPorLink()">
+        <button class="btn ghost" onclick="abrirPorLink()">Abrir</button>
+      </div>
+    </div>
+    <p class="cot-msg" id="cotBuscaMsg"></p>
+    <div id="cotResultados"></div>
+    <div class="cot-card" style="margin-top:14px">
+      <div class="cot-sep">preço e ajustes</div>
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Preço no Paraguai (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
+        <div><label class="cot-lbl">Cotação do dólar (R$)</label>
+          <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
+      </div>
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Margem em cima (%)</label><input id="cotMarkup" type="number" inputmode="decimal" value="20" oninput="cotCalc()"></div>
+        <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucro" type="number" inputmode="decimal" value="600" oninput="cotCalc()"></div>
+      </div>
+      <label class="cot-lbl">Parcelar no cartão em</label>
+      <select id="cotParcelas" onchange="cotCalc()">
+        <option value="1">1x (à vista no cartão) · 2,99%</option>
+        <option value="2">2x · 5,39%</option>
+        <option value="3">3x · 6,49%</option>
+        <option value="4">4x · 7,26%</option>
+        <option value="5">5x · 8,04%</option>
+        <option value="6">6x · 8,79%</option>
+        <option value="7">7x · 9,63%</option>
+        <option value="8">8x · 10,43%</option>
+        <option value="9">9x · 10,88%</option>
+        <option value="10" selected>10x · 11,09%</option>
+        <option value="11">11x · 11,84%</option>
+        <option value="12">12x · 12,49%</option>
+        <option value="13">13x · 13,39%</option>
+        <option value="14">14x · 14,24%</option>
+        <option value="15">15x · 15,09%</option>
+        <option value="16">16x · 15,94%</option>
+        <option value="17">17x · 16,79%</option>
+        <option value="18">18x · 17,64%</option>
+      </select>
+    </div>
+    <div class="cot-result" id="cotResult"></div>
+    <div class="cot-addbar" id="cotAddBar" style="display:none">
+      <input id="cotCor" placeholder="Cor / variação (ex.: Titânio Natural)">
+      <button class="btn primary" onclick="adicionarAoCart()">➕ Adicionar</button>
+      <button class="btn ghost" onclick="gerarCotacaoImagem()" title="Compartilhar como imagem">🖼️</button>
+    </div>
+    <div class="cot-cart" id="cotCart" style="display:none"></div>
+  </div>
+</div>
+
+<!-- TELA DE LOGIN (FUNCIONÁRIO) -->
+<div class="login" id="loginScreen">
+  <form class="login-card" onsubmit="return doLogin(event)">
+    <button type="button" class="login-back" onclick="voltarInicio()">← Início</button>
+    <img src="logo-chip7.png" alt="Chip7 Informática" class="login-logo">
+    <h1>Acesso do Funcionário</h1>
+    <p>Diagnóstico Tecnológico · Chip7 Informática</p>
+    <label for="loginUser">Usuário</label>
+    <input type="text" id="loginUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Usuário">
+    <label for="loginPass">Senha</label>
+    <input type="password" id="loginPass" autocomplete="current-password" placeholder="Senha">
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn primary" type="submit">Entrar</button>
+    <div class="login-foot">
+      CNPJ 27.768.371/0001-74<br>
+      <a href="https://chip7.net.br" target="_blank" rel="noopener">chip7.net.br</a> ·
+      <a href="https://loja.chip7.net.br" target="_blank" rel="noopener">loja.chip7.net.br</a>
+    </div>
+  </form>
+</div>
+
+<div class="app">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">
+        <img src="logo-chip7.png" alt="Chip7 Informática" class="logo-badge">
+        <span>Diagnóstico Tecnológico<small>Levantamento em campo</small></span>
+      </div>
+      <div class="spacer"></div>
+      <div class="score-pill" title="Pontuação geral da infraestrutura">
+        <span class="score-dot" id="scoreDot"></span>
+        <span>Nota</span>
+        <span class="score-num" id="scoreNum">—</span>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-bar" id="progBar"></div></div>
+      <div class="progress-label"><span id="progTxt">0 de 0 itens preenchidos</span> · <span id="empresaTag">Nova visita</span></div>
+    </div>
+  </header>
+
+  <div class="install-hint" id="installHint">
+    <span class="ih-ico">📲</span>
+    <div><b>Instale o app na tela de início</b>
+      <small>Toque em <span class="ih-share">Compartilhar ⬆</span> e depois em <b>“Adicionar à Tela de Início”</b>. Funciona offline.</small></div>
+    <button class="ih-x" onclick="dismissHint()" aria-label="Fechar">✕</button>
+  </div>
+
+  <div class="tabbar" id="tabbar">
+    <button class="tab-btn active" data-tab="diag" onclick="switchTab('diag')">🔍 Diagnóstico</button>
+    <button class="tab-btn" data-tab="doc" onclick="switchTab('doc')">📄 Documento</button>
+    <button class="tab-btn" data-tab="prod" onclick="switchTab('prod')">🛒 Produtos</button>
+    <button class="tab-btn" data-tab="painel" onclick="switchTab('painel')">📊 Painel</button>
+  </div>
+
+  <main class="wrap" id="form"><!-- generated --></main>
+  <main class="wrap" id="docArea" style="display:none"><!-- proposta --></main>
+  <main class="wrap" id="prodArea" style="display:none"><!-- produtos --></main>
+  <main class="wrap" id="painelArea" style="display:none"><!-- painel --></main>
+</div>
+
+<!-- ACTION BAR -->
+<div class="actionbar">
+  <div class="actionbar-inner">
+    <button class="btn ghost" onclick="voltarInicio()" title="Voltar à tela inicial">← Início</button>
+    <button class="btn accent" onclick="autoOpps()">⚡ Gerar oportunidades</button>
+    <button class="btn primary" onclick="saveVisit()">💾 Salvar visita</button>
+    <button class="btn" onclick="printReport()">📄 Relatório / PDF</button>
+    <button class="btn" onclick="openVisits()">📁 Visitas</button>
+    <button class="btn ghost" onclick="newVisit()">➕ Nova</button>
+  </div>
+</div>
+
+<div id="report"></div>
+<div class="toast" id="toast"></div>
+
+<script src="jspdf.umd.min.js"></script>
+<script src="jspdf.autotable.min.js"></script>
+<script>
+/* =========================================================
+   MODELO DE DADOS — baseado no formulário Chip7
+   tipos: text | number | date | tel | email | textarea | yn
+   yn: { risk:{on:'sim'|'nao', w:peso, cats:[...]}, sug:{p,s,prio} }
+   ========================================================= */
+const D = "dados", R = "rede", S = "seg", P = "parada";
+const SECTIONS = [
+ {id:"empresa",ico:"🏢",t:"Informações da Empresa",f:[
+   {id:"cnpj",t:"cnpj",q:"CNPJ (preenche os dados automaticamente)"},
+   {id:"razao_social",t:"text",q:"Razão social"},
+   {id:"empresa",t:"text",q:"Nome fantasia / Empresa"},
+   {id:"responsavel",t:"text",q:"Responsável"},
+   {id:"tel_responsavel",t:"tel",q:"Telefone do responsável"},
+   {id:"telefone",t:"tel",q:"Telefone / WhatsApp da empresa"},
+   {id:"email",t:"email",q:"E-mail"},
+   {id:"endereco",t:"text",q:"Endereço"},
+   {id:"segmento",t:"text",q:"Segmento / Ramo"},
+   {id:"colaboradores",t:"number",q:"Nº de colaboradores"},
+   {id:"os_numero",t:"text",q:"Nº da OS (Ordem de Serviço)"},
+   {id:"data_visita",t:"date",q:"Data da visita"},
+   {id:"vendedor",t:"text",q:"Vendedor / Técnico responsável (Chip7)"},
+ ]},
+ {id:"computadores",ico:"💻",t:"Computadores e Equipamentos",f:[
+   {id:"qtd_computadores",t:"number",q:"Quantos computadores existem?"},
+   {id:"qtd_notebooks",t:"number",q:"Quantos notebooks existem?"},
+   {id:"inventario",t:"yn",q:"Existe inventário dos equipamentos?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem inventário de ativos",s:"Implantação de gestão/inventário de TI",prio:"Média"}},
+   {id:"patrimonio",t:"yn",q:"Existe controle de patrimônio?",risk:{on:"nao",w:1,cats:[]}},
+   {id:"idade_media",t:"text",q:"Qual a idade média dos equipamentos?"},
+   {id:"maquinas_lentas",t:"yn",q:"Existem máquinas lentas?",risk:{on:"sim",w:2,cats:[P]},sug:{p:"Máquinas lentas reduzindo produtividade",s:"Upgrade de hardware (SSD + memória)",prio:"Alta"}},
+   {id:"maquinas_travando",t:"yn",q:"Existem máquinas travando?",risk:{on:"sim",w:2,cats:[P]},sug:{p:"Máquinas travando",s:"Manutenção corretiva e otimização",prio:"Alta"}},
+   {id:"hd_mecanico",t:"yn",q:"Ainda utilizam HD mecânico?",risk:{on:"sim",w:2,cats:[P]},sug:{p:"Uso de HD mecânico (lento)",s:"Substituição por SSD",prio:"Alta"}},
+   {id:"upgrade_memoria",t:"yn",q:"Precisam de upgrade de memória?",risk:{on:"sim",w:1,cats:[P]},sug:{p:"Memória RAM insuficiente",s:"Upgrade de memória RAM",prio:"Média"}},
+   {id:"sem_manutencao",t:"yn",q:"Existem equipamentos sem manutenção preventiva?",risk:{on:"sim",w:1,cats:[P]},sug:{p:"Equipamentos sem manutenção preventiva",s:"Contrato de manutenção preventiva",prio:"Média"}},
+   {id:"plano_renovacao",t:"yn",q:"Existe plano de renovação dos equipamentos?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem plano de renovação de parque",s:"Plano de renovação / locação de equipamentos",prio:"Baixa"}},
+   {id:"avaliaram_locacao",t:"yn",q:"Já avaliaram locação de computadores?",sug:{p:"Não avaliaram locação de computadores",s:"Locação de computadores (CAPEX → OPEX)",prio:"Baixa"},opp:"nao"},
+ ]},
+ {id:"rede",ico:"🌐",t:"Rede e Internet",f:[
+   {id:"pontos_rede",t:"number",q:"Quantos pontos de rede existem?"},
+   {id:"wifi",t:"yn",q:"Utilizam Wi-Fi?"},
+   {id:"cabeada",t:"yn",q:"Utilizam rede cabeada?"},
+   {id:"wifi_atende",t:"yn",q:"O Wi-Fi atende todos os ambientes?",risk:{on:"nao",w:2,cats:[R]},sug:{p:"Wi-Fi não cobre todos os ambientes",s:"Projeto de Wi-Fi com Access Points",prio:"Alta"}},
+   {id:"areas_sem_cobertura",t:"yn",q:"Existem áreas sem cobertura?",risk:{on:"sim",w:2,cats:[R]},sug:{p:"Áreas sem cobertura de rede",s:"Ampliação de cobertura Wi-Fi",prio:"Média"}},
+   {id:"internet_quedas",t:"yn",q:"A internet apresenta quedas?",risk:{on:"sim",w:2,cats:[R,P]},sug:{p:"Internet instável (quedas)",s:"Link redundante / revisão de rede",prio:"Alta"}},
+   {id:"rede_lenta",t:"yn",q:"A rede está lenta?",risk:{on:"sim",w:2,cats:[R,P]},sug:{p:"Rede lenta",s:"Reestruturação de cabeamento/switches",prio:"Alta"}},
+   {id:"rede_visitantes",t:"yn",q:"Existe rede para visitantes?",risk:{on:"nao",w:1,cats:[S]},sug:{p:"Sem rede segregada para visitantes",s:"Rede de visitantes isolada",prio:"Baixa"}},
+   {id:"controle_acesso",t:"yn",q:"Existe controle de acesso?",risk:{on:"nao",w:2,cats:[S,R]},sug:{p:"Sem controle de acesso à rede",s:"Firewall / controle de acesso",prio:"Alta"}},
+   {id:"backup_config",t:"yn",q:"Equipamentos possuem backup da configuração?",risk:{on:"nao",w:1,cats:[R,D]},sug:{p:"Sem backup das configurações de rede",s:"Backup de configuração dos ativos",prio:"Média"}},
+ ]},
+ {id:"impressao",ico:"🖨️",t:"Impressão",f:[
+   {id:"qtd_impressoras",t:"number",q:"Quantas impressoras existem?"},
+   {id:"modelos",t:"text",q:"Modelos principais?"},
+   {id:"controle_custo",t:"yn",q:"Controle de custo por impressão?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem controle de custo de impressão",s:"Bilhetagem / gestão de impressão",prio:"Média"}},
+   {id:"gastos_elevados",t:"yn",q:"Gastos elevados com suprimentos?",risk:{on:"sim",w:1,cats:[]},sug:{p:"Gasto elevado com suprimentos",s:"Outsourcing/locação de impressão",prio:"Média"}},
+   {id:"falhas_frequentes",t:"yn",q:"Existem falhas frequentes?",risk:{on:"sim",w:1,cats:[P]},sug:{p:"Impressoras com falhas frequentes",s:"Substituição / locação de impressoras",prio:"Média"}},
+   {id:"manutencao_preventiva",t:"yn",q:"Fazem manutenção preventiva?",risk:{on:"nao",w:1,cats:[]}},
+   {id:"avaliaram_locacao_imp",t:"yn",q:"Já avaliaram locação de impressoras?",sug:{p:"Não avaliaram locação de impressoras",s:"Outsourcing de impressão",prio:"Baixa"},opp:"nao"},
+ ]},
+ {id:"cftv",ico:"📹",t:"Segurança Eletrônica",f:[
+   {id:"cameras",t:"yn",q:"Possui câmeras?",sug:{p:"Empresa sem CFTV",s:"Projeto de câmeras (CFTV)",prio:"Média"},opp:"nao"},
+   {id:"qtd_cameras",t:"number",q:"Quantas câmeras?"},
+   {id:"gravacao",t:"yn",q:"Existe gravação?",risk:{on:"nao",w:1,cats:[S]},sug:{p:"CFTV sem gravação",s:"Gravação (DVR/NVR + storage)",prio:"Média"}},
+   {id:"cftv_funcionando",t:"yn",q:"Todas estão funcionando?",risk:{on:"nao",w:1,cats:[S]},sug:{p:"Câmeras com defeito",s:"Manutenção do sistema de CFTV",prio:"Média"}},
+   {id:"acesso_remoto",t:"yn",q:"Existe acesso remoto?",sug:{p:"Sem acesso remoto às câmeras",s:"Acesso remoto / app de monitoramento",prio:"Baixa"},opp:"nao"},
+   {id:"pontos_cegos",t:"yn",q:"Existem pontos cegos?",risk:{on:"sim",w:1,cats:[S]},sug:{p:"Pontos cegos de monitoramento",s:"Ampliação de câmeras",prio:"Média"}},
+   {id:"interesse_ampliar",t:"yn",q:"Interesse em ampliar monitoramento?",sug:{p:"Interesse em ampliar monitoramento",s:"Expansão do CFTV",prio:"Média"},opp:"sim"},
+ ]},
+ {id:"servidor",ico:"🗄️",t:"Servidor e Backup",f:[
+   {id:"servidor",t:"yn",q:"Existe servidor?"},
+   {id:"onde_arquivos",t:"text",q:"Onde ficam os arquivos?"},
+   {id:"backup",t:"yn",q:"Existe backup?",risk:{on:"nao",w:3,cats:[D]},sug:{p:"SEM BACKUP dos dados",s:"Implantação de Backup (nuvem + local)",prio:"Alta"}},
+   {id:"frequencia",t:"text",q:"Qual a frequência do backup?"},
+   {id:"testaram_restauracao",t:"yn",q:"Já testaram restauração?",risk:{on:"nao",w:2,cats:[D]},sug:{p:"Backup nunca testado (restauração)",s:"Rotina de testes de restauração / DR",prio:"Alta"}},
+   {id:"responsavel_backup",t:"text",q:"Quem é responsável pelo backup?"},
+   {id:"tempo_parados",t:"text",q:"Quanto tempo ficariam parados sem os dados?"},
+ ]},
+ {id:"energia",ico:"🔋",t:"Energia e Nobreak",f:[
+   {id:"equip_nobreak",t:"yn",q:"Os equipamentos críticos possuem nobreak?",risk:{on:"nao",w:2,cats:[D,P]},sug:{p:"Equipamentos críticos sem nobreak",s:"Instalação de nobreaks",prio:"Alta"}},
+   {id:"servidor_nobreak",t:"yn",q:"O servidor possui nobreak?",risk:{on:"nao",w:2,cats:[D,P]},sug:{p:"Servidor sem proteção de energia",s:"Nobreak dedicado para o servidor",prio:"Alta"}},
+   {id:"perda_energia",t:"yn",q:"Já tiveram perdas ou danos por queda de energia?",risk:{on:"sim",w:2,cats:[D,P]},sug:{p:"Danos/perdas por queda de energia",s:"Proteção elétrica + nobreaks",prio:"Alta"}},
+   {id:"rede_eletrica_estavel",t:"yn",q:"A rede elétrica é estável?",risk:{on:"nao",w:1,cats:[P]},sug:{p:"Rede elétrica instável",s:"Estabilizadores / nobreaks",prio:"Média"}},
+   {id:"aterramento",t:"yn",q:"Existe aterramento adequado?",risk:{on:"nao",w:1,cats:[P]},sug:{p:"Sem aterramento adequado",s:"Adequação de aterramento elétrico",prio:"Média"}},
+   {id:"bateria_dia",t:"yn",q:"As baterias dos nobreaks estão em dia?",risk:{on:"nao",w:1,cats:[P]},sug:{p:"Baterias de nobreak vencidas",s:"Troca de baterias / manutenção de nobreaks",prio:"Média"}},
+ ]},
+ {id:"segdigital",ico:"🛡️",t:"Segurança Digital",f:[
+   {id:"antivirus",t:"yn",q:"Possui antivírus corporativo?",risk:{on:"nao",w:3,cats:[S,D]},sug:{p:"Sem antivírus corporativo",s:"Antivírus corporativo / EDR",prio:"Alta"}},
+   {id:"av_atualizado",t:"yn",q:"Está atualizado?",risk:{on:"nao",w:1,cats:[S]},sug:{p:"Antivírus desatualizado",s:"Gestão e atualização de endpoint",prio:"Média"}},
+   {id:"todas_protegidas",t:"yn",q:"Todas as máquinas protegidas?",risk:{on:"nao",w:2,cats:[S,D]},sug:{p:"Endpoints sem proteção total",s:"Cobertura total de antivírus",prio:"Alta"}},
+   {id:"politicas_senha",t:"yn",q:"Possuem políticas de senha?",risk:{on:"nao",w:1,cats:[S]},sug:{p:"Sem política de senhas",s:"Política de senhas / GPO",prio:"Média"}},
+   {id:"sofreram_ataques",t:"yn",q:"Já sofreram ataques?",risk:{on:"sim",w:2,cats:[S,D]},sug:{p:"Histórico de ataques",s:"Pacote de cibersegurança",prio:"Alta"}},
+   {id:"golpes",t:"yn",q:"Já tiveram golpes por e-mail ou WhatsApp?",risk:{on:"sim",w:1,cats:[S]},sug:{p:"Golpes por e-mail/WhatsApp",s:"Filtro de e-mail + treinamento",prio:"Média"}},
+   {id:"perderam_arquivos",t:"yn",q:"Já perderam arquivos por vírus?",risk:{on:"sim",w:3,cats:[D,S]},sug:{p:"Perda de arquivos por vírus",s:"Backup + proteção contra ransomware",prio:"Alta"}},
+ ]},
+ {id:"telefonia",ico:"☎️",t:"Telefonia e Comunicação",f:[
+   {id:"telefone_fixo",t:"yn",q:"Possui telefone fixo?"},
+   {id:"voip",t:"yn",q:"Utiliza VoIP?",sug:{p:"Não utiliza VoIP",s:"PABX em nuvem / VoIP",prio:"Baixa"},opp:"nao"},
+   {id:"ramais",t:"yn",q:"Possui ramais?"},
+   {id:"perde_ligacoes",t:"yn",q:"Perde ligações?",risk:{on:"sim",w:1,cats:[]},sug:{p:"Perda de ligações",s:"PABX em nuvem com fila de atendimento",prio:"Média"}},
+   {id:"gravacao_chamadas",t:"yn",q:"Existe gravação de chamadas?",sug:{p:"Sem gravação de chamadas",s:"Gravação de chamadas",prio:"Baixa"},opp:"nao"},
+   {id:"fila_atendimento",t:"yn",q:"Existe fila de atendimento?",sug:{p:"Sem fila de atendimento",s:"URA / fila de atendimento",prio:"Baixa"},opp:"nao"},
+ ]},
+ {id:"produtividade",ico:"📈",t:"Produtividade e Processos",f:[
+   {id:"crm",t:"yn",q:"Utiliza CRM?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem CRM",s:"Implantação de CRM",prio:"Média"}},
+   {id:"registra_atendimentos",t:"text",q:"Como registra atendimentos?"},
+   {id:"acompanha_orcamentos",t:"text",q:"Como acompanha orçamentos?"},
+   {id:"controle_oportunidades",t:"yn",q:"Existe controle de oportunidades?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem controle de oportunidades",s:"CRM / funil de vendas",prio:"Média"}},
+   {id:"vendas_perdidas",t:"yn",q:"Existem vendas perdidas por demora?",risk:{on:"sim",w:1,cats:[]},sug:{p:"Vendas perdidas por demora",s:"Automação de atendimento / CRM",prio:"Média"}},
+   {id:"sistema_gestao",t:"yn",q:"Utilizam sistema de gestão?",risk:{on:"nao",w:1,cats:[]},sug:{p:"Sem sistema de gestão (ERP)",s:"Implantação de ERP",prio:"Média"}},
+   {id:"processos_automatizados",t:"yn",q:"Existem processos automatizados?",sug:{p:"Processos manuais",s:"Automação de processos",prio:"Baixa"},opp:"nao"},
+ ]},
+ {id:"planejamento",ico:"🎯",t:"Planejamento Futuro",f:[
+   {id:"projeto_tecnologico",t:"yn",q:"Existe projeto tecnológico para este ano?"},
+   {id:"previsao_expansao",t:"yn",q:"Existe previsão de expansão?"},
+   {id:"interesse_reduzir_custos",t:"yn",q:"Interesse em reduzir custos?",sug:{p:"Interesse em reduzir custos",s:"Diagnóstico de redução de custos de TI",prio:"Média"},opp:"sim"},
+   {id:"interesse_produtividade",t:"yn",q:"Interesse em aumentar produtividade?",sug:{p:"Interesse em produtividade",s:"Soluções de produtividade",prio:"Média"},opp:"sim"},
+   {id:"interesse_seguranca",t:"yn",q:"Interesse em aumentar segurança?",sug:{p:"Interesse em segurança",s:"Pacote de segurança (físico + digital)",prio:"Alta"},opp:"sim"},
+ ]},
+];
+
+/* =========================================================
+   INVENTÁRIO — equipamentos cadastráveis por tópico ("+ Adicionar")
+   ========================================================= */
+const INV = {
+ computadores:{label:"Computador",plural:"Computadores",icon:"💻",titleField:"nome",fields:[
+   {id:"nome",t:"text",q:"Identificação (ex: PC-Recepção)"},
+   {id:"setor",t:"text",q:"Setor / Usuário"},
+   {id:"marca",t:"text",q:"Marca / Modelo"},
+   {id:"processador",t:"text",q:"Processador"},
+   {id:"ram",t:"text",q:"Memória RAM"},
+   {id:"disco",t:"select",q:"Tipo de armazenamento",opts:["SSD","HD mecânico","HD + SSD","NVMe"]},
+   {id:"tamanho",t:"text",q:"Capacidade (ex: 256 GB)"},
+   {id:"so",t:"text",q:"Sistema operacional"},
+   {id:"ano",t:"text",q:"Ano / Idade"},
+   {id:"estado",t:"select",q:"Estado",opts:["Bom","Lento","Travando","Com defeito"]},
+   {id:"ip_tipo",t:"select",q:"Endereçamento IP",opts:["DHCP","Fixo"]},
+   {id:"ip",t:"text",q:"Endereço IP",cond:{field:"ip_tipo",val:"Fixo"}},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ rede:{label:"Equipamento de rede",plural:"Equipamentos de rede",icon:"📡",titleField:"modelo",fields:[
+   {id:"tipo",t:"select",q:"Tipo",opts:["Roteador","Switch","Access Point","Modem","Firewall","Rack","Servidor de rede","Outro"]},
+   {id:"modelo",t:"text",q:"Marca / Modelo"},
+   {id:"local",t:"text",q:"Local"},
+   {id:"portas",t:"text",q:"Portas / Capacidade / Us"},
+   {id:"ip_tipo",t:"select",q:"Endereçamento IP",opts:["DHCP","Fixo"]},
+   {id:"ip",t:"text",q:"Endereço IP",cond:{field:"ip_tipo",val:"Fixo"}},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ impressao:{label:"Impressora",plural:"Impressoras",icon:"🖨️",titleField:"modelo",fields:[
+   {id:"modelo",t:"text",q:"Marca / Modelo"},
+   {id:"local",t:"text",q:"Local / Setor"},
+   {id:"tipo",t:"select",q:"Tipo",opts:["Laser","Jato de tinta","Multifuncional","Matricial","Térmica"]},
+   {id:"cor",t:"select",q:"Cor",opts:["Monocromática","Colorida"]},
+   {id:"conexao",t:"select",q:"Conexão",opts:["USB","Rede (cabo)","Wi-Fi"]},
+   {id:"estado",t:"select",q:"Estado",opts:["Bom","Falhas frequentes","Com defeito"]},
+   {id:"ip_tipo",t:"select",q:"Endereçamento IP",opts:["DHCP","Fixo"]},
+   {id:"ip",t:"text",q:"Endereço IP",cond:{field:"ip_tipo",val:"Fixo"}},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ cftv:{label:"Câmera",plural:"Câmeras",icon:"📹",titleField:"local",fields:[
+   {id:"local",t:"text",q:"Local / Posição"},
+   {id:"tipo",t:"select",q:"Tipo",opts:["Interna","Externa","Dome","Bullet","Speed Dome"]},
+   {id:"resolucao",t:"text",q:"Resolução (ex: 1080p, 4MP)"},
+   {id:"estado",t:"select",q:"Situação",opts:["Funcionando","Com defeito","Sem imagem"]},
+   {id:"ip_tipo",t:"select",q:"Endereçamento IP",opts:["DHCP","Fixo"]},
+   {id:"ip",t:"text",q:"Endereço IP",cond:{field:"ip_tipo",val:"Fixo"}},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ servidor:{label:"Servidor",plural:"Servidores",icon:"🗄️",titleField:"nome",fields:[
+   {id:"nome",t:"text",q:"Nome / Função"},
+   {id:"marca",t:"text",q:"Marca / Modelo"},
+   {id:"processador",t:"text",q:"Processador"},
+   {id:"ram",t:"text",q:"Memória RAM"},
+   {id:"armazenamento",t:"text",q:"Armazenamento / RAID"},
+   {id:"so",t:"text",q:"Sistema operacional"},
+   {id:"ip_tipo",t:"select",q:"Endereçamento IP",opts:["DHCP","Fixo"]},
+   {id:"ip",t:"text",q:"Endereço IP",cond:{field:"ip_tipo",val:"Fixo"}},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ energia:{label:"Nobreak",plural:"Nobreaks",icon:"🔋",titleField:"local",fields:[
+   {id:"local",t:"text",q:"Equipamento protegido / Local"},
+   {id:"modelo",t:"text",q:"Marca / Modelo"},
+   {id:"potencia",t:"text",q:"Potência (VA)"},
+   {id:"tomadas",t:"text",q:"Nº de tomadas"},
+   {id:"bateria",t:"select",q:"Estado da bateria",opts:["Boa","Fraca","Trocar"]},
+   {id:"autonomia",t:"text",q:"Autonomia aproximada"},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+ telefonia:{label:"Telefone / Ramal",plural:"Telefones / Ramais",icon:"☎️",titleField:"ramal",fields:[
+   {id:"ramal",t:"text",q:"Ramal / Número"},
+   {id:"setor",t:"text",q:"Setor / Usuário"},
+   {id:"tipo",t:"select",q:"Tipo",opts:["Fixo","VoIP","Celular","Sem fio"]},
+   {id:"modelo",t:"text",q:"Modelo"},
+   {id:"obs",t:"text",q:"Observações"},
+ ]},
+};
+
+/* ---------- dados da empresa (Chip7) ---------- */
+const CHIP7={
+  nome:"Chip7 Tecnologia e Inovação",
+  razao:"Gabriel Cordeiro da Silva EIRELI",
+  cnpj:"27.768.371/0001-74",
+  endereco:"Av. Ozy Mendonça de Lima, 837 — Centro, São Mateus do Sul/PR",
+  tel:"(42) 3532-6046",
+  telLink:"+554235326046",
+  email:"contato@chip7.net.br",
+  site:"chip7.net.br",
+  loja:"loja.chip7.net.br",
+  social:"@chip7sms",
+  instagram:"https://instagram.com/chip7sms",
+};
+function chip7Footer(){
+  return `<footer class="appfoot">
+    <img src="logo-chip7.png" alt="Chip7" class="appfoot-logo">
+    <div>
+      <b>${CHIP7.nome}</b><br>
+      ${CHIP7.razao} · CNPJ ${CHIP7.cnpj}<br>
+      ${CHIP7.endereco}<br>
+      <a href="tel:${CHIP7.telLink}">${CHIP7.tel}</a> · <a href="mailto:${CHIP7.email}">${CHIP7.email}</a><br>
+      <a href="https://${CHIP7.site}" target="_blank" rel="noopener">${CHIP7.site}</a> ·
+      <a href="https://${CHIP7.loja}" target="_blank" rel="noopener">${CHIP7.loja}</a> ·
+      <a href="${CHIP7.instagram}" target="_blank" rel="noopener">${CHIP7.social}</a>
+    </div>
+  </footer>`;
+}
+
+/* ---------- catálogo de soluções (preços de referência — edite depois de adicionar) ---------- */
+/* produtos da loja.chip7.net.br (snapshot — atualizável via "Importar da loja") */
+const STORE_PRODUTOS=[
+  {n:"Cabo Y P3",v:"R$ 10,00"},
+  {n:"Adaptador Bluetooth",v:"R$ 29,99"},
+  {n:"Apresentador Laser Pointer",v:"R$ 59,99"},
+  {n:"Carregador USB-C 20W",v:"R$ 79,99"},
+  {n:"Impressora Térmica Portátil",v:"R$ 130,00"},
+  {n:"Carregador Acer Aspire 5",v:"R$ 140,00"},
+  {n:"Gabinete Aitek ATX Preto",v:"R$ 179,99"},
+  {n:"Gabinete Mymax Rosa ATX",v:"R$ 199,99"},
+  {n:"Fone Redragon H211W-RGB",v:"R$ 219,99"},
+  {n:"Gabinete Hummer ATX Preto",v:"R$ 249,99"},
+  {n:"Gabinete PCYes ATX Preto",v:"R$ 259,99"},
+  {n:"Fone Redragon Ire Pro H848",v:"R$ 349,99"},
+  {n:"Impressora Epson M352A",v:"R$ 650,00"},
+  {n:"Processador Intel Core i7-12700",v:"R$ 1.670,00"},
+  {n:"Notebook Lenovo Ideapad3 Ryzen 5 5500U",v:"R$ 2.650,00"},
+  {n:"Notebook Lenovo V15 G4 i5 13420H",v:"R$ 3.100,00"},
+  {n:"MacBook Pro 2020 i5 Quad-Core",v:"R$ 4.800,00"},
+];
+const SERVICOS_CHIP7=[
+  {n:"Substituição de HD por SSD",v:"R$ 350"},
+  {n:"Upgrade de memória RAM",v:"R$ 250"},
+  {n:"Locação de computador (mensal)",v:"R$ 150/mês"},
+  {n:"Backup em nuvem (mensal)",v:"R$ 200/mês"},
+  {n:"Antivírus corporativo (máquina/ano)",v:"R$ 120"},
+  {n:"Projeto de Wi-Fi / Access Point",v:"R$ 900"},
+  {n:"Firewall / controle de acesso",v:"R$ 1.500"},
+  {n:"Sistema de CFTV (kit 4 câmeras)",v:"R$ 1.800"},
+  {n:"Manutenção preventiva (mensal)",v:"R$ 300/mês"},
+  {n:"PABX em nuvem / VoIP (mensal)",v:"R$ 90/mês"},
+  {n:"Implantação de CRM",v:"R$ 1.200"},
+];
+const CATALOGO=SERVICOS_CHIP7.map(s=>({n:s.n,v:s.v,tipo:'Serviço'}))
+  .concat(STORE_PRODUTOS.map(p=>({n:p.n,v:p.v,tipo:'Produto'})));
+
+/* ---------- estado ---------- */
+let state = blank();
+let oppFilter = "";
+function blank(){return {answers:{},opps:[],resumo:{},inventory:{},crm:{status:'Lead',followup:''},
+  doc:{hidden:{},incluirVenda:false,incluirTroca:false,venda:[],troca:[]}};}
+const CUR_KEY="chip7_current", LIST_KEY="chip7_visits";
+
+/* ---------- render do formulário ---------- */
+const form = document.getElementById('form');
+function render(){
+  let html='<div id="insights" class="insights" style="display:none"></div>';
+  SECTIONS.forEach(sec=>{
+    html+=`<section class="card" data-sec="${sec.id}">
+      <div class="card-head" onclick="toggle('${sec.id}')">
+        <div class="ico">${sec.ico}</div>
+        <div><h2>${sec.t}</h2><div class="meta" id="meta_${sec.id}"></div></div>
+        <div class="chev">▼</div>
+      </div>
+      <div class="card-body"><div class="grid2">`;
+    sec.f.forEach(f=>{ html+=renderField(f); });
+    html+=`</div>`;
+    if(INV[sec.id]) html+=invBlock(sec.id);
+    html+=`</div></section>`;
+  });
+  // Oportunidades
+  html+=`<section class="card" data-sec="opps">
+    <div class="card-head" onclick="toggle('opps')">
+      <div class="ico">💡</div><div><h2>Oportunidades Identificadas</h2>
+      <div class="meta">Problema · Solução · Valor · Prioridade</div></div><div class="chev">▼</div></div>
+    <div class="card-body">
+      <p class="section-note">Use <b>⚡ Gerar oportunidades</b> para preencher automaticamente a partir das respostas, ou adicione manualmente.</p>
+      <div class="opp-controls">
+        <label for="oppFilter">Filtrar:</label>
+        <select id="oppFilter" onchange="setOppFilter(this.value)">
+          <option value="">Todas as prioridades</option>
+          <option value="Alta">Apenas Alta</option>
+          <option value="Média">Apenas Média</option>
+          <option value="Baixa">Apenas Baixa</option>
+        </select>
+        <button class="btn" onclick="ordenarOpps()">↕ Organizar por prioridade</button>
+      </div>
+      <div style="overflow-x:auto"><table class="opps"><thead><tr>
+        <th style="min-width:180px">Problema encontrado</th><th style="min-width:180px">Solução recomendada</th>
+        <th style="min-width:120px">Valor estimado</th><th style="min-width:110px">Prioridade</th><th></th>
+      </tr></thead><tbody id="oppBody"></tbody></table></div>
+      <div class="opp-counts" id="oppCounts"></div>
+      <div class="opp-total">Investimento estimado total <span id="oppTotal">R$ 0</span></div>
+      <div class="btn-row"><button class="btn" onclick="addOpp()">➕ Adicionar oportunidade</button>
+        <button class="btn accent" onclick="abrirCatalogo()">📋 Adicionar do catálogo</button></div>
+    </div></section>`;
+  // Resumo
+  html+=`<section class="card" data-sec="resumo">
+    <div class="card-head" onclick="toggle('resumo')"><div class="ico">📊</div>
+      <div><h2>Resumo Executivo</h2><div class="meta">Calculado automaticamente — editável</div></div><div class="chev">▼</div></div>
+    <div class="card-body">
+      <div class="gauge"><div class="big" id="gNota">—<small>/10</small></div>
+        <div><div style="font-size:13px;opacity:.8">Pontuação geral da infraestrutura</div>
+        <div id="gTag" style="margin-top:6px"></div></div></div>
+      <div class="dash">
+        <div class="kpi"><div class="lbl">Risco de perda de dados</div><div class="val" id="kDados">—</div></div>
+        <div class="kpi"><div class="lbl">Risco de parada operacional</div><div class="val" id="kParada">—</div></div>
+        <div class="kpi"><div class="lbl">Situação da rede</div><div class="val" id="kRede">—</div></div>
+        <div class="kpi"><div class="lbl">Situação da segurança</div><div class="val" id="kSeg">—</div></div>
+        <div class="kpi"><div class="lbl">Pontos de atenção</div><div class="val" id="kFlags">0</div></div>
+        <div class="kpi"><div class="lbl">Oportunidades</div><div class="val" id="kOpps">0</div></div>
+        <div class="kpi"><div class="lbl">Equipamentos cadastrados</div><div class="val" id="kEquip">0</div></div>
+      </div>
+      <div class="crm-box">
+        <div class="grid2">
+          <div class="field"><label class="q">🎯 Status da negociação <span style="color:var(--muted);font-weight:500">(uso interno)</span></label>
+            <select id="r_status" onchange="setCRM('status',this.value)">
+              <option>Lead</option><option>Proposta enviada</option><option>Fechado</option><option>Perdido</option>
+            </select></div>
+          <div class="field"><label class="q">📅 Retornar / follow-up em</label>
+            <input type="date" id="r_followup" onchange="setCRM('followup',this.value)"></div>
+        </div>
+      </div>
+      <div class="field"><label class="q">Observações gerais / parecer técnico <span style="color:var(--muted);font-weight:500">(visível ao cliente)</span></label>
+        <textarea id="r_obs" data-resumo="obs" placeholder="Resumo da visita, próximos passos, condições comerciais..."></textarea>
+        <div class="btn-row" style="margin-top:8px"><button class="btn accent" onclick="gerarResumoIA()">✨ Resumo feito por IA</button></div></div>
+      <div class="field"><label class="q">🔒 Observações internas <span style="color:var(--muted);font-weight:500">(NÃO aparecem para o cliente)</span></label>
+        <textarea id="r_internas" placeholder="Anotações internas, estratégia de venda, margem, lembretes — uso interno Chip7"></textarea></div>
+
+      <div class="client-panel">
+        <div class="cp-title">👤 Acesso do cliente ao relatório</div>
+        <p class="section-note" style="margin:2px 0 10px">Gere uma senha e envie o link. O cliente acessa com o <b>CNPJ/empresa + senha</b> e vê apenas o relatório dele — sem as observações internas.</p>
+        <div class="cp-cred">
+          <div><span class="cp-lbl">Login do cliente</span><b id="cpLogin">—</b></div>
+          <div><span class="cp-lbl">Senha</span><b id="cpSenha">—</b></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn accent" onclick="gerarSenhaCliente()">🔑 Gerar senha</button>
+          <button class="btn" onclick="copiarLinkCliente()">🔗 Copiar link do cliente</button>
+          <button class="btn wa" onclick="enviarWhatsApp('empresa')">📱 WhatsApp da empresa</button>
+          <button class="btn wa" onclick="enviarWhatsApp('responsavel')">📱 WhatsApp do responsável</button>
+        </div>
+      </div>
+    </div></section>`;
+  html+=chip7Footer();
+  form.innerHTML=html;
+  renderOpps();
+  Object.keys(INV).forEach(renderInventory);
+  bind();
+  updateAll();
+}
+
+function renderField(f){
+  if(f.t==="yn"){
+    return `<div class="field" id="field_${f.id}" data-fid="${f.id}">
+      <label class="q">${f.q}<span class="risk-tag">⚠ atenção</span></label>
+      <div class="seg" data-yn="${f.id}">
+        <button type="button" data-v="sim" onclick="setYN('${f.id}','sim')">Sim</button>
+        <button type="button" data-v="nao" onclick="setYN('${f.id}','nao')">Não</button>
+        <button type="button" data-v="na"  onclick="setYN('${f.id}','na')">N/A</button>
+      </div></div>`;
+  }
+  if(f.t==="cnpj"){
+    return `<div class="field"><label class="q">${f.q}</label>
+      <div class="cnpj-row">
+        <input type="text" id="i_${f.id}" data-fid="${f.id}" inputmode="numeric" placeholder="00.000.000/0000-00">
+        <button type="button" class="btn accent cnpj-btn" onclick="buscarCNPJ()">🔎 Buscar</button>
+      </div></div>`;
+  }
+  const ph = f.t==="number"?"0":"";
+  return `<div class="field"><label class="q">${f.q}</label>
+    <input type="${f.t}" id="i_${f.id}" data-fid="${f.id}" placeholder="${ph}"></div>`;
+}
+
+/* ---------- interações ---------- */
+function toggle(id){document.querySelector(`[data-sec="${id}"]`).classList.toggle('collapsed');}
+function setYN(id,v){
+  if(state.answers[id]===v) v=""; // clicar de novo limpa
+  state.answers[id]=v;
+  paintYN(id);
+  updateAll();save(CUR_KEY,state);
+}
+function paintYN(id){
+  const seg=document.querySelector(`[data-yn="${id}"]`); if(!seg)return;
+  const v=state.answers[id]||"";
+  seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  const field=document.getElementById('field_'+id);
+  const f=fieldDef(id);
+  const isRisk=f&&f.risk&&v&&v===f.risk.on;
+  if(field)field.classList.toggle('risk',!!isRisk);
+}
+function bind(){
+  form.querySelectorAll('input[data-fid]').forEach(inp=>{
+    const fid=inp.dataset.fid, fd=fieldDef(fid);
+    inp.addEventListener('input',()=>{
+      if(fd && fd.t==='tel') inp.value=formatPhoneBR(inp.value);
+      if(fd && fd.t==='cnpj') inp.value=formatCnpjMask(inp.value);
+      state.answers[fid]=inp.value; updateAll(); save(CUR_KEY,state);
+      if(fid==='vendedor'){try{localStorage.setItem('chip7_vendedor',inp.value);}catch(e){}}
+      if(fd && fd.t==='email') validateEmailField(inp);
+    });
+    if(fd && fd.t==='email') inp.addEventListener('blur',()=>validateEmailField(inp));
+  });
+  const obs=document.getElementById('r_obs');
+  if(obs)obs.addEventListener('input',()=>{state.resumo.obs=obs.value;save(CUR_KEY,state);});
+  const intn=document.getElementById('r_internas');
+  if(intn)intn.addEventListener('input',()=>{state.resumo.internas=intn.value;save(CUR_KEY,state);});
+}
+
+/* ---------- oportunidades ---------- */
+function setOppFilter(v){oppFilter=v;renderOpps();}
+function ordenarOpps(){
+  const ord={'Alta':0,'Média':1,'Baixa':2};
+  state.opps.sort((a,b)=>(ord[a.prio]??9)-(ord[b.prio]??9));
+  save(CUR_KEY,state);renderOpps();toast('Oportunidades organizadas por prioridade');
+}
+function setCRM(k,v){ if(!state.crm)state.crm={status:'Lead',followup:''}; state.crm[k]=v; save(CUR_KEY,state); }
+/* catálogo de soluções */
+const PROD_KEY='chip7_produtos';
+function getProdutos(){
+  let p=null; try{p=JSON.parse(localStorage.getItem(PROD_KEY));}catch(e){}
+  if(!Array.isArray(p)){ p=CATALOGO.map(c=>({n:c.n,v:c.v,tipo:c.tipo||'Produto'})); saveProdutos(p); }
+  return p;
+}
+function saveProdutos(arr){try{localStorage.setItem(PROD_KEY,JSON.stringify(arr));}catch(e){} if(typeof cloudSaveProdutos==='function')cloudSaveProdutos(arr);}
+function abrirCatalogo(target){
+  target=target||'opps';
+  const prods=getProdutos();
+  const html=`<div class="modal-bg" id="catModal" onclick="if(event.target.id==='catModal')fecharCat()">
+    <div class="modal-card">
+      <div class="modal-head"><h2 style="margin:0;flex:1">📋 ${target==='venda'?'Adicionar à oferta':'Adicionar às oportunidades'}</h2><button class="btn ghost" onclick="fecharCat()">✕</button></div>
+      <p class="section-note">Toque para adicionar. Edite/cadastre produtos na aba 🛒 Produtos.</p>
+      <div class="cat-list">${prods.length?prods.map((c,i)=>`<button class="cat-item" onclick="addFromCatalogo(${i},'${target}')"><span>${esc(c.n)}</span><b>${esc(c.v)}</b></button>`).join(''):'<p class="muted">Nenhum produto cadastrado. Vá na aba 🛒 Produtos.</p>'}</div>
+    </div></div>`;
+  const d=document.createElement('div');d.id='catModalWrap';d.innerHTML=html;document.body.appendChild(d);
+}
+function fecharCat(){const m=document.getElementById('catModalWrap');if(m)m.remove();}
+function addFromCatalogo(i,target){
+  const c=getProdutos()[i]; if(!c)return;
+  if(target==='venda'){
+    if(!state.doc.venda)state.doc.venda=[];
+    state.doc.venda.push({modelo:c.n,qtd:'1',preco:c.v});
+    save(CUR_KEY,state); renderVenda();
+  } else {
+    state.opps.push({p:'', s:c.n, v:c.v, prio:'Média'});
+    save(CUR_KEY,state); renderOpps(); updateAll();
+  }
+  toast('➕ '+c.n);
+}
+/* aba Produtos (catálogo editável, separado por tipo e ordenado por preço) */
+let prodSort='asc';
+function renderProdArea(){
+  const el=document.getElementById('prodArea'); if(!el)return;
+  el.innerHTML=`<div class="card" style="padding:18px">
+    <h2 style="margin:0 0 4px">🛒 Produtos e Serviços</h2>
+    <p class="section-note">Catálogo que alimenta o "📋 Do catálogo" das Oportunidades e da oferta. ${(typeof cloud!=='undefined'&&cloud.on)?'<b style="color:#15803d">☁️ Sincronizado com a equipe</b> — alterações aparecem nos outros aparelhos.':'<b style="color:#6a7587">💾 Salvo neste aparelho</b> (sincroniza quando logado na nuvem).'}</p>
+    <div class="btn-row" style="margin-bottom:6px">
+      <button class="btn accent" onclick="importarLoja()">🔄 Importar da loja Chip7</button>
+      <button class="btn" onclick="addProduto('Produto')">➕ Produto</button>
+      <button class="btn" onclick="addProduto('Serviço')">➕ Serviço</button>
+      <button class="btn" onclick="toggleProdSort()">↕ Preço: <span id="prodSortLbl">${prodSort==='asc'?'menor→maior':'maior→menor'}</span></button>
+    </div>
+    <div id="prodList"></div>
+  </div>`;
+  renderProdList();
+}
+function renderProdList(){
+  const el=document.getElementById('prodList'); if(!el)return;
+  const prods=getProdutos();
+  const groups={'Produto':[], 'Serviço':[]};
+  prods.forEach((p,i)=>{ const t=(p.tipo==='Serviço')?'Serviço':'Produto'; groups[t].push({p,i}); });
+  const sortFn=(x,y)=>{const a=parseMoney(x.p.v),b=parseMoney(y.p.v);const na=isNaN(a)?Infinity:a,nb=isNaN(b)?Infinity:b;return prodSort==='asc'?na-nb:nb-na;};
+  groups['Produto'].sort(sortFn); groups['Serviço'].sort(sortFn);
+  const row=(p,i)=>`<div class="sell-row" style="grid-template-columns:1fr 96px 88px 30px">
+      <input type="text" placeholder="Nome" value="${esc(p.n||'')}" oninput="updProduto(${i},'n',this.value)">
+      <input type="text" placeholder="R$" value="${esc(p.v||'')}" oninput="updProduto(${i},'v',this.value)" onblur="renderProdList()">
+      <select onchange="updProduto(${i},'tipo',this.value);renderProdList()"><option ${p.tipo!=='Serviço'?'selected':''}>Produto</option><option ${p.tipo==='Serviço'?'selected':''}>Serviço</option></select>
+      <button class="del" onclick="delProduto(${i})">✕</button>
+    </div>`;
+  let html=`<h3 class="pn-h">🛒 Produtos (${groups['Produto'].length})</h3>`;
+  html+=groups['Produto'].length?groups['Produto'].map(({p,i})=>row(p,i)).join(''):`<p class="inv-empty">Nenhum produto.</p>`;
+  html+=`<h3 class="pn-h">🔧 Serviços (${groups['Serviço'].length})</h3>`;
+  html+=groups['Serviço'].length?groups['Serviço'].map(({p,i})=>row(p,i)).join(''):`<p class="inv-empty">Nenhum serviço.</p>`;
+  el.innerHTML=html;
+}
+function toggleProdSort(){prodSort=prodSort==='asc'?'desc':'asc';const l=document.getElementById('prodSortLbl');if(l)l.textContent=prodSort==='asc'?'menor→maior':'maior→menor';renderProdList();}
+function importarLoja(){
+  const cur=getProdutos(); const byName={}; cur.forEach(p=>{byName[(p.n||'').toLowerCase().trim()]=p;});
+  let added=0, updated=0;
+  STORE_PRODUTOS.forEach(sp=>{
+    const k=sp.n.toLowerCase().trim(); const ex=byName[k];
+    if(ex){ if((ex.v||'')!==sp.v){ ex.v=sp.v; updated++; } }
+    else { const novo={n:sp.n,v:sp.v,tipo:'Produto'}; cur.push(novo); byName[k]=novo; added++; }
+  });
+  saveProdutos(cur); renderProdList();
+  toast((added||updated)?`Loja: ${added} novo(s), ${updated} preço(s) atualizado(s)`:'Catálogo já está atualizado');
+}
+function addProduto(tipo){const p=getProdutos();p.push({n:'',v:'',tipo:tipo||'Produto'});saveProdutos(p);renderProdList();}
+function updProduto(i,k,v){const p=getProdutos();if(p[i]){p[i][k]=v;saveProdutos(p);}}
+function delProduto(i){const p=getProdutos();p.splice(i,1);saveProdutos(p);renderProdList();}
+function renderOpps(){
+  const tb=document.getElementById('oppBody');if(!tb)return;tb.innerHTML="";
+  let shown=0;
+  state.opps.forEach((o,i)=>{
+    if(oppFilter && o.prio!==oppFilter) return;
+    shown++;
+    const tr=document.createElement('tr');
+    tr.className='oppr-'+(o.prio==='Alta'?'alta':o.prio==='Média'?'media':o.prio==='Baixa'?'baixa':'na');
+    tr.innerHTML=`
+      <td><input type="text" value="${esc(o.p)}" oninput="updOpp(${i},'p',this.value)"></td>
+      <td><input type="text" value="${esc(o.s)}" oninput="updOpp(${i},'s',this.value)"></td>
+      <td><input type="text" value="${esc(o.v)}" placeholder="R$" oninput="updOpp(${i},'v',this.value)"></td>
+      <td><select onchange="updOpp(${i},'prio',this.value);renderOpps()">
+        ${["Alta","Média","Baixa"].map(p=>`<option ${o.prio===p?'selected':''}>${p}</option>`).join('')}
+      </select></td>
+      <td><button class="del" onclick="delOpp(${i})" title="Remover">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  if(oppFilter && shown===0){const tr=document.createElement('tr');tr.innerHTML=`<td colspan="5" style="text-align:center;color:var(--muted)">Nenhuma oportunidade com prioridade "${oppFilter}".</td>`;tb.appendChild(tr);}
+  oppTotal();
+}
+function addOpp(o){state.opps.push(o||{p:"",s:"",v:"",prio:"Média"});renderOpps();save(CUR_KEY,state);updateAll();}
+function updOpp(i,k,v){state.opps[i][k]=v;if(k==='v')oppTotal();save(CUR_KEY,state);}
+function delOpp(i){state.opps.splice(i,1);renderOpps();save(CUR_KEY,state);updateAll();}
+function oppTotal(){
+  let sum=0,a=0,m=0,b=0;
+  state.opps.forEach(o=>{const n=parseMoney(o.v);if(!isNaN(n))sum+=n;
+    if(o.prio==='Alta')a++;else if(o.prio==='Média')m++;else if(o.prio==='Baixa')b++;});
+  const t=document.getElementById('oppTotal');if(t)t.textContent=fmtMoney(sum);
+  const k=document.getElementById('kOpps');if(k)k.textContent=state.opps.length;
+  const cc=document.getElementById('oppCounts');
+  if(cc)cc.innerHTML=state.opps.length?`<span class="oc-a">🔴 ${a} Alta</span> · <span class="oc-m">🟡 ${m} Média</span> · <span class="oc-b">🟢 ${b} Baixa</span>`:'';
+}
+function autoOpps(){
+  const existing=new Set(state.opps.map(o=>(o.p||'').toLowerCase().trim()));
+  let added=0;
+  SECTIONS.forEach(sec=>sec.f.forEach(f=>{
+    if(!f.sug)return;
+    const v=state.answers[f.id];
+    const trigger = f.risk ? (v===f.risk.on) : (f.opp && v===f.opp);
+    if(trigger){
+      const key=f.sug.p.toLowerCase().trim();
+      if(!existing.has(key)){state.opps.push({p:f.sug.p,s:f.sug.s,v:"",prio:f.sug.prio});existing.add(key);added++;}
+    }
+  }));
+  const def=pcDeficit();
+  if(def){const p=`Faltam ${def.falta} computador(es) para os colaboradores`;
+    if(!existing.has(p.toLowerCase())){state.opps.push({p,s:`Fornecimento/locação de ${def.falta} computador(es)`,v:"",prio:"Alta"});existing.add(p.toLowerCase());added++;}}
+  renderOpps();save(CUR_KEY,state);updateAll();
+  toast(added?`${added} oportunidade(s) adicionada(s)`:"Nenhuma nova oportunidade — responda mais itens");
+  if(added)document.querySelector('[data-sec="opps"]').classList.remove('collapsed');
+}
+
+/* ---------- inventário de equipamentos ---------- */
+function invBlock(secId){
+  const cfg=INV[secId];
+  return `<div class="inv-block">
+    <div class="inv-head"><span class="inv-title">${cfg.icon} ${cfg.plural} cadastrados</span>
+      <span class="inv-count" id="invcount_${secId}">0</span></div>
+    <div class="inv-list" id="invlist_${secId}"></div>
+    <button class="btn add-inv" onclick="addItem('${secId}')">➕ Adicionar ${cfg.label.toLowerCase()}</button>
+  </div>`;
+}
+function itemTitle(secId,item,i){
+  const cfg=INV[secId];const tf=(item[cfg.titleField]||'').trim();
+  return tf?tf:`${cfg.label} ${i+1}`;
+}
+function invField(secId,i,f,item){
+  const val=item[f.id]||'';
+  const hidden=f.cond && item[f.cond.field]!==f.cond.val;
+  const attrs=f.cond?` id="condwrap_${secId}_${i}_${f.id}" style="${hidden?'display:none':''}"`:'';
+  let inner;
+  if(f.t==="select"){
+    inner=`<select onchange="updItem('${secId}',${i},'${f.id}',this.value)">
+        <option value="">—</option>
+        ${f.opts.map(o=>`<option ${val===o?'selected':''}>${o}</option>`).join('')}
+      </select>`;
+  }else{
+    inner=`<input type="${f.t}" value="${esc(val)}" oninput="updItem('${secId}',${i},'${f.id}',this.value)">`;
+  }
+  return `<div class="field"${attrs}><label class="q">${f.q}</label>${inner}</div>`;
+}
+function invItemHTML(secId,item,i){
+  const cfg=INV[secId];
+  return `<div class="inv-item">
+    <div class="inv-item-head"><b id="invtitle_${secId}_${i}">${esc(itemTitle(secId,item,i))}</b>
+      <button class="del" title="Remover" onclick="delItem('${secId}',${i})">✕</button></div>
+    <div class="grid2">${cfg.fields.map(f=>invField(secId,i,f,item)).join('')}</div>
+    <div class="inv-fotos" id="fotos_${secId}_${i}">${fotosHTML(secId,item,i)}</div>
+  </div>`;
+}
+function fotosHTML(secId,item,i){
+  const fotos=item._fotos||[];
+  const thumbs=fotos.map((src,fi)=>`<div class="foto-thumb"><img src="${src}" alt="foto"><button class="foto-del" onclick="delFoto('${secId}',${i},${fi})" title="Remover foto">✕</button></div>`).join('');
+  return thumbs+`<label class="foto-add" title="Adicionar foto">📷<input type="file" accept="image/*" capture="environment" style="display:none" onchange="addFoto('${secId}',${i},this)"></label>`;
+}
+function renderFotos(secId,i){
+  const el=document.getElementById(`fotos_${secId}_${i}`);
+  if(el)el.innerHTML=fotosHTML(secId,state.inventory[secId][i],i);
+}
+async function addFoto(secId,i,input){
+  const file=input.files&&input.files[0]; if(!file){return;}
+  try{
+    const data=await compressImage(file,640,0.55);
+    const item=state.inventory[secId][i];
+    if(!item._fotos)item._fotos=[];
+    item._fotos.push(data);
+    renderFotos(secId,i); save(CUR_KEY,state); updateAll();
+    toast('📷 Foto adicionada');
+  }catch(e){ toast('Não foi possível adicionar a foto'); }
+  input.value='';
+}
+function delFoto(secId,i,fi){
+  const item=state.inventory[secId][i];
+  if(item._fotos)item._fotos.splice(fi,1);
+  renderFotos(secId,i); save(CUR_KEY,state); updateAll();
+}
+function compressImage(file,maxDim,quality){
+  return new Promise((res,rej)=>{
+    const img=new Image(); const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>h && w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}
+      else if(h>=w && h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      try{res(cv.toDataURL('image/jpeg',quality));}catch(e){rej(e);}
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('img'));};
+    img.src=url;
+  });
+}
+function renderInventory(secId){
+  const list=document.getElementById('invlist_'+secId);if(!list)return;
+  const arr=state.inventory[secId]||[];
+  list.innerHTML=arr.length?arr.map((it,i)=>invItemHTML(secId,it,i)).join('')
+    :`<div class="inv-empty">Nenhum ${INV[secId].label.toLowerCase()} cadastrado ainda.</div>`;
+  const c=document.getElementById('invcount_'+secId);if(c)c.textContent=arr.length;
+}
+function addItem(secId){
+  if(!state.inventory[secId])state.inventory[secId]=[];
+  state.inventory[secId].push({});
+  renderInventory(secId);save(CUR_KEY,state);updateAll();
+  const list=document.getElementById('invlist_'+secId);
+  const items=list.querySelectorAll('.inv-item');
+  const last=items[items.length-1];
+  if(last){last.scrollIntoView({behavior:'smooth',block:'center'});const inp=last.querySelector('input,select');if(inp)inp.focus();}
+}
+function updItem(secId,i,fid,v){
+  state.inventory[secId][i][fid]=v;
+  const cfg=INV[secId];
+  if(fid===cfg.titleField){const t=document.getElementById(`invtitle_${secId}_${i}`);
+    if(t)t.textContent=(v&&v.trim())?v:`${cfg.label} ${i+1}`;}
+  cfg.fields.forEach(f=>{ if(f.cond){const w=document.getElementById(`condwrap_${secId}_${i}_${f.id}`);
+    if(w)w.style.display=(state.inventory[secId][i][f.cond.field]===f.cond.val)?'':'none';}});
+  save(CUR_KEY,state);
+}
+function delItem(secId,i){
+  if(!confirm("Remover este "+INV[secId].label.toLowerCase()+"?"))return;
+  state.inventory[secId].splice(i,1);
+  renderInventory(secId);save(CUR_KEY,state);updateAll();
+}
+
+/* ---------- CNPJ: preenchimento automático pela internet ---------- */
+function setAns(id,v){state.answers[id]=v;}
+async function buscarCNPJ(){
+  const raw=(state.answers.cnpj||'').replace(/\D/g,'');
+  if(raw.length!==14){toast('Digite os 14 dígitos do CNPJ');return;}
+  toast('🔎 Buscando dados do CNPJ...');
+  let d=null;
+  try{const r=await fetch('https://brasilapi.com.br/api/cnpj/v1/'+raw);if(r.ok)d=await r.json();}catch(e){}
+  if(!d){try{const r2=await fetch('https://publica.cnpj.ws/cnpj/'+raw);if(r2.ok)d=normalizeCnpjWs(await r2.json());}catch(e){}}
+  if(!d){toast('Não foi possível buscar (verifique internet/CNPJ). Preencha manualmente.');return;}
+  if(d.razao_social)setAns('razao_social',d.razao_social);
+  setAns('empresa', d.nome_fantasia||state.answers.empresa||d.razao_social||'');
+  const tel=formatPhoneBR(d.ddd_telefone_1||d.telefone); if(tel)setAns('telefone',tel);
+  if(d.email)setAns('email',String(d.email).toLowerCase());
+  const end=[d.logradouro,d.numero,d.bairro].filter(Boolean).join(', ');
+  const cidade=[d.municipio,d.uf].filter(Boolean).join('/');
+  setAns('endereco',[end,cidade,(d.cep?'CEP '+formatCep(d.cep):'')].filter(Boolean).join(' - '));
+  if(d.cnae_fiscal_descricao)setAns('segmento',d.cnae_fiscal_descricao);
+  setAns('cnpj',formatCnpj(raw));
+  hydrate();save(CUR_KEY,state);
+  toast('✓ Dados preenchidos — confira e edite o que precisar');
+}
+function normalizeCnpjWs(j){
+  const e=j.estabelecimento||{};
+  return {razao_social:j.razao_social, nome_fantasia:e.nome_fantasia,
+    ddd_telefone_1:(e.ddd1&&e.telefone1)?(e.ddd1+e.telefone1):'', email:e.email,
+    logradouro:e.logradouro, numero:e.numero, bairro:e.bairro,
+    municipio:e.cidade&&e.cidade.nome, uf:e.estado&&e.estado.sigla, cep:e.cep,
+    cnae_fiscal_descricao:e.atividade_principal&&e.atividade_principal.descricao};
+}
+function formatTel(v){if(!v)return '';const n=String(v).replace(/\D/g,'');if(n.length<10)return String(v);const dd=n.slice(0,2),r=n.slice(2);return r.length===9?`(${dd}) ${r.slice(0,5)}-${r.slice(5)}`:`(${dd}) ${r.slice(0,4)}-${r.slice(4)}`;}
+function formatCep(v){const n=String(v).replace(/\D/g,'');return n.length===8?n.slice(0,5)+'-'+n.slice(5):String(v);}
+function formatCnpj(n){n=String(n).replace(/\D/g,'');return n.length===14?`${n.slice(0,2)}.${n.slice(2,5)}.${n.slice(5,8)}/${n.slice(8,12)}-${n.slice(12)}`:n;}
+function formatCnpjMask(v){
+  let d=String(v).replace(/\D/g,'').slice(0,14), out='';
+  if(d.length>0)out=d.slice(0,2);
+  if(d.length>2)out+='.'+d.slice(2,5);
+  if(d.length>5)out+='.'+d.slice(5,8);
+  if(d.length>8)out+='/'+d.slice(8,12);
+  if(d.length>12)out+='-'+d.slice(12,14);
+  return out;
+}
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function formatPhoneBR(v){
+  let d=String(v).replace(/\D/g,'').slice(0,11);
+  if(!d) return '';
+  if(d.length<=2) return '('+d;
+  const dd='('+d.slice(0,2)+') ', r=d.slice(2);
+  if(d.length<=6) return dd+r;
+  if(d.length<=10) return dd+r.slice(0,r.length-4)+'-'+r.slice(-4);
+  return dd+r.slice(0,1)+' '+r.slice(1,5)+'-'+r.slice(5,9);
+}
+function validateEmailField(inp){
+  const v=(inp.value||'').trim();
+  const ok = v==='' || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  inp.classList.toggle('invalid', !ok);
+  let msg=inp.parentNode.querySelector('.field-err');
+  if(!ok){ if(!msg){msg=document.createElement('div');msg.className='field-err';inp.parentNode.appendChild(msg);} msg.textContent='Digite um e-mail válido (ex.: nome@empresa.com)'; }
+  else if(msg){ msg.remove(); }
+}
+
+/* ---------- scoring ---------- */
+function compute(){return computeFrom(state);}
+function computeFrom(st){
+  let totW=0,hitW=0,flags=0;
+  const cat={[D]:[0,0],[R]:[0,0],[S]:[0,0],[P]:[0,0]};
+  const ans=(st&&st.answers)||{};
+  SECTIONS.forEach(sec=>sec.f.forEach(f=>{
+    if(f.t!=="yn"||!f.risk)return;
+    const w=f.risk.w;totW+=w;
+    const v=ans[f.id];
+    const hit = v===f.risk.on;
+    (f.risk.cats||[]).forEach(c=>{cat[c][0]+=w; if(hit)cat[c][1]+=w;});
+    if(hit){hitW+=w;flags++;}
+  }));
+  const ratio= totW? hitW/totW : 0;
+  const nota = Math.max(0, Math.round((10*(1-ratio))*10)/10);
+  return {nota,flags,ratio,cat};
+}
+function catStatus(pair,riskWording){
+  const [max,hit]=pair; if(max===0)return {txt:"—",cls:""};
+  const r=hit/max;
+  if(riskWording){ // categorias de RISCO: mais alto = pior
+    if(r>=.5)return{txt:"Alto",cls:"r"};
+    if(r>0)return{txt:"Médio",cls:"y"};
+    return{txt:"Baixo",cls:"g"};
+  } else { // categorias de SITUAÇÃO
+    if(r>=.5)return{txt:"Crítica",cls:"r"};
+    if(r>0)return{txt:"Atenção",cls:"y"};
+    return{txt:"Boa",cls:"g"};
+  }
+}
+function colorOfNota(n){return n>=8?"g":n>=5?"y":"r";}
+function labelOfNota(n){return n>=8?"🟢 Excelente":n>=5?"🟡 Atenção":"🔴 Crítico";}
+
+/* ---------- atualizar UI ---------- */
+function updateAll(){
+  // progresso
+  let tot=0,fill=0,totalEquip=0;
+  SECTIONS.forEach(sec=>{let st=0,sf=0;sec.f.forEach(f=>{tot++;st++;
+    const v=state.answers[f.id];if(v!==undefined&&v!==""){fill++;sf++;}});
+    let metaTxt=`${sf}/${st} preenchidos`;
+    if(INV[sec.id]){const n=(state.inventory[sec.id]||[]).length;totalEquip+=n;
+      if(n)metaTxt+=` · ${n} ${(n===1?INV[sec.id].label:INV[sec.id].plural).toLowerCase()}`;}
+    const m=document.getElementById('meta_'+sec.id);if(m)m.textContent=metaTxt;
+  });
+  const ke=document.getElementById('kEquip');if(ke)ke.textContent=totalEquip;
+  document.getElementById('progBar').style.width=(tot?fill/tot*100:0)+'%';
+  document.getElementById('progTxt').textContent=`${fill} de ${tot} itens preenchidos`;
+  document.getElementById('empresaTag').textContent=state.answers.empresa||"Nova visita";
+
+  // score
+  const c=compute();
+  const col=colorOfNota(c.nota);
+  document.getElementById('scoreNum').textContent=c.nota.toFixed(1);
+  document.getElementById('scoreDot').style.background={g:'var(--green)',y:'var(--yellow)',r:'var(--red)'}[col];
+  const gN=document.getElementById('gNota');if(gN)gN.innerHTML=`${c.nota.toFixed(1)}<small>/10</small>`;
+  const gT=document.getElementById('gTag');if(gT)gT.innerHTML=`<span class="tag ${col}">${labelOfNota(c.nota)}</span>`;
+  setKpi('kDados',catStatus(c.cat[D],true));
+  setKpi('kParada',catStatus(c.cat[P],true));
+  setKpi('kRede',catStatus(c.cat[R],false));
+  setKpi('kSeg',catStatus(c.cat[S],false));
+  const kf=document.getElementById('kFlags');if(kf)kf.textContent=c.flags;
+  updateInsights();
+  oppTotal();
+}
+function pcDeficit(){
+  const colab=parseInt(state.answers.colaboradores)||0;
+  const pcs=(parseInt(state.answers.qtd_computadores)||0)+(parseInt(state.answers.qtd_notebooks)||0);
+  return (colab>0 && colab>pcs) ? {colab,pcs,falta:colab-pcs} : null;
+}
+function updateInsights(){
+  const el=document.getElementById('insights');if(!el)return;
+  const list=[];
+  const def=pcDeficit();
+  if(def)list.push(`👥 <b>${def.colab} colaboradores</b> para <b>${def.pcs} computador(es)</b> — faltam <b>${def.falta}</b> estação(ões). O ideal é um equipamento por colaborador.`);
+  el.innerHTML=list.map(t=>`<div class="insight">${t}</div>`).join('');
+  el.style.display=list.length?'block':'none';
+}
+function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+function resumoIAtexto(st){
+  const a=(st&&st.answers)||{}, c=computeFrom(st), opps=(st&&st.opps)||[];
+  const nome=a.empresa||a.razao_social||'A empresa avaliada';
+  const cls=labelOfNota(c.nota).replace(/[^\x00-\xFF]/g,'').replace(/\s+/g,' ').trim();
+  const dados=catStatus(c.cat[D],true).txt, parada=catStatus(c.cat[P],true).txt,
+        rede=catStatus(c.cat[R],false).txt, seg=catStatus(c.cat[S],false).txt;
+  const FR=[];
+  FR.push(`${nome} passou por um diagnóstico tecnológico que resultou em nota ${c.nota.toFixed(1)}/10, classificando a infraestrutura como "${cls}".`);
+  const riscos=[];
+  if(dados==='Alto')riscos.push('alto risco de perda de dados'); else if(dados==='Médio')riscos.push('risco moderado de perda de dados');
+  if(parada==='Alto')riscos.push('alto risco de parada operacional'); else if(parada==='Médio')riscos.push('risco moderado de parada operacional');
+  if(riscos.length)FR.push(`Os principais pontos de atenção envolvem ${riscos.join(' e ')}.`);
+  const sit=[];
+  if(rede==='Crítica'||rede==='Atenção')sit.push(`a situação da rede está em nível de ${rede.toLowerCase()}`);
+  if(seg==='Crítica'||seg==='Atenção')sit.push(`a segurança digital apresenta nível de ${seg.toLowerCase()}`);
+  if(sit.length)FR.push(capitalize(sit.join(' e '))+'.');
+  const probs=[]; SECTIONS.forEach(sec=>sec.f.forEach(f=>{ if(f.t==='yn'&&f.risk&&a[f.id]===f.risk.on&&f.sug)probs.push(f.sug.p.toLowerCase()); }));
+  if(probs.length)FR.push(`Foram identificados ${c.flags} ponto(s) crítico(s), com destaque para: ${probs.slice(0,5).join('; ')}.`);
+  const colab=parseInt(a.colaboradores)||0, pcs=(parseInt(a.qtd_computadores)||0)+(parseInt(a.qtd_notebooks)||0);
+  if(colab>0 && colab>pcs)FR.push(`Há ${colab} colaboradores para apenas ${pcs} computador(es), indicando a necessidade de ${colab-pcs} estação(ões) adicional(is).`);
+  if(opps.length){ let total=0; opps.forEach(o=>{const n=parseMoney(o.v);if(!isNaN(n))total+=n;});
+    FR.push(`Como plano de ação, foram mapeadas ${opps.length} oportunidade(s) de melhoria${total?`, com investimento estimado em ${fmtMoney(total)}`:''}, priorizando as ações de maior impacto na continuidade e na segurança do negócio.`);
+  }
+  if(c.nota>=8)FR.push('De modo geral, o ambiente está bem estruturado; recomenda-se manutenção preventiva e monitoramento contínuo para preservar a qualidade.');
+  else if(c.nota>=5)FR.push('Recomenda-se priorizar as correções apontadas para reduzir riscos e aumentar a produtividade da operação.');
+  else FR.push('Recomenda-se ação imediata sobre os itens críticos para evitar perda de dados e paradas que impactem diretamente o negócio.');
+  FR.push('A Chip7 Informática está à disposição para implementar as soluções recomendadas.');
+  return FR.join(' ');
+}
+function gerarResumoIA(){
+  const txt=resumoIAtexto(state);
+  state.resumo.obs=txt;
+  const el=document.getElementById('r_obs'); if(el)el.value=txt;
+  save(CUR_KEY,state);
+  toast('✨ Resumo gerado — revise e ajuste se quiser');
+}
+function setKpi(id,st){const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=st.cls?`<span class="tag ${st.cls}">${st.txt}</span>`:st.txt;}
+
+/* ---------- carregar valores nos inputs ---------- */
+function hydrate(){
+  SECTIONS.forEach(sec=>sec.f.forEach(f=>{
+    const v=state.answers[f.id];
+    if(f.t==="yn"){paintYN(f.id);}
+    else{const i=document.getElementById('i_'+f.id);if(i)i.value=v??"";}
+  }));
+  if(!state.answers.data_visita){state.answers.data_visita=todayISO();const di=document.getElementById('i_data_visita');if(di)di.value=state.answers.data_visita;}
+  if(!state.answers.vendedor){const lv=localStorage.getItem('chip7_vendedor');if(lv){state.answers.vendedor=lv;const vi=document.getElementById('i_vendedor');if(vi)vi.value=lv;}}
+  if(!state.crm)state.crm={status:'Lead',followup:''};
+  const st=document.getElementById('r_status');if(st)st.value=state.crm.status||'Lead';
+  const fu=document.getElementById('r_followup');if(fu)fu.value=state.crm.followup||'';
+  const obs=document.getElementById('r_obs');if(obs)obs.value=state.resumo.obs||"";
+  const intn=document.getElementById('r_internas');if(intn)intn.value=state.resumo.internas||"";
+  if(!state.inventory)state.inventory={};
+  Object.keys(INV).forEach(renderInventory);
+  renderClientPanel();
+  renderOpps();updateAll();
+}
+
+/* ---------- persistência ---------- */
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function load(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+function saveVisit(){
+  const faltam=[];
+  if(!(state.answers.empresa||'').trim() && !(state.answers.razao_social||'').trim()) faltam.push('Empresa / Razão social');
+  if(!(state.answers.telefone||'').trim() && !(state.answers.tel_responsavel||'').trim()) faltam.push('Telefone');
+  if(faltam.length && !confirm('⚠️ Faltam dados importantes: '+faltam.join(', ')+'.\n\nDeseja salvar mesmo assim?')) return;
+  const nome=state.answers.empresa||state.answers.razao_social||("Visita "+new Date().toLocaleDateString('pt-BR'));
+  const list=load(LIST_KEY)||[];
+  if(!state.id)state.id="v"+Date.now();
+  const c=compute();
+  let total=0;state.opps.forEach(o=>{const n=parseMoney(o.v);if(!isNaN(n))total+=n;});
+  const rec={id:state.id,nome,nota:c.nota,data:state.answers.data_visita||"",savedAt:new Date().toISOString(),
+    vendedor:state.answers.vendedor||"",status:(state.crm&&state.crm.status)||"Lead",followup:(state.crm&&state.crm.followup)||"",
+    total:total,opps:state.opps.length,state:JSON.parse(JSON.stringify(state))};
+  const idx=list.findIndex(x=>x.id===state.id);
+  if(idx>=0)list[idx]=rec;else list.unshift(rec);
+  save(LIST_KEY,list);save(CUR_KEY,state);
+  cloudUpsert(rec);
+  toast("Visita salva ✓ ("+nome+")"+(cloud.on?" · sincronizada":""));
+}
+function newVisit(){
+  if(!confirm("Iniciar nova visita? Os dados não salvos serão limpos."))return;
+  state=blank();save(CUR_KEY,state);hydrate();
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('collapsed'));
+  window.scrollTo(0,0);toast("Nova visita iniciada");
+}
+function openVisits(){
+  const list=load(LIST_KEY)||[];
+  let html=`<div style="position:fixed;inset:0;background:rgba(10,37,64,.55);z-index:300;display:grid;place-items:center;padding:18px" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+    <div style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:84vh;overflow:auto;padding:20px">
+    <div style="display:flex;align-items:center;margin-bottom:6px"><h2 style="margin:0;flex:1">Visitas salvas</h2>
+    <button class="btn ghost" onclick="closeModal()">✕</button></div>
+    <div id="cloudStatus" class="cloud-status off"></div>`;
+  if(!list.length)html+=`<p class="muted">Nenhuma visita salva ainda.</p>`;
+  list.forEach(v=>{
+    const col=colorOfNota(v.nota||0);
+    const status=v.status||'Lead';
+    html+=`<div class="visit">
+      <span class="tag ${col}">${(v.nota||0).toFixed(1)}</span>
+      <div style="flex:1;min-width:0">
+        <b>${esc(v.nome)}</b>
+        <small>${v.vendedor?('👤 '+esc(v.vendedor)+' · '):''}${v.data?(v.data+' · '):''}${v.total?(fmtMoney(v.total)+' · '):''}salvo ${new Date(v.savedAt).toLocaleDateString('pt-BR')}</small>
+        <div style="margin-top:4px"><span class="status-badge ${statusClass(status)}">${status}</span>${v.followup?` &nbsp;📅 retorno ${v.followup}`:''}</div>
+      </div>
+      <button class="btn" onclick="loadVisit('${v.id}')">Abrir</button>
+      <button class="btn ghost" onclick="delVisit('${v.id}')" title="Excluir">🗑</button>
+    </div>`;
+  });
+  html+=`<div class="btn-row" style="margin-top:16px">
+      <button class="btn primary" onclick="painel()">📊 Painel da equipe</button>
+      <button class="btn" onclick="exportJSON()">⬇ Exportar (JSON)</button>
+      <button class="btn" onclick="document.getElementById('imp').click()">⬆ Importar</button>
+      <button class="btn ghost" onclick="logout()" style="margin-left:auto;color:var(--red)">🔒 Sair</button>
+    </div>
+    <input type="file" id="imp" accept="application/json" class="hide" onchange="importJSON(event)"></div></div>`;
+  const d=document.createElement('div');d.id="modalWrap";d.innerHTML=html;document.body.appendChild(d);
+  refreshCloudStatus();
+}
+function closeModal(){const m=document.getElementById('modalWrap');if(m)m.remove();}
+function statusClass(s){return s==='Fechado'?'st-win':s==='Perdido'?'st-lost':s==='Proposta enviada'?'st-prop':'st-lead';}
+function painelHTML(){
+  const list=load(LIST_KEY)||[];
+  const n=list.length;
+  let totalFunil=0,totalFechado=0,somaNota=0;
+  const byStatus={'Lead':{c:0,v:0},'Proposta enviada':{c:0,v:0},'Fechado':{c:0,v:0},'Perdido':{c:0,v:0}};
+  const byVend={};
+  list.forEach(v=>{
+    const val=v.total||0; somaNota+=(v.nota||0); totalFunil+=val;
+    const st=v.status||'Lead'; if(byStatus[st]){byStatus[st].c++;byStatus[st].v+=val;}
+    if(st==='Fechado')totalFechado+=val;
+    const vend=((v.vendedor||'').trim())||'(sem vendedor)';
+    if(!byVend[vend])byVend[vend]={c:0,v:0,fechado:0};
+    byVend[vend].c++; byVend[vend].v+=val; if(st==='Fechado')byVend[vend].fechado+=val;
+  });
+  const notaMedia=n?(somaNota/n):0;
+  const vendRank=Object.entries(byVend).sort((a,b)=>b[1].v-a[1].v);
+  const stCard=(label,o,cls)=>`<div class="pn-status ${cls}"><div class="pn-s-l">${label}</div><div class="pn-s-c">${o.c}</div><div class="pn-s-v">${fmtMoney(o.v)}</div></div>`;
+  return `
+      <div class="pn-kpis">
+        <div class="pn-kpi"><div class="pn-k-l">Visitas</div><div class="pn-k-v">${n}</div></div>
+        <div class="pn-kpi"><div class="pn-k-l">Funil (oportunidades)</div><div class="pn-k-v">${fmtMoney(totalFunil)}</div></div>
+        <div class="pn-kpi"><div class="pn-k-l">Fechado</div><div class="pn-k-v" style="color:var(--green)">${fmtMoney(totalFechado)}</div></div>
+        <div class="pn-kpi"><div class="pn-k-l">Nota média</div><div class="pn-k-v">${notaMedia.toFixed(1)}</div></div>
+      </div>
+      <h3 class="pn-h">Funil por status</h3>
+      <div class="pn-statuses">
+        ${stCard('Lead',byStatus['Lead'],'st-lead')}
+        ${stCard('Proposta',byStatus['Proposta enviada'],'st-prop')}
+        ${stCard('Fechado',byStatus['Fechado'],'st-win')}
+        ${stCard('Perdido',byStatus['Perdido'],'st-lost')}
+      </div>
+      <h3 class="pn-h">Ranking por vendedor</h3>
+      ${vendRank.length?`<div style="overflow-x:auto"><table class="pn-table"><thead><tr><th>Vendedor</th><th>Visitas</th><th>Funil</th><th>Fechado</th></tr></thead><tbody>${vendRank.map(([k,o])=>`<tr><td>${esc(k)}</td><td>${o.c}</td><td>${fmtMoney(o.v)}</td><td style="color:var(--green)">${fmtMoney(o.fechado)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">Nenhuma visita salva ainda. Salve visitas (com o campo Vendedor) para ver os números aqui.</p>'}`;
+}
+function renderPainelArea(){
+  const el=document.getElementById('painelArea'); if(!el)return;
+  el.innerHTML=`<div class="card" style="padding:18px"><h2 style="margin:0 0 4px">📊 Painel da equipe</h2><p class="section-note">Resumo de todas as visitas salvas e sincronizadas.</p>${painelHTML()}</div>`;
+}
+function painel(){ closeModal(); switchTab('painel'); }
+/* abas Diagnóstico / Documento */
+function switchTab(t){
+  const ids={diag:'form',doc:'docArea',prod:'prodArea',painel:'painelArea'};
+  Object.keys(ids).forEach(k=>{const el=document.getElementById(ids[k]);if(el)el.style.display=(k===t)?'':'none';});
+  document.querySelectorAll('#tabbar .tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  if(t==='doc')renderDocArea();
+  if(t==='prod')renderProdArea();
+  if(t==='painel')renderPainelArea();
+  window.scrollTo(0,0);
+}
+function renderDocArea(){
+  const el=document.getElementById('docArea'); if(!el)return;
+  if(!state.doc)state.doc={hidden:{},incluirVenda:false,incluirTroca:false,venda:[],troca:[]};
+  const d=state.doc;
+  const secToggles=SECTIONS.filter(s=>s.id!=='empresa').map(s=>`
+    <label class="doc-toggle"><input type="checkbox" ${d.hidden[s.id]?'':'checked'} onchange="toggleHidden('${s.id}',this.checked)">
+      <span class="dt-label">${s.ico} ${s.t}</span></label>`).join('');
+  el.innerHTML=`
+    <div class="doc-card">
+      <h2>📄 Documento / Proposta</h2>
+      <p class="section-note">Monte o documento do cliente: escolha o que aparece, ofereça computadores e a recompra. Depois baixe em Word editável.</p>
+      <div class="btn-row">
+        <button class="btn primary" onclick="gerarRelatorioPDF()">📄 Baixar Relatório (PDF)</button>
+        <button class="btn" onclick="printReport()">🖨️ Relatório detalhado (PDF)</button>
+      </div>
+    </div>
+    <div class="doc-card">
+      <h2>👁️ Tópicos visíveis para o cliente</h2>
+      <p class="section-note">Desmarque o que <b>não</b> deve aparecer no documento do cliente.</p>
+      ${secToggles}
+    </div>
+    <div class="doc-card">
+      <div class="doc-head-toggle"><input type="checkbox" ${d.incluirVenda?'checked':''} onchange="toggleDocOpt('incluirVenda',this.checked)">
+        <h2 style="margin:0">🖥️ Computadores para vender</h2></div>
+      <p class="section-note">Oferta de máquinas novas. Marque a caixa acima para incluir no documento.</p>
+      <div id="vendaList"></div>
+      <div class="doc-total">Total da oferta <span id="vendaTotal">R$ 0</span></div>
+      <div class="btn-row"><button class="btn" onclick="addVenda()">➕ Adicionar computador</button>
+        <button class="btn accent" onclick="abrirCatalogo('venda')">📋 Do catálogo</button></div>
+    </div>
+    <div class="doc-card">
+      <div class="doc-head-toggle"><input type="checkbox" ${d.incluirTroca?'checked':''} onchange="toggleDocOpt('incluirTroca',this.checked)">
+        <h2 style="margin:0">♻️ Pegamos seus equipamentos por</h2></div>
+      <p class="section-note">Recompra/troca dos equipamentos atuais (abatível na proposta). Marque a caixa acima para incluir.</p>
+      <div id="trocaList"></div>
+      <div class="doc-total">Total da recompra <span id="trocaTotal">R$ 0</span></div>
+      <div class="btn-row"><button class="btn" onclick="addTroca()">➕ Adicionar equipamento</button></div>
+    </div>`;
+  renderVenda(); renderTroca();
+}
+function toggleHidden(secId,checked){ if(!state.doc.hidden)state.doc.hidden={}; if(checked)delete state.doc.hidden[secId]; else state.doc.hidden[secId]=true; save(CUR_KEY,state); }
+function toggleDocOpt(key,checked){ state.doc[key]=checked; save(CUR_KEY,state); }
+/* computadores para vender */
+function renderVenda(){
+  const el=document.getElementById('vendaList'); if(!el)return;
+  const arr=(state.doc&&state.doc.venda)||[];
+  el.innerHTML=arr.length?arr.map((v,i)=>`
+    <div class="sell-row">
+      <input class="sr-modelo" type="text" placeholder="Modelo / descrição" value="${esc(v.modelo||'')}" oninput="updVenda(${i},'modelo',this.value)">
+      <input type="number" placeholder="Qtd" value="${esc(v.qtd||'')}" oninput="updVenda(${i},'qtd',this.value)">
+      <input type="text" placeholder="R$ unit." value="${esc(v.preco||'')}" oninput="updVenda(${i},'preco',this.value)">
+      <button class="del sr-del" onclick="delVenda(${i})">✕</button>
+    </div>`).join(''):`<p class="inv-empty">Nenhum computador na oferta ainda.</p>`;
+  vendaTotal();
+}
+function vendaTotal(){
+  let s=0;((state.doc&&state.doc.venda)||[]).forEach(v=>{const p=parseMoney(v.preco),q=parseInt(v.qtd)||1;if(!isNaN(p))s+=p*q;});
+  const el=document.getElementById('vendaTotal');if(el)el.textContent=fmtMoney(s);return s;
+}
+function addVenda(){if(!state.doc.venda)state.doc.venda=[];state.doc.venda.push({modelo:'',qtd:'1',preco:''});renderVenda();save(CUR_KEY,state);}
+function updVenda(i,k,v){state.doc.venda[i][k]=v;if(k!=='modelo')vendaTotal();save(CUR_KEY,state);}
+function delVenda(i){state.doc.venda.splice(i,1);renderVenda();save(CUR_KEY,state);}
+/* recompra de equipamentos */
+function renderTroca(){
+  const el=document.getElementById('trocaList'); if(!el)return;
+  const arr=(state.doc&&state.doc.troca)||[];
+  el.innerHTML=arr.length?arr.map((t,i)=>`
+    <div class="sell-row" style="grid-template-columns:1fr 120px 34px">
+      <input type="text" placeholder="Equipamento" value="${esc(t.item||'')}" oninput="updTroca(${i},'item',this.value)">
+      <input type="text" placeholder="R$ recompra" value="${esc(t.valor||'')}" oninput="updTroca(${i},'valor',this.value)">
+      <button class="del" onclick="delTroca(${i})">✕</button>
+    </div>`).join(''):`<p class="inv-empty">Nenhum equipamento para recompra ainda.</p>`;
+  trocaTotal();
+}
+function trocaTotal(){let s=0;((state.doc&&state.doc.troca)||[]).forEach(t=>{const v=parseMoney(t.valor);if(!isNaN(v))s+=v;});const el=document.getElementById('trocaTotal');if(el)el.textContent=fmtMoney(s);return s;}
+function addTroca(){if(!state.doc.troca)state.doc.troca=[];state.doc.troca.push({item:'',valor:''});renderTroca();save(CUR_KEY,state);}
+function updTroca(i,k,v){state.doc.troca[i][k]=v;if(k==='valor')trocaTotal();save(CUR_KEY,state);}
+function delTroca(i){state.doc.troca.splice(i,1);renderTroca();save(CUR_KEY,state);}
+/* blocos de venda/recompra no relatório (HTML) */
+function vendaTrocaReportHTML(st){
+  const d=st.doc||{}; let h='';
+  if(d.incluirVenda && (d.venda||[]).length){
+    let tot=0;const rows=d.venda.map(v=>{const p=parseMoney(v.preco),q=parseInt(v.qtd)||1;const sub=!isNaN(p)?p*q:0;tot+=sub;
+      return `<tr><td>${esc(v.modelo)}</td><td>${esc(v.qtd||'1')}</td><td>${esc(v.preco)||'—'}</td><td>${sub?fmtMoney(sub):'—'}</td></tr>`;}).join('');
+    h+=`<h2>🖥️ Proposta de Computadores</h2><table><thead><tr><th>Modelo / descrição</th><th>Qtd</th><th>Valor unit.</th><th>Subtotal</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th colspan="3" style="text-align:right">Total da oferta</th><th>${fmtMoney(tot)}</th></tr></tfoot></table>`;
+  }
+  if(d.incluirTroca && (d.troca||[]).length){
+    let tot=0;const rows=d.troca.map(t=>{const v=parseMoney(t.valor);if(!isNaN(v))tot+=v;
+      return `<tr><td>${esc(t.item)}</td><td>${esc(t.valor)||'—'}</td></tr>`;}).join('');
+    h+=`<h2>♻️ Recompra dos seus equipamentos</h2><p>A Chip7 adquire seus equipamentos atuais pelos valores abaixo, que podem ser abatidos na proposta:</p><table><thead><tr><th>Equipamento</th><th>Valor de recompra</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th style="text-align:right">Total da recompra</th><th>${fmtMoney(tot)}</th></tr></tfoot></table>`;
+  }
+  return h;
+}
+/* gera documento Word (.doc editável) */
+/* documento Word no formato do .docx original */
+function buildWordOriginal(st){
+  const a=st.answers||{}, c=computeFrom(st);
+  const ynTxt=v=>v==='sim'?'Sim':v==='nao'?'Não':v==='na'?'N/A':'';
+  const val=id=>{const f=fieldDef(id);const v=a[id];if(v===undefined||v==='')return '';return f&&f.t==='yn'?ynTxt(v):String(v);};
+  const hidden=(st.doc&&st.doc.hidden)||{};
+  const inv=st.inventory||{};
+  const logo=logoDataURL();
+  let b='';
+  if(logo)b+=`<p style="text-align:center"><img src="${logo}" style="width:90px;height:90px"></p>`;
+  b+=`<h1 style="text-align:center">Diagnóstico Tecnológico Empresarial - Chip7</h1>`;
+  SECTIONS.forEach(sec=>{
+    if(sec.id!=='empresa' && hidden[sec.id])return;
+    b+=`<h2>${sec.t}</h2>`;
+    sec.f.forEach(f=>{
+      const ans=val(f.id);
+      b+=`<p style="margin:3px 0">&#9633; ${f.q}: ${ans?('<b>'+esc(ans)+'</b>'):'_______________________'}</p>`;
+    });
+    const cfg=INV[sec.id]; const arr=cfg?(inv[sec.id]||[]):[];
+    if(arr.length){
+      b+=`<p style="margin:6px 0 2px"><b>${cfg.plural} cadastrados:</b></p>`;
+      arr.forEach((it,i)=>{
+        const parts=cfg.fields.filter(f=>String(it[f.id]||'').trim()).map(f=>`${f.q.split('(')[0].trim()}: ${esc(it[f.id])}`).join(' · ');
+        b+=`<p style="margin:2px 0 2px 16px">• <b>${esc(itemTitle(sec.id,it,i))}</b> — ${parts||'sem dados'}</p>`;
+      });
+    }
+  });
+  const opps=st.opps||[];
+  b+=`<h2>Oportunidades Identificadas</h2><table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;width:100%"><tr><th>Problema Encontrado</th><th>Solução Recomendada</th><th>Valor Estimado</th><th>Prioridade</th></tr>`;
+  if(opps.length)opps.forEach(o=>{b+=`<tr><td>${esc(o.p)}</td><td>${esc(o.s)}</td><td>${esc(o.v)}</td><td>${esc(o.prio)}</td></tr>`;});
+  else b+=`<tr><td colspan="4" style="text-align:center">—</td></tr>`;
+  b+=`</table>`;
+  b+=vendaTrocaReportHTML(st);
+  const stt=(p,r)=>catStatus(p,r).txt;
+  b+=`<h2>Resumo Executivo</h2>
+    <p>Nota da infraestrutura: <b>${c.nota.toFixed(1)} / 10</b></p>
+    <p>Risco de perda de dados: <b>${stt(c.cat[D],true)}</b></p>
+    <p>Risco de parada operacional: <b>${stt(c.cat[P],true)}</b></p>
+    <p>Situação da rede: <b>${stt(c.cat[R],false)}</b></p>
+    <p>Situação da segurança: <b>${stt(c.cat[S],false)}</b></p>
+    <p>Pontuação Geral: <b>${labelOfNota(c.nota)}</b></p>`;
+  const obs=(st.resumo&&st.resumo.obs)||resumoIAtexto(st);
+  if(obs)b+=`<h2>Resumo do Diagnóstico</h2><p style="text-align:justify">${esc(obs)}</p>`;
+  return b;
+}
+function gerarWord(){
+  const body=buildWordOriginal(state);
+  const styles=`body{font-family:'Segoe UI',Arial,sans-serif;color:#000;font-size:12px}
+    h1{font-size:20px;margin:0 0 2px;color:#0a2550}
+    h2{font-size:14px;border-left:4px solid #8cc63f;padding-left:8px;margin:16px 0 6px;color:#0a2550}
+    p{margin:6px 0}
+    table{width:100%;border-collapse:collapse;margin:6px 0}
+    th,td{border:1px solid #cccccc;padding:6px 8px;text-align:left;font-size:11px;vertical-align:top}
+    th{background:#f1f4f9}
+    .rep-head{border-bottom:3px solid #0a2550;padding-bottom:10px;margin-bottom:14px}
+    .rep-kpi{border:1px solid #dddddd;padding:8px;display:inline-block;margin-right:6px}
+    .rep-kpi .l{font-size:10px;color:#666666}.rep-kpi .v{font-weight:bold;font-size:13px}
+    .rep-inv-title{font-weight:bold;color:#0a2550;margin:8px 0 4px}
+    .inv-rep{border:1px solid #dddddd;padding:6px 8px;margin:4px 0;font-size:11px}
+    .inv-rep-fotos img{width:120px;height:auto;border:1px solid #cccccc;margin:2px}
+    .prio-alta{color:#dc2626;font-weight:bold}.prio-media{color:#f59e0b;font-weight:bold}.prio-baixa{color:#16a34a;font-weight:bold}`;
+  const html=`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Diagnóstico Tecnológico</title>
+    <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+    <style>${styles}</style></head><body>${body}</body></html>`;
+  const nome=(state.answers.empresa||state.answers.razao_social||'cliente').replace(/[^\w\-]+/g,'_');
+  const blob=new Blob(['﻿'+html],{type:'application/msword'});
+  downloadBlob(new File([blob],`Diagnostico-${nome}.doc`,{type:'application/msword'}));
+  toast('📄 Documento Word gerado');
+}
+/* ===== Relatório consultivo (PDF) — formato narrativo ===== */
+function listar(arr){arr=arr.filter(Boolean);if(arr.length<=1)return arr[0]||'';return arr.slice(0,-1).join(', ')+' e '+arr[arr.length-1];}
+function relatorioConsultivo(st){
+  const a=st.answers||{}, hidden=(st.doc&&st.doc.hidden)||{};
+  const sim=id=>a[id]==='sim', nao=id=>a[id]==='nao';
+  const out=[];
+  let r;
+  r=[]; if(sim('rede_lenta'))r.push('lentidão na rede'); if(sim('internet_quedas'))r.push('instabilidade e quedas de internet');
+  if(nao('wifi_atende')||sim('areas_sem_cobertura'))r.push('áreas com cobertura Wi-Fi insuficiente');
+  if(nao('controle_acesso'))r.push('ausência de controle de acesso à rede'); if(nao('backup_config'))r.push('falta de backup das configurações dos ativos de rede');
+  if(r.length&&!hidden['rede'])out.push({titulo:'Infraestrutura de Rede e Conectividade',
+    descricao:`A infraestrutura de rede concentrou parte importante das oportunidades identificadas. Foram observadas ${listar(r)}.`,
+    riscos:'redução da produtividade, interrupções operacionais, dificuldades de acesso aos sistemas e aumento do tempo de recuperação em caso de falhas',
+    recomendacoes:'avaliação detalhada da infraestrutura, revisão da cobertura Wi-Fi, análise de desempenho dos equipamentos, implementação de redundância de links e backup das configurações dos ativos de rede',
+    chip7:'A Chip7 pode apoiar desde o diagnóstico aprofundado até a implementação das melhorias necessárias para elevar a disponibilidade e o desempenho do ambiente.'});
+  r=[]; if(nao('backup'))r.push('ausência de rotina de backup'); else if(nao('testaram_restauracao'))r.push('backups realizados, porém sem testes periódicos de restauração');
+  if(sim('perderam_arquivos'))r.push('histórico de perda de arquivos');
+  if(r.length&&!hidden['servidor'])out.push({titulo:'Continuidade Operacional e Proteção dos Dados',
+    descricao:`Em relação à continuidade operacional, observou-se ${listar(r)}.`,
+    riscos:'indisponibilidade de dados, paralisação das operações, perda de informações críticas e impactos financeiros',
+    recomendacoes:'implementação de testes periódicos de recuperação, documentação dos procedimentos de contingência e definição clara de responsabilidades',
+    chip7:'A Chip7 pode apoiar na validação do ambiente atual e na construção de uma estratégia de continuidade operacional adequada à criticidade do negócio.'});
+  r=[]; if(sim('sofreram_ataques'))r.push('histórico de ataques digitais'); if(sim('golpes'))r.push('tentativas de golpes por e-mail e WhatsApp');
+  if(nao('antivirus')||nao('todas_protegidas'))r.push('proteção de endpoints insuficiente'); if(nao('politicas_senha'))r.push('ausência de política de senhas');
+  if(r.length&&!hidden['segdigital'])out.push({titulo:'Segurança Digital',
+    descricao:`No âmbito da segurança digital foram identificados ${listar(r)}.`,
+    riscos:'comprometimento de contas corporativas, vazamento de informações, ransomware e fraudes',
+    recomendacoes:'fortalecimento dos controles de segurança, autenticação multifator, revisão de acessos, proteção avançada de e-mails e treinamento de conscientização dos usuários',
+    chip7:'A Chip7 possui experiência na implementação de soluções de proteção, monitoramento e capacitação para redução dos riscos cibernéticos.'});
+  r=[]; if(sim('maquinas_lentas'))r.push('equipamentos com desempenho abaixo do esperado'); if(sim('maquinas_travando'))r.push('máquinas apresentando travamentos');
+  if(sim('hd_mecanico'))r.push('uso de HDs mecânicos, de menor desempenho'); if(sim('sem_manutencao'))r.push('ausência de manutenção preventiva estruturada');
+  if(r.length&&!hidden['computadores'])out.push({titulo:'Equipamentos e Produtividade',
+    descricao:`Quanto ao parque de equipamentos, foram identificados ${listar(r)}.`,
+    riscos:'perda de produtividade, aumento de falhas inesperadas e redução da vida útil dos ativos',
+    recomendacoes:'manutenção preventiva, monitoramento dos ativos críticos, upgrades pontuais e renovação planejada',
+    chip7:'A Chip7 pode fornecer equipamentos, upgrades, manutenção preventiva e modelos de locação corporativa.'});
+  r=[]; if(nao('controle_custo'))r.push('ausência de controle de custos de impressão'); if(sim('gastos_elevados'))r.push('gastos elevados com suprimentos'); if(sim('falhas_frequentes'))r.push('falhas frequentes nas impressoras');
+  if(r.length&&!hidden['impressao'])out.push({titulo:'Gestão de Impressão e Controle de Custos',
+    descricao:`Na gestão de impressão foram identificados ${listar(r)}.`,
+    riscos:'desperdícios, falta de visibilidade dos custos e despesas superiores ao necessário',
+    recomendacoes:'bilhetagem, monitoramento de consumo, revisão dos custos atuais e avaliação de outsourcing de impressão',
+    chip7:'A Chip7 oferece soluções de impressão gerenciada, proporcionando maior previsibilidade e redução de custos.'});
+  r=[]; if(nao('cameras'))r.push('ausência de sistema de câmeras'); if(sim('pontos_cegos'))r.push('pontos cegos no monitoramento'); if(nao('gravacao')||nao('cftv_funcionando'))r.push('falhas no sistema de gravação ou monitoramento');
+  if(r.length&&!hidden['cftv'])out.push({titulo:'Segurança Eletrônica e Monitoramento',
+    descricao:`Na segurança eletrônica observou-se ${listar(r)}.`,
+    riscos:'menor capacidade de prevenção e resposta a incidentes e fragilidade no monitoramento físico',
+    recomendacoes:'projeto ou ampliação de CFTV, correção de pontos cegos, gravação confiável e acesso remoto ao monitoramento',
+    chip7:'A Chip7 projeta, instala e mantém sistemas de CFTV adequados à necessidade de cada ambiente.'});
+  r=[]; if(nao('equip_nobreak')||nao('servidor_nobreak'))r.push('equipamentos críticos sem proteção por nobreak'); if(sim('perda_energia'))r.push('histórico de danos por oscilação ou queda de energia'); if(nao('aterramento'))r.push('aterramento elétrico inadequado');
+  if(r.length&&!hidden['energia'])out.push({titulo:'Energia e Proteção Elétrica',
+    descricao:`Quanto à proteção elétrica foram identificados ${listar(r)}.`,
+    riscos:'danos a equipamentos, perda de dados por desligamentos abruptos e paradas não planejadas',
+    recomendacoes:'instalação de nobreaks dimensionados, adequação do aterramento e manutenção das baterias',
+    chip7:'A Chip7 fornece e dimensiona soluções de energia, como nobreaks e estabilizadores, para proteger a operação.'});
+  r=[]; if(nao('crm'))r.push('ausência de CRM para gestão de atendimentos e oportunidades'); if(nao('sistema_gestao'))r.push('falta de um sistema de gestão (ERP)'); if(sim('vendas_perdidas'))r.push('vendas perdidas por demora no atendimento');
+  if(r.length&&!hidden['produtividade'])out.push({titulo:'Produtividade e Processos',
+    descricao:`Em produtividade e processos identificou-se ${listar(r)}.`,
+    riscos:'perda de oportunidades, retrabalho e baixa previsibilidade comercial',
+    recomendacoes:'implantação de CRM e/ou ERP, automação de processos e padronização de rotinas',
+    chip7:'A Chip7 apoia na escolha e implantação de ferramentas de gestão e automação que aumentam a produtividade.'});
+  return out;
+}
+function visaoGeralTexto(st){
+  const a=st.answers||{}, nome=a.empresa||a.razao_social||'a empresa avaliada';
+  const pos=[]; if(a.inventario==='sim')pos.push('inventário patrimonial'); if(a.plano_renovacao==='sim')pos.push('plano de renovação de equipamentos');
+  if(a.sistema_gestao==='sim')pos.push('utilização de sistemas de gestão'); if(a.backup==='sim')pos.push('rotinas de backup'); if(a.antivirus==='sim')pos.push('antivírus corporativo');
+  let t=`A avaliação realizada pela Chip7 teve como objetivo analisar o ambiente tecnológico da ${nome} sob a ótica da produtividade, disponibilidade, segurança e eficiência operacional.`;
+  if(pos.length)t+=` Foram identificados pontos positivos, como ${listar(pos)}.`;
+  t+=` Também foram observadas oportunidades relevantes de melhoria, capazes de reduzir riscos operacionais, aumentar a produtividade dos usuários e fortalecer a segurança da informação.`;
+  return t;
+}
+function consideracoesFinaisTexto(st){
+  const a=st.answers||{}, nome=a.empresa||a.razao_social||'a empresa';
+  return `A ${nome} possui uma base tecnológica que pode ser fortalecida com as ações apontadas neste relatório, voltadas a aumentar a produtividade, reforçar a segurança e reduzir riscos operacionais. Recomenda-se a construção de um plano estruturado de evolução tecnológica, priorizando os pontos de maior impacto para o negócio. A Chip7 coloca-se à disposição para apoiar na definição das prioridades, no fornecimento de soluções, equipamentos e serviços especializados, e no acompanhamento da execução das iniciativas, transformando tecnologia em resultados concretos.`;
+}
+function pdfCheckPage(doc,y,need){const H=doc.internal.pageSize.getHeight();if(y+(need||16)>H-56){doc.addPage();return 60;}return y;}
+function pdfHeading(doc,txt,M,y){y=pdfCheckPage(doc,y,46);y+=12;doc.setFont('helvetica','bold');doc.setFontSize(12.5);doc.setTextColor(10,37,80);doc.text(txt,M,y);y+=5;doc.setDrawColor(140,198,63);doc.setLineWidth(2);doc.line(M,y,M+44,y);return y+13;}
+function pdfPara(doc,txt,M,y,maxW,bold,color){doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(10.5);const co=color||[40,40,40];doc.setTextColor(co[0],co[1],co[2]);
+  const lines=doc.splitTextToSize(txt,maxW);const lh=14.5;
+  for(const ln of lines){ y=pdfCheckPage(doc,y,lh); doc.text(ln,M,y); y+=lh; } return y+5;}
+function gerarRelatorioPDF(){
+  if(!window.jspdf){toast('Biblioteca de PDF indisponível');return;}
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(); const M=48, maxW=W-2*M;
+  const a=state.answers, nome=a.empresa||a.razao_social||'Cliente';
+  doc.setFillColor(10,37,80);doc.rect(0,0,W,68,'F');
+  const logo=logoDataURL(); if(logo){try{doc.addImage(logo,'PNG',M,15,38,38);}catch(e){}}
+  const hx=M+(logo?48:0);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Chip7 Tecnologia e Inovação',hx,30);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(200,215,235);doc.text(`CNPJ ${CHIP7.cnpj} · ${CHIP7.tel} · ${CHIP7.site}`,hx,46);
+  let y=96;
+  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(10,37,80);
+  doc.splitTextToSize('RELATÓRIO DE OPORTUNIDADES, RISCOS E RECOMENDAÇÕES TECNOLÓGICAS',maxW).forEach(ln=>{doc.text(ln,M,y);y+=19;});
+  y+=4; doc.setFontSize(13);doc.setTextColor(0,0,0);doc.text(nome,M,y); y+=18;
+  doc.setFont('helvetica','italic');doc.setFontSize(10);doc.setTextColor(90,90,90);doc.text('Elaborado por Chip7 Tecnologia e Inovação',M,y); y+=6;
+  doc.setDrawColor(220,224,230);doc.setLineWidth(1);doc.line(M,y+4,W-M,y+4); y+=18;
+  y=pdfHeading(doc,'Visão Geral',M,y);
+  y=pdfPara(doc,visaoGeralTexto(state),M,y,maxW);
+  const cats=relatorioConsultivo(state);
+  if(!cats.length)y=pdfPara(doc,'Não foram identificados pontos críticos relevantes no momento da avaliação. Recomenda-se manter as boas práticas e o monitoramento contínuo do ambiente.',M,y,maxW);
+  cats.forEach((c,i)=>{
+    y=pdfHeading(doc,`${i+1}. ${c.titulo}`,M,y);
+    y=pdfPara(doc,c.descricao,M,y,maxW);
+    y=pdfPara(doc,'Principais riscos: '+c.riscos+'.',M,y,maxW,false,[120,40,40]);
+    y=pdfPara(doc,'Recomendações: '+c.recomendacoes+'.',M,y,maxW,false,[20,70,30]);
+    y=pdfPara(doc,c.chip7,M,y,maxW,false,[10,37,80]);
+  });
+  y=pdfHeading(doc,'Considerações Finais',M,y);
+  y=pdfPara(doc,consideracoesFinaisTexto(state),M,y,maxW);
+  const pages=doc.internal.getNumberOfPages();
+  for(let p=1;p<=pages;p++){doc.setPage(p);
+    doc.setDrawColor(220,224,230);doc.line(M,H-40,W-M,H-40);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,120,120);
+    doc.text(`${CHIP7.nome} · ${CHIP7.endereco}`,M,H-26);
+    doc.text(`Pág. ${p}/${pages}`,W-M,H-26,{align:'right'});
+  }
+  const fn=nome.replace(/[^\w\-]+/g,'_');
+  downloadBlob(new File([doc.output('blob')],`Relatorio-Chip7-${fn}.pdf`,{type:'application/pdf'}));
+  toast('📄 Relatório PDF gerado');
+}
+function loadVisit(id){
+  const list=load(LIST_KEY)||[];const v=list.find(x=>x.id===id);if(!v)return;
+  state=JSON.parse(JSON.stringify(v.state));state.id=id;save(CUR_KEY,state);
+  closeModal();hydrate();window.scrollTo(0,0);toast("Visita carregada: "+v.nome);
+}
+function delVisit(id){
+  if(!confirm("Excluir esta visita?"))return;
+  let list=load(LIST_KEY)||[];list=list.filter(x=>x.id!==id);save(LIST_KEY,list);cloudDelete(id);closeModal();openVisits();
+}
+function exportJSON(){
+  const data={visits:load(LIST_KEY)||[],exported:new Date().toISOString()};
+  dl("diagnosticos-chip7.json",JSON.stringify(data,null,2),"application/json");
+}
+function importJSON(ev){
+  const file=ev.target.files[0];if(!file)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);const inc=d.visits||d;
+    if(!Array.isArray(inc))throw 0;
+    const list=load(LIST_KEY)||[];const ids=new Set(list.map(x=>x.id));
+    inc.forEach(v=>{if(!ids.has(v.id))list.push(v);});
+    save(LIST_KEY,list);closeModal();toast(inc.length+" visita(s) importada(s)");
+  }catch(e){alert("Arquivo inválido.");}};
+  r.readAsText(file);
+}
+
+/* ---------- relatório / PDF ---------- */
+function buildReport(st){
+  const a=st.answers||{},c=computeFrom(st),col=colorOfNota(c.nota);
+  const inv=st.inventory||{},opps=st.opps||[];
+  const ynTxt=v=>v==='sim'?'Sim':v==='nao'?'Não':v==='na'?'N/A':'—';
+  const val=id=>{const f=fieldDef(id);const v=a[id];if(v===undefined||v==='')return '—';return f&&f.t==='yn'?ynTxt(v):esc(v);};
+  let secHtml="";
+  const hidden=(st.doc&&st.doc.hidden)||{};
+  SECTIONS.forEach(sec=>{
+    if(sec.id==='empresa')return;
+    if(hidden[sec.id])return;
+    const rows=sec.f.map(f=>{
+      const v=a[f.id];const isRisk=f.risk&&v===f.risk.on;
+      return `<tr><td>${f.q}</td><td style="${isRisk?'color:#dc2626;font-weight:700':''}">${val(f.id)}${isRisk?' ⚠':''}</td></tr>`;
+    }).join('');
+    secHtml+=`<h2>${sec.ico} ${sec.t}</h2><table><tbody>${rows}</tbody></table>`;
+    const cfg=INV[sec.id];const arr=cfg?(inv[sec.id]||[]):[];
+    if(arr.length){
+      secHtml+=`<div class="rep-inv-title">${cfg.icon} ${cfg.plural} cadastrados (${arr.length})</div>`;
+      arr.forEach((it,i)=>{
+        const parts=cfg.fields.filter(f=>String(it[f.id]||'').trim())
+          .map(f=>`<span><b>${f.q.split('(')[0].trim()}:</b> ${esc(it[f.id])}</span>`).join(' · ');
+        const fotos=(it._fotos||[]).map(s=>`<img src="${s}">`).join('');
+        secHtml+=`<div class="inv-rep"><b>${esc(itemTitle(sec.id,it,i))}</b><br>${parts||'<i>sem dados</i>'}${fotos?`<div class="inv-rep-fotos">${fotos}</div>`:''}</div>`;
+      });
+    }
+  });
+  let oppRows=opps.map(o=>`<tr><td>${esc(o.p)}</td><td>${esc(o.s)}</td><td>${esc(o.v)||'—'}</td>
+     <td class="prio-${(o.prio||'').toLowerCase().replace('é','e').replace('média','media')}">${o.prio||'—'}</td></tr>`).join('');
+  if(!oppRows)oppRows=`<tr><td colspan="4" style="text-align:center;color:#888">Nenhuma oportunidade registrada</td></tr>`;
+  let total=0;opps.forEach(o=>{const n=parseMoney(o.v);if(!isNaN(n))total+=n;});
+  const stt=(p,r)=>catStatus(p,r);
+  const obs=(st.resumo&&st.resumo.obs)||'';
+  return `
+    <div class="rep-head">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="logo-chip7.png" alt="Chip7" style="width:54px;height:54px;border-radius:50%">
+        <div><h1>Diagnóstico Tecnológico</h1><div style="color:#666">Chip7 Informática · Relatório de visita técnica</div></div>
+      </div>
+      <div style="text-align:right"><div style="font-size:34px;font-weight:900;color:${col==='g'?'#16a34a':col==='y'?'#f59e0b':'#dc2626'}">${c.nota.toFixed(1)}<span style="font-size:16px;color:#999">/10</span></div>
+      <div>${labelOfNota(c.nota)}</div></div>
+    </div>
+    <table><tbody>
+      <tr><th style="width:22%">Empresa</th><td>${val('empresa')}</td><th style="width:14%">CNPJ</th><td>${val('cnpj')}</td></tr>
+      <tr><th>Razão social</th><td>${val('razao_social')}</td><th>Segmento</th><td>${val('segmento')}</td></tr>
+      <tr><th>Endereço</th><td colspan="3">${val('endereco')}</td></tr>
+      <tr><th>Responsável</th><td>${val('responsavel')}</td><th>Colaboradores</th><td>${val('colaboradores')}</td></tr>
+      <tr><th>Telefone</th><td>${val('telefone')}</td><th>E-mail</th><td>${val('email')}</td></tr>
+      <tr><th>Nº da OS</th><td>${val('os_numero')}</td><th>Data da visita</th><td>${val('data_visita')}</td></tr>
+      <tr><th>Atendido por</th><td colspan="3">${val('vendedor')}</td></tr>
+    </tbody></table>
+
+    <h2>📊 Resumo Executivo</h2>
+    <div class="rep-kpis">
+      <div class="rep-kpi"><div class="l">Risco de perda de dados</div><div class="v">${stt(c.cat[D],true).txt}</div></div>
+      <div class="rep-kpi"><div class="l">Risco de parada operacional</div><div class="v">${stt(c.cat[P],true).txt}</div></div>
+      <div class="rep-kpi"><div class="l">Situação da rede</div><div class="v">${stt(c.cat[R],false).txt}</div></div>
+      <div class="rep-kpi"><div class="l">Situação da segurança</div><div class="v">${stt(c.cat[S],false).txt}</div></div>
+      <div class="rep-kpi"><div class="l">Pontos de atenção</div><div class="v">${c.flags}</div></div>
+    </div>
+
+    <h2>💡 Oportunidades Identificadas</h2>
+    <table><thead><tr><th>Problema</th><th>Solução recomendada</th><th>Valor</th><th>Prioridade</th></tr></thead>
+    <tbody>${oppRows}</tbody>
+    <tfoot><tr><th colspan="2" style="text-align:right">Investimento estimado total</th><th colspan="2">${fmtMoney(total)}</th></tr></tfoot></table>
+
+    ${vendaTrocaReportHTML(st)}
+
+    ${secHtml}
+
+    <h2>📝 Resumo do Diagnóstico</h2>
+    <p style="text-align:justify;line-height:1.6">${esc(obs||resumoIAtexto(st))}</p>
+
+    <div style="margin-top:26px;border-top:2px solid #0a2550;padding-top:10px;font-size:11px;color:#333;line-height:1.6">
+      <b style="color:#0a2550;font-size:12px">${CHIP7.nome}</b> — ${CHIP7.razao}<br>
+      <b>CNPJ:</b> ${CHIP7.cnpj} &nbsp;·&nbsp; ${CHIP7.endereco}<br>
+      <b>Tel/WhatsApp:</b> ${CHIP7.tel} &nbsp;·&nbsp; ${CHIP7.email} &nbsp;·&nbsp; ${CHIP7.site} · ${CHIP7.loja} · ${CHIP7.social}<br>
+      <span style="color:#888">Documento gerado pelo App de Diagnóstico Tecnológico. Itens marcados com ⚠ indicam pontos de atenção.</span>
+    </div>`;
+}
+function printReport(){ document.getElementById('report').innerHTML=buildReport(state); window.print(); }
+function logoDataURL(){
+  try{const img=document.querySelector('.logo-badge')||document.querySelector('.appfoot-logo');
+    if(!img||!img.naturalWidth)return null;
+    const cv=document.createElement('canvas');cv.width=img.naturalWidth;cv.height=img.naturalHeight;
+    cv.getContext('2d').drawImage(img,0,0);return cv.toDataURL('image/png');}catch(e){return null;}
+}
+function gerarPDFBlob(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  const a=state.answers,c=compute(),col=colorOfNota(c.nota);
+  const rgb=col==='g'?[22,163,74]:col==='y'?[245,158,11]:[220,38,38];
+  const ynTxt=v=>v==='sim'?'Sim':v==='nao'?'Não':v==='na'?'N/A':'—';
+  const val=id=>{const f=fieldDef(id);const v=a[id];if(v===undefined||v==='')return '—';return f&&f.t==='yn'?ynTxt(v):String(v);};
+  const M=40;
+  // cabeçalho
+  doc.setFillColor(10,37,80);doc.rect(0,0,W,76,'F');
+  const logo=logoDataURL();if(logo){try{doc.addImage(logo,'PNG',M,18,42,42);}catch(e){}}
+  const hx=M+(logo?54:0);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(17);
+  doc.text('Diagnóstico Tecnológico',hx,36);
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(195,212,235);
+  doc.text('Chip7 Informática · Relatório de visita técnica',hx,53);
+  doc.setTextColor(rgb[0],rgb[1],rgb[2]);doc.setFont('helvetica','bold');doc.setFontSize(22);
+  doc.text(c.nota.toFixed(1)+'/10',W-M,40,{align:'right'});
+  doc.setFontSize(9);doc.setTextColor(220,228,240);
+  doc.text(labelOfNota(c.nota).replace(/[^\x00-\xFF]/g,'').trim(),W-M,55,{align:'right'});
+  // empresa
+  doc.autoTable({startY:88,theme:'grid',styles:{fontSize:9,cellPadding:4},
+    columnStyles:{0:{fontStyle:'bold',fillColor:[241,244,249],cellWidth:95},2:{fontStyle:'bold',fillColor:[241,244,249],cellWidth:80}},
+    body:[
+      ['Empresa',val('empresa'),'CNPJ',val('cnpj')],
+      ['Razão social',val('razao_social'),'Segmento',val('segmento')],
+      ['Endereço',{content:val('endereco'),colSpan:3}],
+      ['Responsável',val('responsavel'),'Tel. resp.',val('tel_responsavel')],
+      ['Telefone',val('telefone'),'E-mail',val('email')],
+      ['Nº da OS',val('os_numero'),'Data',val('data_visita')],
+      ['Colaboradores',val('colaboradores'),'Emitido',new Date().toLocaleDateString('pt-BR')],
+    ],margin:{left:M,right:M}});
+  // resumo executivo
+  const stt=(p,r)=>catStatus(p,r).txt;
+  doc.autoTable({startY:doc.lastAutoTable.finalY+10,
+    head:[['Perda de dados','Parada operacional','Rede','Segurança','Atenção']],
+    body:[[stt(c.cat[D],true),stt(c.cat[P],true),stt(c.cat[R],false),stt(c.cat[S],false),String(c.flags)]],
+    theme:'grid',headStyles:{fillColor:[10,37,80],fontSize:8},styles:{fontSize:9,halign:'center'},margin:{left:M,right:M}});
+  if(state.resumo&&state.resumo.obs){
+    let yy=doc.lastAutoTable.finalY+14;doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(20,30,40);
+    doc.text('Parecer técnico:',M,yy);doc.setFont('helvetica','normal');
+    doc.text(doc.splitTextToSize(state.resumo.obs,W-2*M),M,yy+12);
+  }
+  // oportunidades
+  let total=0;state.opps.forEach(o=>{const n=parseMoney(o.v);if(!isNaN(n))total+=n;});
+  doc.autoTable({startY:doc.lastAutoTable.finalY+(state.resumo&&state.resumo.obs?42:14),
+    head:[['Oportunidades — Problema','Solução recomendada','Valor','Prioridade']],
+    body:state.opps.length?state.opps.map(o=>[o.p,o.s,o.v||'—',o.prio||'—']):[[{content:'Nenhuma oportunidade registrada',colSpan:4,styles:{halign:'center',textColor:[150,150,150]}}]],
+    foot:[[{content:'Investimento estimado total',colSpan:2,styles:{halign:'right',fontStyle:'bold'}},{content:fmtMoney(total),colSpan:2,styles:{fontStyle:'bold'}}]],
+    theme:'striped',headStyles:{fillColor:[0,145,196]},footStyles:{fillColor:[235,241,249],textColor:[10,37,80]},styles:{fontSize:9},margin:{left:M,right:M}});
+  // seções + inventário
+  const hiddenPdf=(state.doc&&state.doc.hidden)||{};
+  SECTIONS.forEach(sec=>{
+    if(sec.id==='empresa')return;
+    if(hiddenPdf[sec.id])return;
+    const body=sec.f.map(f=>{const v=a[f.id];const isRisk=f.risk&&v===f.risk.on;
+      return [f.q,{content:val(f.id)+(isRisk?'  (!)':''),styles:isRisk?{textColor:[220,38,38],fontStyle:'bold'}:{}}];});
+    doc.autoTable({startY:doc.lastAutoTable.finalY+16,
+      head:[[{content:sec.t,colSpan:2,styles:{fillColor:[10,37,80],textColor:255,halign:'left'}}]],
+      body,theme:'grid',styles:{fontSize:8.5,cellPadding:3},columnStyles:{0:{cellWidth:235}},margin:{left:M,right:M}});
+    const cfg=INV[sec.id];const arr=cfg?(state.inventory[sec.id]||[]):[];
+    if(arr.length){
+      const invBody=arr.map((it,i)=>{const parts=cfg.fields.filter(f=>String(it[f.id]||'').trim())
+        .map(f=>`${f.q.split('(')[0].trim()}: ${it[f.id]}`).join(' · ');return [itemTitle(sec.id,it,i),parts||'—'];});
+      doc.autoTable({startY:doc.lastAutoTable.finalY+2,
+        head:[[{content:`${cfg.plural} cadastrados (${arr.length})`,colSpan:2,styles:{fillColor:[0,145,196],textColor:255}}]],
+        body:invBody,theme:'grid',styles:{fontSize:8,cellPadding:3},columnStyles:{0:{cellWidth:120,fontStyle:'bold'}},margin:{left:M,right:M}});
+    }
+  });
+  // resumo do diagnóstico (final)
+  const resumoTxt=(state.resumo&&state.resumo.obs)||resumoIAtexto(state);
+  doc.autoTable({startY:doc.lastAutoTable.finalY+16,
+    head:[[{content:'Resumo do Diagnóstico',styles:{fillColor:[10,37,80],textColor:255,halign:'left'}}]],
+    body:[[resumoTxt]],theme:'grid',styles:{fontSize:9,cellPadding:6,lineHeight:1.3},margin:{left:M,right:M}});
+  // rodapé em todas as páginas
+  const pages=doc.internal.getNumberOfPages();
+  for(let p=1;p<=pages;p++){doc.setPage(p);
+    doc.setDrawColor(10,37,80);doc.setLineWidth(1);doc.line(M,H-46,W-M,H-46);
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(10,37,80);
+    doc.text(`${CHIP7.nome} — ${CHIP7.razao} · CNPJ ${CHIP7.cnpj}`,M,H-35);
+    doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);
+    doc.text(CHIP7.endereco,M,H-25);
+    doc.text(`${CHIP7.tel} · ${CHIP7.email} · ${CHIP7.site}`,M,H-15);
+    doc.text(`Pág. ${p}/${pages}`,W-M,H-15,{align:'right'});
+  }
+  return doc.output('blob');
+}
+
+/* ---------- util ---------- */
+function fieldDef(id){for(const s of SECTIONS)for(const f of s.f)if(f.id===id)return f;return null;}
+function esc(s){return String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
+function parseMoney(s){if(!s)return NaN;const n=String(s).replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');return parseFloat(n);}
+function fmtMoney(n){return (n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function dl(name,content,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+let toastT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ---------- PWA / iPhone ---------- */
+// registra o service worker (offline) — só funciona via http(s), ignora em file://
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+// aviso "Adicionar à Tela de Início" no iPhone/iPad (Safari, fora do modo app)
+function dismissHint(){const h=document.getElementById('installHint');h.classList.remove('show');try{localStorage.setItem('chip7_hint','1');}catch(e){}}
+(function installHint(){
+  const ua=navigator.userAgent||'';
+  const isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const standalone=window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed=load('chip7_hint');
+  if(isIOS&&!standalone&&!dismissed){document.getElementById('installHint').classList.add('show');}
+})();
+
+/* ---------- acesso do cliente (relatório read-only) ---------- */
+function normId(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function clientIdentifier(){
+  const cnpj=(state.answers.cnpj||'').replace(/\D/g,'');
+  if(cnpj.length===14)return cnpj;
+  return normId(state.answers.empresa||'');
+}
+function renderClientPanel(){
+  const loginEl=document.getElementById('cpLogin'),senhaEl=document.getElementById('cpSenha');
+  if(!loginEl)return;
+  const cnpj=(state.answers.cnpj||'').replace(/\D/g,'');
+  loginEl.textContent = cnpj.length===14 ? formatCnpj(cnpj) : (state.answers.empresa||'—');
+  senhaEl.textContent = (state.clientAccess&&state.clientAccess.senha)||'—';
+}
+function gerarSenhaCliente(){
+  if(!clientIdentifier()){toast('Preencha o CNPJ ou o nome da empresa primeiro');return;}
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
+  for(let i=0;i<6;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+  state.clientAccess={senha:s,criadoEm:new Date().toISOString()};
+  save(CUR_KEY,state);renderClientPanel();
+  toast('🔑 Senha do cliente: '+s);
+}
+function clientSnapshot(){
+  return {answers:state.answers,opps:state.opps,inventory:state.inventory,resumo:{obs:(state.resumo&&state.resumo.obs)||''},doc:state.doc||{},v:1};
+}
+function xorc(str,key){let o='';for(let i=0;i<str.length;i++)o+=String.fromCharCode(str.charCodeAt(i)^key.charCodeAt(i%key.length));return o;}
+function b64urlEnc(s){return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function b64urlDec(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return atob(s);}
+function encClient(obj,secret){return b64urlEnc(xorc(unescape(encodeURIComponent(JSON.stringify(obj))),secret));}
+function decClient(b64,secret){return JSON.parse(decodeURIComponent(escape(xorc(b64urlDec(b64),secret))));}
+function gerarLinkCliente(){
+  if(!(state.clientAccess&&state.clientAccess.senha))return null;
+  const id=clientIdentifier();if(!id)return null;
+  const secret=id+'|'+state.clientAccess.senha;
+  return location.origin+location.pathname+'#c='+encClient(clientSnapshot(),secret);
+}
+function copiarLinkCliente(){
+  if(!(state.clientAccess&&state.clientAccess.senha)){toast('Gere a senha do cliente primeiro');return;}
+  const link=gerarLinkCliente();if(!link){toast('Preencha o CNPJ/empresa primeiro');return;}
+  if(location.protocol==='file:')toast('Publique o site para o link funcionar no cliente');
+  navigator.clipboard.writeText(link).then(()=>toast('🔗 Link copiado — envie ao cliente')).catch(()=>prompt('Copie o link do cliente:',link));
+}
+function whatsText(){
+  const c=compute();
+  const nome=state.answers.empresa||state.answers.razao_social||'cliente';
+  let msg=`*Diagnóstico Tecnológico — Chip7 Informática*\n\nOlá! Segue o diagnóstico da ${nome}.\n`;
+  msg+=`\n*Nota da infraestrutura:* ${c.nota.toFixed(1)}/10 (${labelOfNota(c.nota)})\n`;
+  if(state.opps.length)msg+=`\n*Oportunidades identificadas:*\n`+state.opps.slice(0,6).map(o=>'• '+o.p).join('\n')+'\n';
+  const link=gerarLinkCliente();
+  if(link&&location.protocol!=='file:'){
+    const cnpjF=(state.answers.cnpj||'').replace(/\D/g,'');
+    msg+=`\n*Acesse seu relatório completo online:*\n${link}\n`;
+    msg+=`Login: ${cnpjF.length===14?formatCnpj(cnpjF):nome}\nSenha: ${state.clientAccess.senha}\n`;
+  }
+  msg+=`\nAtenciosamente, Chip7 Informática — ${CHIP7.tel}`;
+  return msg;
+}
+function downloadBlob(file){const u=URL.createObjectURL(file);const a=document.createElement('a');a.href=u;a.download=file.name||'relatorio.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+async function enviarWhatsApp(target){
+  const tel = target==='empresa' ? state.answers.telefone : state.answers.tel_responsavel;
+  const quem = target==='empresa' ? 'da empresa' : 'do responsável';
+  const telRaw=(tel||'').replace(/\D/g,'');
+  const nome=(state.answers.empresa||state.answers.razao_social||'cliente').replace(/[^\w\-]+/g,'_');
+  const text=whatsText();
+  let file=null;
+  try{ if(window.jspdf){ file=new File([gerarPDFBlob()],`Diagnostico-${nome}.pdf`,{type:'application/pdf'}); } }
+  catch(e){ console.warn('PDF',e); }
+  // Celular: compartilhamento nativo anexa o PDF de verdade (escolhe WhatsApp na lista)
+  if(file && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file],text,title:'Diagnóstico Tecnológico - Chip7'}); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  // PC / sem suporte: baixa o PDF e abre o WhatsApp já no telefone do responsável
+  if(file){ downloadBlob(file); toast('📄 PDF gerado — anexe-o na conversa do WhatsApp'); }
+  if(!telRaw){ toast('Preencha o telefone '+quem); return; }
+  const num=telRaw.length<=11?'55'+telRaw:telRaw;
+  const extra=file?'\n\n(O PDF foi baixado neste aparelho — toque no clipe 📎 e anexe-o.)':'';
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(text+extra)}`,'_blank');
+}
+/* modo cliente: abre via link #c=... ou pelo botão "Sou Cliente" */
+let CLIENT_SNAP=null;
+function buildClientLoginForm(needCode){
+  return `<form class="login-card" onsubmit="return clientDoLogin(event)">
+    <button type="button" class="login-back" onclick="voltarInicio()">← Início</button>
+    <img src="logo-chip7.png" alt="Chip7" class="login-logo">
+    <h1>Seu Diagnóstico</h1><p>Chip7 Informática · Acesso do cliente</p>
+    ${needCode?`<label>Código / link de acesso</label>
+    <input type="text" id="clCode" autocapitalize="none" spellcheck="false" placeholder="Cole o link recebido no WhatsApp">`:''}
+    <label>CNPJ ou nome da empresa</label>
+    <input type="text" id="clId" autocapitalize="none" spellcheck="false" placeholder="CNPJ ou empresa">
+    <label>Senha</label>
+    <input type="password" id="clPass" placeholder="Senha recebida">
+    <div class="login-err" id="clErr"></div>
+    <button class="btn primary" type="submit">Ver meu relatório</button>
+    <div class="login-foot">Não tem a senha? Solicite ao seu consultor Chip7.</div>
+  </form>`;
+}
+function showClientLogin(payload){
+  const w=document.getElementById('welcome');if(w)w.classList.remove('show');
+  const ls=document.getElementById('loginScreen');if(ls)ls.classList.remove('show');
+  const app=document.querySelector('.app');if(app)app.style.display='none';
+  const ab=document.querySelector('.actionbar');if(ab)ab.style.display='none';
+  window._clientPayload=payload||null;
+  let wrap=document.getElementById('clientLogin');if(wrap)wrap.remove();
+  wrap=document.createElement('div');wrap.id='clientLogin';wrap.className='login show';
+  wrap.innerHTML=buildClientLoginForm(!payload);
+  document.body.appendChild(wrap);
+  setTimeout(()=>{const x=document.getElementById(payload?'clId':'clCode');if(x)x.focus();},120);
+}
+function initClientMode(){
+  const h=location.hash||'';
+  if(h.indexOf('#c=')!==0)return false;
+  showClientLogin(h.slice(3));
+  return true;
+}
+function clientDoLogin(e){
+  if(e)e.preventDefault();
+  let payload=window._clientPayload;
+  if(!payload){const cc=document.getElementById('clCode');let code=(cc&&cc.value||'').trim();
+    if(code.indexOf('#c=')>=0)code=code.split('#c=')[1];payload=code;}
+  if(!payload){document.getElementById('clErr').textContent='Cole o link de acesso recebido no WhatsApp.';return false;}
+  const rawId=document.getElementById('clId').value||'';
+  const digits=rawId.replace(/\D/g,'');
+  const id=digits.length===14?digits:normId(rawId);
+  const senha=document.getElementById('clPass').value||'';
+  try{const snap=decClient(payload,id+'|'+senha);if(!snap||!snap.answers)throw 0;renderClientReport(snap);}
+  catch(err){document.getElementById('clErr').textContent='Dados/senha incorretos ou link inválido.';}
+  return false;
+}
+/* ---------- tela inicial / boas-vindas ---------- */
+function showWelcome(){
+  const w=document.getElementById('welcome');if(!w)return;
+  const info=document.getElementById('welInfo');
+  if(info)info.innerHTML=
+    `<div class="wi-row"><span>🏢</span><span>${CHIP7.razao} · CNPJ ${CHIP7.cnpj}</span></div>
+     <div class="wi-row"><span>📍</span><span>${CHIP7.endereco}</span></div>
+     <div class="wi-row"><span>📞</span><span><a href="tel:${CHIP7.telLink}">${CHIP7.tel}</a> · <a href="mailto:${CHIP7.email}">${CHIP7.email}</a></span></div>
+     <div class="wi-row"><span>🌐</span><span><a href="https://${CHIP7.site}" target="_blank" rel="noopener">${CHIP7.site}</a> · <a href="https://${CHIP7.loja}" target="_blank" rel="noopener">${CHIP7.loja}</a> · ${CHIP7.social}</span></div>`;
+  const cl=document.getElementById('clientLogin');if(cl)cl.remove();
+  document.getElementById('loginScreen').classList.remove('show');
+  const app=document.querySelector('.app');if(app)app.style.display='';
+  const ab=document.querySelector('.actionbar');if(ab)ab.style.display='';
+  const rep=document.getElementById('report');if(rep){rep.style.display='';rep.innerHTML='';}
+  w.classList.add('show');
+}
+function escolherFuncionario(){
+  document.getElementById('welcome').classList.remove('show');
+  if(isAuthed()){ showChooser(); return; }
+  const ls=document.getElementById('loginScreen');ls.classList.add('show');
+  setTimeout(()=>{const u=document.getElementById('loginUser');if(u)u.focus();},120);
+}
+function escolherCliente(){ document.getElementById('welcome').classList.remove('show'); showClientLogin(null); }
+function whatsappLoja(){
+  const num='55'+CHIP7.tel.replace(/\D/g,'');
+  const msg=encodeURIComponent('Olá! Vim pelo app de Diagnóstico Tecnológico e gostaria de falar com a Chip7.');
+  window.open(`https://wa.me/${num}?text=${msg}`,'_blank');
+}
+function voltarInicio(){
+  const cl=document.getElementById('clientLogin');if(cl)cl.remove();
+  document.getElementById('loginScreen').classList.remove('show');
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('cotacaoScreen').classList.remove('show');
+  showWelcome();
+}
+/* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
+function showChooser(){
+  ['welcome','loginScreen','cotacaoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  const cl=document.getElementById('clientLogin');if(cl)cl.remove();
+  document.getElementById('chooser').classList.add('show');
+}
+function escolherDiagnostico(){ document.getElementById('chooser').classList.remove('show'); window.scrollTo(0,0); }
+function escolherCotacao(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('cotacaoScreen').classList.add('show');
+  renderLojas();
+  onCategoria();
+  if(!document.getElementById('cotDolar').value) buscarDolar();
+  cotCalc();
+}
+function voltarChooser(){ document.getElementById('cotacaoScreen').classList.remove('show'); showChooser(); }
+/* ---------- cotação ---------- */
+const LOJAS_PY=[
+  {id:'nissei',nome:'Nissei'},
+  {id:'mega',nome:'Mega Eletrônicos'},
+  {id:'cellshop',nome:'Cellshop'},
+  {id:'shoppingchina',nome:'Shopping China'},
+  {id:'mobilezone',nome:'Mobile Zone'},
+  {id:'atacado',nome:'Atacado Connect'},
+  {id:'visaovip',nome:'Visão VIP'},
+  {id:'stargames',nome:'Star Games'}
+];
+let COT_HITS=[], COT_OFS=[];
+function renderLojas(){
+  const box=document.getElementById('cotLojas'); if(!box||box.dataset.done)return;
+  box.innerHTML=LOJAS_PY.map(l=>`<label class="loja-chip"><input type="checkbox" value="${l.id}" checked onchange="onLojaToggle()"> ${l.nome}</label>`).join('');
+  box.dataset.done='1';
+}
+function lojasSelecionadas(){ return [...document.querySelectorAll('#cotLojas input:checked')].map(i=>i.value); }
+function onCategoria(){
+  const sel=document.getElementById('cotCategoria');
+  const mk=sel.options[sel.selectedIndex].getAttribute('data-mk')||'20';
+  document.getElementById('cotMarkup').value=mk;
+  cotCalc();
+}
+async function buscarDolar(){
+  try{
+    const r=await fetch('https://economia.awesomeapi.com.br/last/USD-BRL',{cache:'no-store'});
+    const d=await r.json(); const v=parseFloat(d.USDBRL.bid);
+    if(v){ document.getElementById('cotDolar').value=v.toFixed(2); cotCalc(); }
+  }catch(e){ /* informe manual */ }
+}
+function arredCima5(v){ return Math.ceil(v/5)*5; }   // sempre pra cima, múltiplo de 5
+function arredNice(v){                                // sobe de 50 em 50; último degrau antes do milhar vira X.999,90
+  v=Math.ceil(v/50)*50;
+  if(v%1000===950) v=v+50-0.10;
+  return v;
+}
+// taxas reais da maquininha (% que a loja repassa por nº de parcelas)
+const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
+let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_VARFILTER='', COT_SHOWALL=false;
+function cotCalc(){
+  const usd=parseFloat(document.getElementById('cotPreco').value)||0;
+  const dolar=parseFloat(document.getElementById('cotDolar').value)||0;
+  const markup=(parseFloat(document.getElementById('cotMarkup').value)||0)/100;
+  const lucro=parseFloat(document.getElementById('cotLucro').value)||0;
+  const selP=document.getElementById('cotParcelas');
+  const N=parseInt(selP?selP.value:'10',10)||10;
+  const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
+  const custoBRL=usd*dolar;                  // custo no Paraguai já convertido em REAIS
+  const valorMarkup=custoBRL*markup;         // quanto a margem % adiciona, em reais
+  const aVistaBruto=custoBRL*(1+markup)+lucro;
+  const aVista=arredNice(aVistaBruto);       // preço à vista (dinheiro/PIX), sem taxa de cartão
+  const totalCartao=aVista*(1+taxa);         // repassa a taxa da maquininha
+  const parcela=arredCima5(totalCartao/N);   // parcela pra cima, múltiplo de 5
+  const totalParc=parcela*N;
+  COT_CALC = usd ? {usd,dolar,custoBRL,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
+  const el=document.getElementById('cotResult');
+  const bar=document.getElementById('cotAddBar');
+  if(!el)return;
+  if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole um link ou informe o preço (US$) para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; return; }
+  el.innerHTML=`
+    <details class="cr-calc" open><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
+      <div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
+      <div class="cr-line"><span>+ Margem em cima (${(markup*100).toFixed(0)}%)</span><b>+ ${fmtMoney(valorMarkup)}</b></div>
+      <div class="cr-line"><span>+ Lucro</span><b>+ ${fmtMoney(lucro)}</b></div>
+      <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
+      <div class="cr-line"><span>+ Taxa maquininha (${N}x · ${(TAXAS_CARTAO[N]||0).toString().replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
+    </details>
+    <div class="cr-venda big"><b>À vista · dinheiro/PIX</b><span>${fmtMoney(aVista)}</span></div>
+    <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
+    <div class="cr-sub">Total no cartão ${fmtMoney(totalParc)}</div>`;
+  if(bar)bar.style.display='flex';
+}
+/* ---- leitor do comprasparaguai (mesma lógica da função do servidor, validada) ---- */
+const CP_BASE='https://www.comprasparaguai.com.br';
+const CP_PRICE=/US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/i;
+const LOJAS_TERMOS={nissei:['nissei'],mega:['mega eletr'],cellshop:['cellshop','cell shop'],shoppingchina:['shopping china'],mobilezone:['mobile zone'],atacado:['atacado connect'],visaovip:['visãovip','visaovip','visão vip','visao vip'],stargames:['star games']};
+function termosDeLojas(){ return lojasSelecionadas().flatMap(id=>LOJAS_TERMOS[id]||[]); }
+function cpPrecoNum(s){ s=String(s||'').trim(); if(/,\d{2}$/.test(s)) s=s.replace(/\./g,'').replace(',','.'); const n=parseFloat(s); return (!isNaN(n)&&n>0)?n:null; }
+function cpDecode(s){ const t=document.createElement('textarea'); t.innerHTML=s||''; return t.value.replace(/\s+/g,' ').trim(); }
+async function cpProxy(url){
+  // passa pelo proxy CORS (navegador não consegue ler o site direto)
+  // corsproxy.io primeiro: rápido (~1s) e aguenta páginas maiores; allorigins de reserva
+  const proxies=['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
+  let err;
+  for(const px of proxies){
+    try{ const r=await fetch(px+encodeURIComponent(url)); if(r.ok) return await r.text(); err=new Error('status '+r.status); }
+    catch(e){ err=e; }
+  }
+  throw err||new Error('proxy');
+}
+function cpParseBusca(html){
+  const m=html.match(/resultados-busca([\s\S]*?)(?:paginacao|<footer|rodape)/i);
+  const area=m?m[1]:html;
+  const cards=area.split(/<div class="promocao-produtos-item col-sm-12"/i).slice(1);
+  const out=[];
+  for(const c of cards){
+    const nm=c.match(/promocao-item-nome[\s\S]*?<a[^>]*>\s*([\s\S]*?)\s*<\/a>/i);
+    const pm=c.match(CP_PRICE), lk=c.match(/href="(\/[^"]+_\d+\/)"/i), of=c.match(/(\d+)\s*OFERTAS?/i);
+    const im=c.match(/data-src="(https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i)||c.match(/data-src="([^"]+)"/i);
+    const preco=pm?cpPrecoNum(pm[1]):null;
+    if(nm&&preco) out.push({nome:cpDecode(nm[1].replace(/<[^>]+>/g,'')),precoUSD:preco,ofertas:of?+of[1]:1,link:lk?lk[1]:'',img:im?im[1]:''});
+  }
+  return out.slice(0,30);   // ordem de relevância do site (o produto certo vem no topo)
+}
+const CP_CORES=/(deep\s*blue|cosmic\s*orange|space\s*black|space\s*gray|sierra\s*blue|alpine\s*green|jet\s*black|rose\s*gold|product\s*red|natural\s*titanium|desert\s*titanium|preto|branco|azul|verde|vermelho|rosa|roxo|dourado|prateado|prata|cinza|chumbo|grafite|tit[âa]nio|meia.?noite|estelar|natural|deserto?|areia|coral|menta|lil[áa]s|bege|marrom|laranja|amarelo|midnight|starlight|graphite|black|white|blue|green|red|pink|purple|violet|golden|gold|silver|gray|grey|teal|orange|yellow|cosmic|titanium|space|sierra|jet|ultramarine|sky)/i;
+// grade aceita os vários jeitos do site: "Grade A+", "Grad A", "Grado A", "Swap A", "A+"
+function extrairGrade(nome){ const m=(nome||'').match(/(?:grad[eo]?|swap)\s*([a-cA-C][+\-]?)(?![a-z])/i); return m?('Grade '+m[1].toUpperCase()):''; }
+function extrairCor(nome){
+  if(!nome) return '';
+  const parts=nome.split(/\s[-–]\s/);                                  // cor após " - " (vem completa: "Deep Blue")
+  if(parts.length>1){ const last=parts[parts.length-1].trim(); if(last.length<=28 && CP_CORES.test(last)) return last; }
+  const m=nome.match(CP_CORES); return m?m[1].replace(/\s+/g,' ').trim():'';  // ou no meio do nome
+}
+function extrairVariante(nome){ return extrairGrade(nome)||extrairCor(nome); }   // grade manda; senão cor
+const ORDEM_GRADE={'Grade A+':1,'Grade A':2,'Grade A-':3,'Grade B':4,'Grade B+':3.5,'Grade C':5};
+function ordenarVariantes(arr){ return arr.sort((a,b)=>((ORDEM_GRADE[a]||50)-(ORDEM_GRADE[b]||50))||a.localeCompare(b)); }
+function cpParseDetalhe(html){
+  const blocks=html.split(/<div class="promocao-produtos-item"/i).slice(1);
+  const map={};                                   // loja|variante -> oferta mais barata
+  for(const b of blocks){
+    const adv=b.match(/'advertiser':\s*'([^']+)'/), pm=b.match(CP_PRICE);
+    const nm=b.match(/promocao-item-nome[\s\S]*?<a[^>]*>\s*([\s\S]*?)\s*<\/a>/i);
+    const preco=pm?cpPrecoNum(pm[1]):null;
+    if(adv&&preco){
+      const loja=cpDecode(adv[1]), nome=nm?cpDecode(nm[1].replace(/<[^>]+>/g,'')):'';
+      const grade=extrairGrade(nome), cor=extrairCor(nome), variante=grade||cor;
+      const k=loja.toLowerCase()+'|'+variante.toLowerCase();
+      if(!map[k]||preco<map[k].precoUSD) map[k]={loja,precoUSD:preco,variante,grade,cor,nome};
+    }
+  }
+  return Object.values(map).sort((a,b)=>a.precoUSD-b.precoUSD);  // todas; o filtro de loja é dinâmico no cliente
+}
+// tenta a função do Netlify; se não existir (site arrastado), faz pelo navegador
+async function cpPesquisa(q){
+  try{ const r=await fetch('/.netlify/functions/buscar?q='+encodeURIComponent(q)); if(r.ok){const d=await r.json(); if(!d.erro&&d.itens) return d.itens;} }catch(_){}
+  const html=await cpProxy(CP_BASE+'/busca/?q='+encodeURIComponent(q));
+  return cpParseBusca(html);
+}
+async function cpDetalhe(link){
+  try{ const r=await fetch('/.netlify/functions/buscar?detalhe='+encodeURIComponent(link)); if(r.ok){const d=await r.json(); if(!d.erro&&d.ofertas){return {ofertas:d.ofertas,nome:d.nome||'',img:d.img||''};}} }catch(_){}
+  const html=await cpProxy(link.startsWith('http')?link:CP_BASE+link);
+  const ofertas=cpParseDetalhe(html);
+  const nome=(html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
+  const img=(html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
+  return {ofertas,nome:cpDecode(nome),img};
+}
+function htmlProdHit(i,n){ return `<div class="prod-hit" onclick="verOfertas(${n})">
+    ${i.img?`<img class="prod-thumb" src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
+    <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)</small></div>
+    <span class="ph-go">›</span></div>`; }
+function renderProdutos(){
+  document.getElementById('cotBuscaMsg').textContent=`✔ ${COT_HITS.length} produto(s) — toque para ver cor, loja e preço:`;
+  document.getElementById('cotResultados').innerHTML=COT_HITS.map(htmlProdHit).join('');
+}
+async function pesquisarProdutos(){
+  const q=(document.getElementById('cotBusca').value||'').trim();
+  const msg=document.getElementById('cotBuscaMsg');
+  const box=document.getElementById('cotResultados');
+  if(!q){ msg.textContent='Digite o que quer pesquisar (ex.: placa mãe B550).'; return; }
+  msg.textContent='🔄 Buscando produtos no Paraguai...'; box.innerHTML='';
+  buscarDolar();
+  try{
+    COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0);
+    if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
+    renderProdutos();
+  }catch(e){
+    msg.textContent='⚠ Não consegui buscar agora (o passador pode estar fora do ar). Tente de novo, cole o link ou digite o preço (US$).';
+  }
+}
+async function abrirPorLink(){
+  const url=(document.getElementById('cotLink').value||'').trim();
+  const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
+  if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole um link de produto do comprasparaguai (ex.: .../celular-..._64041/).'; return; }
+  msg.textContent='🔄 Abrindo o produto...'; box.innerHTML=''; buscarDolar();
+  const path=url.replace(/^https?:\/\/[^/]+/,'');
+  try{
+    const d=await cpDetalhe(path);
+    const ofs=(d.ofertas||[]).filter(o=>o.precoUSD>0);
+    const menor=ofs.length?Math.min(...ofs.map(o=>o.precoUSD)):0;
+    const prod={nome:d.nome||'Produto',img:d.img||'',link:path,precoUSD:menor,ofertas:ofs.length||1};
+    COT_HITS=[prod];
+    if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_VARFILTER=''; COT_SHOWALL=false; renderOfertas(); }
+    else mostrarFallback(prod);
+  }catch(e){ msg.textContent='⚠ Não consegui abrir esse link (produtos grandes não abrem pelo navegador). Use a busca.'; }
+}
+async function verOfertas(n){
+  const prod=COT_HITS[n]; if(!prod)return;
+  const msg=document.getElementById('cotBuscaMsg');
+  msg.textContent='🔄 Buscando cor, loja e preço...';
+  let res={ofertas:[]};
+  if(prod.link){ try{ res=await cpDetalhe(prod.link); }catch(e){ res={ofertas:[]}; } }
+  if(!prod.img && res.img) prod.img=res.img;
+  const ofs=(res.ofertas||[]).filter(o=>o.precoUSD>0);
+  if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_VARFILTER=''; COT_SHOWALL=false; renderOfertas(); }
+  else mostrarFallback(prod);
+}
+function ofertasVisiveis(){
+  let list=COT_OFS.slice();
+  if(COT_VARFILTER==='__outras__') list=list.filter(o=>!o.grade);
+  else if(COT_VARFILTER) list=list.filter(o=>o.variante===COT_VARFILTER);
+  const termos=termosDeLojas();
+  if(termos.length && !COT_SHOWALL) list=list.filter(o=>termos.some(t=>o.loja.toLowerCase().includes(t)));  // só as lojas marcadas
+  const byLoja={}; for(const o of list){ if(!byLoja[o.loja]||o.precoUSD<byLoja[o.loja].precoUSD) byLoja[o.loja]=o; }
+  return Object.values(byLoja).sort((a,b)=>a.precoUSD-b.precoUSD).slice(0,12);
+}
+function renderOfertas(){
+  const prod=COT_PROD, box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  const variantes=ordenarVariantes([...new Set(COT_OFS.map(o=>o.variante).filter(Boolean))]);
+  const head=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
+    `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`;
+  const grades=variantes.filter(v=>v.startsWith('Grade')), cores=variantes.filter(v=>!v.startsWith('Grade'));
+  let chipVals = grades.length ? grades.concat(cores.length?['__outras__']:[]) : cores;   // se tem grade, cores soltas viram "Outras"
+  const lblChip=v=>v==='__outras__'?'Outras cores':v;
+  let chips='';
+  if(chipVals.length>1){
+    chips=`<div class="var-chips"><span class="var-chip${COT_VARFILTER===''?' on':''}" onclick="setVar('')">Todas</span>`+
+      chipVals.map(v=>`<span class="var-chip${COT_VARFILTER===v?' on':''}" onclick="setVar(this.dataset.v)" data-v="${v.replace(/"/g,'&quot;')}">${lblChip(v).replace(/</g,'&lt;')}</span>`).join('')+`</div>`;
+  }
+  COT_VIS=ofertasVisiveis();
+  if(!COT_VIS.length){
+    msg.textContent='Nenhuma das lojas marcadas tem este produto.';
+    box.innerHTML=head+chips+
+      `<p class="cot-fallback">Nenhuma das lojas marcadas vende este produto. Marque mais lojas acima ou veja todas:</p>`+
+      `<div class="prod-hit off" onclick="verTodasLojas()"><div class="ph-info"><b>Ver todas as lojas (${COT_OFS.length})</b></div><span class="ph-go">›</span></div>`;
+    return;
+  }
+  msg.textContent=`✔ ${COT_SHOWALL?'Todas as lojas':'Lojas conhecidas'} · menor preço já selecionado.${variantes.length>1?' Escolha a cor e a loja.':' Toque na loja pra trocar.'}`;
+  const list=COT_VIS.map((o,k)=>{
+    const sub=[o.grade,o.cor].filter(Boolean).join(' · ');
+    return `<div class="prod-hit off" onclick="usarOfertaVis(${k})">
+      <div class="ph-info"><b>${(o.loja||'Loja').replace(/</g,'&lt;')}</b>${sub?`<small>${sub.replace(/</g,'&lt;')}</small>`:''}${k===0?'<small class="badge-min">★ mais barato</small>':''}</div>
+      <span class="ph-price">US$ ${(+o.precoUSD).toFixed(2)}</span></div>`;}).join('');
+  box.innerHTML=head+chips+list;
+  if(COT_VIS.length) usarOfertaVis(0);
+}
+function verTodasLojas(){ COT_SHOWALL=true; renderOfertas(); }
+function onLojaToggle(){ COT_SHOWALL=false; if(COT_OFS&&COT_OFS.length) renderOfertas(); }
+function setVar(v){ COT_VARFILTER=v||''; renderOfertas(); }
+function usarOfertaVis(k){
+  const o=COT_VIS[k]; if(!o)return;
+  usarPreco(o.precoUSD,(COT_PROD&&COT_PROD.nome)||o.nome,COT_PROD&&COT_PROD.img,o.loja,o.cor||o.variante);
+  document.querySelectorAll('#cotResultados .prod-hit.off').forEach((e,i)=>e.classList.toggle('sel',i===k));
+}
+function mostrarFallback(prod){
+  COT_PROD=prod; COT_OFS=[]; COT_VARFILTER='';
+  const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
+  usarPreco(prod.precoUSD,prod.nome,prod.img,'','');
+  msg.textContent='✔ Usei o menor preço entre as lojas: US$ '+(+prod.precoUSD).toFixed(2)+'.';
+  box.innerHTML=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
+    `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`+
+    `<div class="prod-hit off sel"><div class="ph-info"><b>Menor preço (todas as lojas)</b><small class="badge-min">★ mais barato</small></div><span class="ph-price">US$ ${(+prod.precoUSD).toFixed(2)}</span></div>`+
+    `<p class="cot-fallback">Produto grande: o navegador não abre loja por loja — usei o menor preço do site. Você pode digitar a cor abaixo. (Pra escolher a loja em produtos grandes, dá pra publicar a versão rápida.)</p>`;
+}
+function usarPreco(usd,nome,img,loja,variante){
+  document.getElementById('cotPreco').value=(+usd).toFixed(2);
+  COT_SEL={nome:nome||'',img:img||'',loja:loja||'',usd:+usd,variante:variante||''};
+  if(nome) document.getElementById('cotBusca').value=nome;
+  const cor=document.getElementById('cotCor'); if(cor && variante!==undefined) cor.value=variante||'';
+  cotCalc();
+}
+/* ---- carrinho de orçamento (vários produtos) ---- */
+function itemAtual(){
+  if(!COT_CALC) return null;
+  const cor=(document.getElementById('cotCor').value||'').trim();
+  return {nome:(COT_SEL&&COT_SEL.nome)||document.getElementById('cotBusca').value||'Produto',
+    cor, img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'',
+    aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
+}
+function adicionarAoCart(){
+  const it=itemAtual(); if(!it){ toast('Calcule um preço primeiro.'); return; }
+  COT_CART.push(it); renderCart(); toast('✔ Adicionado ao orçamento ('+COT_CART.length+')');
+  const cc=document.getElementById('cotCart'); if(cc) cc.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
+function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
+function renderCart(){
+  const el=document.getElementById('cotCart'); if(!el)return;
+  if(!COT_CART.length){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  const tv=COT_CART.reduce((s,i)=>s+i.aVista,0);
+  el.innerHTML=`<div class="cart-head">🧾 Orçamento — ${COT_CART.length} ${COT_CART.length>1?'itens':'item'}</div>`+
+    COT_CART.map((i,k)=>`<div class="cart-item">
+      ${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<div class="cart-ph"></div>'}
+      <div class="ci-info"><b>${i.nome.replace(/</g,'&lt;')}</b>
+        <small>${i.cor?('🎨 '+i.cor.replace(/</g,'&lt;')):''}${i.cor&&i.loja?' · ':''}${i.loja?i.loja.replace(/</g,'&lt;'):''}</small>
+        <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
+      <button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div>`).join('')+
+    `<div class="cart-total"><span>Total à vista</span><b>${fmtMoney(tv)}</b></div>`+
+    `<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar orçamento no WhatsApp</button>`+
+    `<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`+
+    `<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`+
+    `<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
+}
+/* ---- PDF do orçamento (logo, foto, preços de venda, validade 7 dias) ---- */
+async function logoPng(){
+  return await new Promise(res=>{ const im=new Image();
+    im.onload=()=>{ try{ let w=im.naturalWidth,h=im.naturalHeight; const max=160; if(w>max){h=h*max/w;w=max;}
+      const cv=document.createElement('canvas'); cv.width=w;cv.height=h; cv.getContext('2d').drawImage(im,0,0,w,h); res(cv.toDataURL('image/png')); }catch(e){res(null);} };
+    im.onerror=()=>res(null); im.src='logo-chip7.png'; });
+}
+function imgThumb(url){ return url?('https://images.weserv.nl/?url='+encodeURIComponent(url.replace(/^https?:\/\//,''))+'&w=120&h=120&fit=contain&cbg=white&output=jpg'):''; }
+async function imgParaDataURL(url){
+  if(!url) return null;
+  const raw=url.replace(/^https?:\/\//,'');
+  // weserv: proxy de imagens com CORS (converte webp->jpg e redimensiona) -> rápido e sem taint
+  const fontes=['https://images.weserv.nl/?url='+encodeURIComponent(raw)+'&w=700&output=jpg', url];
+  for(const src of fontes){
+    const data=await new Promise(res=>{ const im=new Image(); im.crossOrigin='anonymous';
+      im.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=im.naturalWidth;cv.height=im.naturalHeight;
+        const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.drawImage(im,0,0);
+        res(cv.toDataURL('image/jpeg',0.85)); }catch(e){ res(null); } };
+      im.onerror=()=>res(null); im.src=src; });
+    if(data) return data;
+  }
+  return null;
+}
+function cotItens(){
+  if(COT_CART.length) return COT_CART;
+  const it=itemAtual(); return it?[it]:[];
+}
+async function gerarCotacaoPDF(baixar){
+  const itens=cotItens();
+  if(!itens.length){ toast('Adicione um produto ao orçamento primeiro.'); return null; }
+  if(!window.jspdf){ toast('PDF indisponível.'); return null; }
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=42, hoje=new Date();
+  // pré-carrega as fotos (weserv) e a logo
+  const fotos={}; for(const it of itens){ if(it.img&&!(it.img in fotos)) fotos[it.img]=await imgParaDataURL(it.img); }
+  const logo=await logoPng();
+  function header(){
+    doc.setFillColor(10,37,80); doc.rect(0,0,W,84,'F');
+    if(logo){ try{ doc.addImage(logo,'PNG',M,18,48,48); }catch(e){} }
+    const hx=M+(logo?60:0);
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);
+    doc.text('Orçamento',hx,52);doc.text(CHIP7.endereco,hx,65);
+    doc.setFontSize(10);doc.setTextColor(220,230,245);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
+  }
+  function footer(){
+    const fy=H-66; doc.setDrawColor(225,230,238);doc.line(M,fy-14,W-M,fy-14);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text(CHIP7.nome+'  ·  CNPJ '+CHIP7.cnpj,M,fy);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);
+    doc.text(CHIP7.endereco,M,fy+14);
+    doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site+'   ·   '+CHIP7.email,M,fy+27);
+  }
+  const bottom=H-100, rowH=96;
+  header(); let y=100;
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);
+  doc.text(itens.length>1?`Orçamento — ${itens.length} itens`:'Orçamento',M,y); y+=12;
+  for(const it of itens){
+    if(y+rowH>bottom){ footer(); doc.addPage(); header(); y=100; }
+    doc.setDrawColor(230,234,240);doc.setFillColor(252,253,255);doc.roundedRect(M,y,W-2*M,rowH-8,8,8,'FD');
+    let tx=M+14; const foto=fotos[it.img];
+    if(foto){ try{ doc.addImage(foto,'JPEG',M+8,y+8,72,72); tx=M+90; }catch(e){} }
+    doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
+    const nl=doc.splitTextToSize(it.nome,W-tx-M-150);
+    doc.text(nl.slice(0,2),tx,y+22);
+    let sy=y+22+Math.min(nl.length,2)*13+3;
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
+    if(it.cor){ doc.text('Cor/variação: '+it.cor,tx,sy); sy+=13; }
+    doc.text('Produto pronta entrega',tx,sy);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text('À vista',W-M-14,y+24,{align:'right'});
+    doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(10,37,80);doc.text(fmtMoney(it.aVista),W-M-14,y+44,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);doc.text((it.parcelas||10)+'x de '+fmtMoney(it.parcela),W-M-14,y+62,{align:'right'});
+    y+=rowH;
+  }
+  if(itens.length>1){
+    if(y+60>bottom){ footer(); doc.addPage(); header(); y=100; }
+    const tv=itens.reduce((s,i)=>s+i.aVista,0), tp=itens.reduce((s,i)=>s+(i.totalParc||0),0);
+    y+=6; doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);doc.text('Total à vista',M+14,y+23);
+    doc.setFontSize(18);doc.setTextColor(10,37,80);doc.text(fmtMoney(tv),W-M-14,y+25,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(95,105,120);doc.text('Parcelado total: '+fmtMoney(tp),W-M-14,y+44,{align:'right'});
+    y+=54;
+  }
+  y+=24; if(y>bottom){ footer(); doc.addPage(); header(); y=100; }
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);doc.text('Este orçamento é válido por 7 dias.',M,y);
+  footer();
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const base=itens.length>1?'Orçamento Chip7':itens[0].nome.replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+  const fname=`${base} - ${hoje.getDate()} de ${meses[hoje.getMonth()]}.pdf`;
+  const blob=doc.output('blob');
+  if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); salvarNoHistorico(itens); }
+  return {blob,fname,itens};
+}
+/* ---- histórico de orçamentos (localStorage) ---- */
+function histLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_hist')||'[]'); }catch(e){ return []; } }
+function histSave(arr){ try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(arr.slice(0,60))); }catch(e){} }
+function salvarNoHistorico(itens){
+  if(!itens||!itens.length) return;
+  const arr=histLoad();
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
+  histSave(arr);
+}
+function abrirHistorico(){
+  const arr=histLoad(), box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  msg.textContent=arr.length?`🕘 ${arr.length} orçamento(s) salvos`:'';
+  let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
+  if(!arr.length){ box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar um orçamento, ele fica guardado aqui (neste aparelho).</p>`; return; }
+  html+=arr.map(h=>{
+    const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const nomes=h.itens.map(i=>i.nome).join(', ');
+    return `<div class="hist-item"><div class="hi-info"><b>${h.itens.length} item(ns) · ${fmtMoney(h.totalVista)}</b><small>${dt}</small><small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small></div>
+      <div class="hi-acts"><button class="btn ghost" onclick="reabrirHist(${h.id})">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
+  }).join('');
+  box.innerHTML=html;
+}
+function reabrirHist(id){ const h=histLoad().find(x=>x.id===id); if(!h)return; COT_CART=h.itens.map(i=>({...i})); renderCart(); renderProdutos(); toast('Orçamento reaberto no carrinho ('+COT_CART.length+')'); const cc=document.getElementById('cotCart'); if(cc)cc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function excluirHist(id){ histSave(histLoad().filter(x=>x.id!==id)); abrirHistorico(); }
+/* ---- compartilhar como imagem (card visual) ---- */
+function cpRoundRect(cx,x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+function cpLoadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
+async function gerarCotacaoImagem(){
+  const itens=cotItens(); if(!itens.length){ toast('Adicione/selecione um produto primeiro.'); return; }
+  const it=itens[0], W=1080, H=1080;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const cx=cv.getContext('2d');
+  const g=cx.createLinearGradient(0,0,W,H); g.addColorStop(0,'#1a4a8f'); g.addColorStop(1,'#0a2550'); cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  // topo: logo + nome
+  const logoD=await logoPng(); if(logoD){ const li=await cpLoadImg(logoD); if(li) cx.drawImage(li,56,48,96,96); }
+  cx.fillStyle='#fff'; cx.font='bold 38px Arial'; cx.textBaseline='alphabetic'; cx.fillText(CHIP7.nome,168,96);
+  cx.fillStyle='rgba(255,255,255,.78)'; cx.font='24px Arial'; cx.fillText('Orçamento',168,132);
+  // card branco
+  const cardX=56, cardY=180, cardW=W-112, cardH=H-300;
+  cx.fillStyle='#fff'; cpRoundRect(cx,cardX,cardY,cardW,cardH,28); cx.fill();
+  // foto
+  const fotoD=await imgParaDataURL(it.img); let ty=cardY+56, tx=cardX+48;
+  if(fotoD){ const fi=await cpLoadImg(fotoD); if(fi){ const s=300; cx.save(); cpRoundRect(cx,cardX+(cardW-s)/2,cardY+40,s,s,18); cx.clip(); cx.fillStyle='#fff'; cx.fillRect(cardX+(cardW-s)/2,cardY+40,s,s); const r=Math.min(s/fi.width,s/fi.height); const dw=fi.width*r,dh=fi.height*r; cx.drawImage(fi,cardX+(cardW-dw)/2,cardY+40+(s-dh)/2,dw,dh); cx.restore(); ty=cardY+380; } }
+  // nome
+  cx.fillStyle='#1b2430'; cx.font='bold 40px Arial'; cx.textAlign='center';
+  const nome=it.nome+(it.cor?(' · '+it.cor):'');
+  wrapText(cx,nome,W/2,ty,cardW-120,46,2); ty+=110;
+  // à vista
+  cx.fillStyle='#6a7587'; cx.font='600 26px Arial'; cx.fillText('À VISTA (DINHEIRO/PIX)',W/2,ty); ty+=64;
+  cx.fillStyle='#0a2550'; cx.font='bold 86px Arial'; cx.fillText(fmtMoney(it.aVista),W/2,ty); ty+=66;
+  // parcelado
+  cx.fillStyle='#1b2430'; cx.font='bold 40px Arial'; cx.fillText(`ou ${it.parcelas||10}x de ${fmtMoney(it.parcela)}`,W/2,ty);
+  // validade + rodapé
+  cx.textAlign='center'; cx.fillStyle='#c4541c'; cx.font='bold 26px Arial'; cx.fillText('Orçamento válido por 7 dias',W/2,cardY+cardH-34);
+  cx.fillStyle='rgba(255,255,255,.92)'; cx.font='24px Arial';
+  cx.fillText('WhatsApp '+CHIP7.tel+'  ·  '+CHIP7.site,W/2,H-46);
+  cx.textAlign='left';
+  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.9));
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const hoje=new Date(); const fname=(it.nome.replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,50))+' - '+hoje.getDate()+' de '+meses[hoje.getMonth()]+'.jpg';
+  const file=new File([blob],fname,{type:'image/jpeg'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:'Orçamento Chip7'}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  downloadBlob(file); toast('🖼️ Imagem gerada');
+}
+function wrapText(cx,text,x,y,maxW,lh,maxLines){
+  const words=text.split(' '); let line='',lines=[];
+  for(const w of words){ const t=line?line+' '+w:w; if(cx.measureText(t).width>maxW && line){ lines.push(line); line=w; } else line=t; }
+  if(line) lines.push(line);
+  lines=lines.slice(0,maxLines);
+  lines.forEach((l,i)=>cx.fillText(l,x,y+i*lh));
+  return lines.length;
+}
+async function enviarCotacaoWhatsApp(){
+  const r=await gerarCotacaoPDF(false); if(!r) return;
+  salvarNoHistorico(r.itens);
+  const itens=r.itens;
+  let text=`*Orçamento — ${CHIP7.nome}*\n\n`;
+  text+=itens.map(i=>`• ${i.nome}${i.cor?(' ('+i.cor+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`).join('\n');
+  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*Total à vista: ${fmtMoney(tv)}*`; }
+  text+=`\n\n_Orçamento válido por 7 dias._\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  const file=new File([r.blob],r.fname,{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file],text,title:'Orçamento - Chip7'}); return; }
+    catch(e){ if(e&&e.name==='AbortError') return; }
+  }
+  downloadBlob(file); toast('📄 PDF baixado — anexe no WhatsApp');
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+function renderClientReport(snap){
+  CLIENT_SNAP=snap;
+  const cl=document.getElementById('clientLogin');if(cl)cl.remove();
+  const rep=document.getElementById('report');
+  rep.innerHTML=`<div class="cr-bar no-print"><img src="logo-chip7.png" alt="Chip7"><b>Seu Diagnóstico Tecnológico</b><span style="flex:1"></span><button class="btn primary" onclick="window.print()">📄 Salvar / Imprimir PDF</button></div>`+buildReport(snap);
+  rep.style.display='block';rep.style.background='#fff';rep.style.minHeight='100vh';
+  window.scrollTo(0,0);
+}
+
+/* ================================================================
+   SINCRONIZAÇÃO EM NUVEM DA EQUIPE (Firebase Firestore)
+   >>> Cole abaixo a configuração do SEU projeto Firebase (passo a passo
+   no chat). Enquanto apiKey estiver vazio, o app funciona só local. <<<
+   ================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBPOQ_Af0EuwGGKJeys0EV2srwfKufx3o0",
+  authDomain: "chip7-diagnostico.firebaseapp.com",
+  projectId: "chip7-diagnostico",
+  storageBucket: "chip7-diagnostico.firebasestorage.app",
+  messagingSenderId: "475272660585",
+  appId: "1:475272660585:web:ea5edc0a2792efd8ac44f8"
+};
+const FIREBASE_TEAM_EMAIL = "equipe@chip7diag.com"; // conta compartilhada da equipe (criada por você no Firebase)
+const FIREBASE_TEAM_PASS  = "Chip72017";            // senha dessa conta
+const cloud = {on:false, ready:false, db:null, auth:null, unsub:null, status:'off'};
+function cloudConfigured(){ return !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId); }
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('falha '+src));document.head.appendChild(s);});}
+async function cloudInit(){
+  if(!cloudConfigured()){ cloud.status='off'; refreshCloudStatus(); return; }
+  try{
+    const base='https://www.gstatic.com/firebasejs/10.12.2/';
+    await loadScript(base+'firebase-app-compat.js');
+    await loadScript(base+'firebase-auth-compat.js');
+    await loadScript(base+'firebase-firestore-compat.js');
+    firebase.initializeApp(FIREBASE_CONFIG);
+    cloud.auth=firebase.auth(); cloud.db=firebase.firestore();
+    cloud.ready=true; cloud.status='ready'; refreshCloudStatus();
+  }catch(e){ cloud.ready=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud init:',e); }
+}
+async function cloudSignIn(){
+  if(!cloud.ready) return false;
+  try{
+    await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
+    cloud.on=true; cloud.status='on'; refreshCloudStatus();
+    cloudSubscribe(); cloudSubscribeProdutos(); await cloudPushLocal();
+    return true;
+  }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
+}
+function cloudSubscribe(){
+  if(!cloud.ready) return;
+  if(cloud.unsub){cloud.unsub();cloud.unsub=null;}
+  cloud.unsub=cloud.db.collection('visitas').onSnapshot(snap=>{
+    const list=[]; snap.forEach(doc=>{const d=doc.data(); if(d&&d.rec)list.push(d.rec);});
+    list.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
+    save(LIST_KEY,list);
+    if(document.getElementById('modalWrap')){ closeModal(); openVisits(); }
+  }, err=>{ cloud.status='err'; refreshCloudStatus(); console.warn('Cloud sync:',err); });
+}
+async function cloudUpsert(rec){
+  if(!cloud.on) return;
+  try{ await cloud.db.collection('visitas').doc(rec.id).set({rec, savedAt:rec.savedAt||new Date().toISOString()}); }
+  catch(e){ console.warn('Cloud save:',e); }
+}
+async function cloudDelete(id){
+  if(!cloud.on) return;
+  try{ await cloud.db.collection('visitas').doc(id).delete(); }catch(e){ console.warn('Cloud del:',e); }
+}
+async function cloudPushLocal(){
+  if(!cloud.on) return;
+  const list=load(LIST_KEY)||[];
+  for(const rec of list){ try{ await cloud.db.collection('visitas').doc(rec.id).set({rec, savedAt:rec.savedAt||''},{merge:true}); }catch(e){} }
+}
+/* sincronização do catálogo de produtos/serviços entre dispositivos */
+let _prodCloudTimer=null;
+function cloudSaveProdutos(arr){
+  if(!cloud.on) return;
+  clearTimeout(_prodCloudTimer);
+  _prodCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('catalogo').doc('lista').set({itens:arr, ts:Date.now()}); }catch(e){console.warn('Cloud prod save',e);} }, 800);
+}
+function cloudSubscribeProdutos(){
+  if(!cloud.ready) return;
+  if(cloud._unsubProd){cloud._unsubProd();cloud._unsubProd=null;}
+  cloud._unsubProd=cloud.db.collection('catalogo').doc('lista').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){
+      const incoming=JSON.stringify(d.itens);
+      if(incoming!==localStorage.getItem(PROD_KEY)){
+        const pl=document.getElementById('prodList');
+        const editando=pl && document.activeElement && pl.contains(document.activeElement);
+        if(!editando){ try{localStorage.setItem(PROD_KEY,incoming);}catch(e){} if(pl)renderProdList(); }
+      }
+    } else {
+      // catálogo ainda não existe na nuvem: sobe o local
+      cloudSaveProdutos(getProdutos());
+    }
+  }, err=>console.warn('Cloud prod sync',err));
+}
+function refreshCloudStatus(){
+  const el=document.getElementById('cloudStatus'); if(!el)return;
+  const map={on:'☁️ Sincronizado com a equipe', ready:'☁️ Conectando à nuvem...', err:'⚠️ Nuvem indisponível (usando este aparelho)', off:'💾 Somente neste aparelho (nuvem não configurada)'};
+  el.textContent=map[cloud.status]||'';
+  el.className='cloud-status '+(cloud.status==='on'?'ok':cloud.status==='err'?'err':'off');
+}
+
+/* ---------- login ---------- */
+const AUTH_USER='chip7', AUTH_PASS='Chip72017', AUTH_KEY='chip7_auth';
+function isAuthed(){return load(AUTH_KEY)===true;}
+function doLogin(e){
+  if(e)e.preventDefault();
+  const u=(document.getElementById('loginUser').value||'').trim().toLowerCase();
+  const p=document.getElementById('loginPass').value||'';
+  if(u===AUTH_USER && p===AUTH_PASS){
+    save(AUTH_KEY,true);
+    document.getElementById('loginScreen').classList.remove('show');
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginErr').textContent='';
+    cloudSignIn();
+    showChooser();
+    return false;
+  }
+  document.getElementById('loginErr').textContent='Usuário ou senha incorretos.';
+  const pw=document.getElementById('loginPass');pw.value='';pw.focus();
+  return false;
+}
+function logout(){
+  if(!confirm('Sair do app? Será necessário fazer login novamente.'))return;
+  localStorage.removeItem(AUTH_KEY);location.reload();
+}
+function gateAuth(){
+  if(!isAuthed()){
+    document.getElementById('loginScreen').classList.add('show');
+    setTimeout(()=>{const u=document.getElementById('loginUser');if(u)u.focus();},120);
+  }
+}
+
+/* ---------- init ---------- */
+render();
+const saved=load(CUR_KEY);
+if(saved){state=Object.assign(blank(),saved);}
+hydrate();
+cloudInit().then(()=>{ if(isAuthed() && location.hash.indexOf('#c=')!==0) cloudSignIn(); });
+if(initClientMode()){/* cliente via link */}
+else if(isAuthed()){ showChooser(); }
+else { showWelcome(); }
+</script>
+</body>
+</html>
