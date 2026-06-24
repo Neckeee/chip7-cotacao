@@ -67,11 +67,19 @@ function parseBusca(html) {
 
 const CORES = /(deep\s*blue|cosmic\s*orange|space\s*black|space\s*gray|sierra\s*blue|alpine\s*green|jet\s*black|rose\s*gold|product\s*red|natural\s*titanium|desert\s*titanium|preto|branco|azul|verde|vermelho|rosa|roxo|dourado|prateado|prata|cinza|chumbo|grafite|tit[âa]nio|meia.?noite|estelar|natural|deserto?|areia|coral|menta|lil[áa]s|bege|marrom|laranja|amarelo|midnight|starlight|graphite|black|white|blue|green|red|pink|purple|violet|golden|gold|silver|gray|grey|teal|orange|yellow|cosmic|titanium|space|sierra|jet|ultramarine|sky)/i;
 function extrairGrade(nome) { const m = (nome || '').match(/(?:grad[eo]?|swap)\s*([a-cA-C][+\-]?)(?![a-z])/i); return m ? ('Grade ' + m[1].toUpperCase()) : ''; }
+const COR_MAP = {blue:'Azul',black:'Preto',white:'Branco',silver:'Prata',gold:'Dourado',golden:'Dourado',gray:'Cinza',grey:'Cinza',red:'Vermelho',green:'Verde',pink:'Rosa',purple:'Roxo',violet:'Roxo',orange:'Laranja',yellow:'Amarelo',graphite:'Grafite',titanium:'Titânio',natural:'Natural',midnight:'Meia-noite',starlight:'Estelar',teal:'Azul',sky:'Azul'};
+function corCanon(c) {
+  if (!c) return '';
+  c = c.replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  const low = c.toLowerCase();
+  if (COR_MAP[low]) return COR_MAP[low];
+  return c.charAt(0).toUpperCase() + c.slice(1);
+}
 function extrairCor(nome) {
   if (!nome) return '';
   const parts = nome.split(/\s[-–]\s/);
-  if (parts.length > 1) { const last = parts[parts.length - 1].trim(); if (last.length <= 28 && CORES.test(last)) return last; }
-  const m = nome.match(CORES); return m ? m[1].replace(/\s+/g, ' ').trim() : '';
+  if (parts.length > 1) { const last = parts[parts.length - 1].trim(); if (last.length <= 28 && CORES.test(last)) return corCanon(last); }
+  const m = nome.match(CORES); return m ? corCanon(m[1]) : '';
 }
 function parseDetalhe(html) {
   const blocks = html.split(/<div class="promocao-produtos-item"/i).slice(1);

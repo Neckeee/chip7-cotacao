@@ -243,9 +243,11 @@ textarea{min-height:60px;resize:vertical}
 .var-chip{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer;user-select:none}
 .var-chip.on{background:#fff;color:var(--brand);border-color:#fff}
 .ph-info small+small{margin-top:1px}
-.cot-addbar{display:flex;gap:8px;margin-top:12px}
-.cot-addbar input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff;color:var(--text)}
-.cot-addbar .btn{flex:none;white-space:nowrap}
+.cot-addbar{margin-top:14px}
+.ab-actions{display:flex;gap:8px;margin-top:12px}
+.ab-actions .btn{flex:1;white-space:nowrap}
+.var-row{display:flex;align-items:flex-start;gap:8px;margin:8px 0 2px}
+.var-lbl{flex:none;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);padding-top:7px;min-width:42px}
 .cot-cart{background:#fff;border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
 .cart-head{font-weight:800;font-size:15px;color:var(--brand);margin-bottom:10px}
 .cart-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -497,6 +499,16 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div><label class="cot-lbl">Margem em cima (%)</label><input id="cotMarkup" type="number" inputmode="decimal" value="20" oninput="cotCalc()"></div>
         <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucro" type="number" inputmode="decimal" value="600" oninput="cotCalc()"></div>
       </div>
+    </div>
+    <div class="cot-result" id="cotResult"></div>
+    <div class="cot-card cot-addbar" id="cotAddBar" style="display:none">
+      <div class="cot-sep">o que vai no orçamento</div>
+      <label class="cot-lbl">Nome no orçamento (PDF)</label>
+      <input id="cotNomePdf" placeholder="Nome do produto">
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Grade (condição)</label><input id="cotGrade" placeholder="ex.: Grade A+ (deixe vazio se novo)"></div>
+        <div><label class="cot-lbl">Cor</label><input id="cotCor" placeholder="ex.: Titânio Natural"></div>
+      </div>
       <label class="cot-lbl">Parcelar no cartão em</label>
       <select id="cotParcelas" onchange="cotCalc()">
         <option value="1">1x (à vista no cartão) · 2,99%</option>
@@ -518,12 +530,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <option value="17">17x · 16,79%</option>
         <option value="18">18x · 17,64%</option>
       </select>
-    </div>
-    <div class="cot-result" id="cotResult"></div>
-    <div class="cot-addbar" id="cotAddBar" style="display:none">
-      <input id="cotCor" placeholder="Cor / variação (ex.: Titânio Natural)">
-      <button class="btn primary" onclick="adicionarAoCart()">➕ Adicionar</button>
-      <button class="btn ghost" onclick="gerarCotacaoImagem()" title="Compartilhar como imagem">🖼️</button>
+      <div class="ab-actions">
+        <button class="btn primary" onclick="adicionarAoCart()">➕ Adicionar ao orçamento</button>
+        <button class="btn ghost" onclick="gerarCotacaoImagem()" title="Compartilhar como imagem">🖼️ Imagem</button>
+      </div>
     </div>
     <div class="cot-cart" id="cotCart" style="display:none"></div>
   </div>
@@ -2323,7 +2333,7 @@ function arredNice(v){                                // sobe de 50 em 50; últi
 }
 // taxas reais da maquininha (% que a loja repassa por nº de parcelas)
 const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
-let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_VARFILTER='', COT_SHOWALL=false;
+let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false;
 function cotCalc(){
   const usd=parseFloat(document.getElementById('cotPreco').value)||0;
   const dolar=parseFloat(document.getElementById('cotDolar').value)||0;
@@ -2355,7 +2365,7 @@ function cotCalc(){
     <div class="cr-venda big"><b>À vista · dinheiro/PIX</b><span>${fmtMoney(aVista)}</span></div>
     <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
     <div class="cr-sub">Total no cartão ${fmtMoney(totalParc)}</div>`;
-  if(bar)bar.style.display='flex';
+  if(bar)bar.style.display='block';
 }
 /* ---- leitor do comprasparaguai (mesma lógica da função do servidor, validada) ---- */
 const CP_BASE='https://www.comprasparaguai.com.br';
@@ -2392,11 +2402,19 @@ function cpParseBusca(html){
 const CP_CORES=/(deep\s*blue|cosmic\s*orange|space\s*black|space\s*gray|sierra\s*blue|alpine\s*green|jet\s*black|rose\s*gold|product\s*red|natural\s*titanium|desert\s*titanium|preto|branco|azul|verde|vermelho|rosa|roxo|dourado|prateado|prata|cinza|chumbo|grafite|tit[âa]nio|meia.?noite|estelar|natural|deserto?|areia|coral|menta|lil[áa]s|bege|marrom|laranja|amarelo|midnight|starlight|graphite|black|white|blue|green|red|pink|purple|violet|golden|gold|silver|gray|grey|teal|orange|yellow|cosmic|titanium|space|sierra|jet|ultramarine|sky)/i;
 // grade aceita os vários jeitos do site: "Grade A+", "Grad A", "Grado A", "Swap A", "A+"
 function extrairGrade(nome){ const m=(nome||'').match(/(?:grad[eo]?|swap)\s*([a-cA-C][+\-]?)(?![a-z])/i); return m?('Grade '+m[1].toUpperCase()):''; }
+const COR_MAP={blue:'Azul',black:'Preto',white:'Branco',silver:'Prata',gold:'Dourado',golden:'Dourado',gray:'Cinza',grey:'Cinza',red:'Vermelho',green:'Verde',pink:'Rosa',purple:'Roxo',violet:'Roxo',orange:'Laranja',yellow:'Amarelo',graphite:'Grafite',titanium:'Titânio',natural:'Natural',midnight:'Meia-noite',starlight:'Estelar',teal:'Azul',sky:'Azul'};
+function corCanon(c){
+  if(!c) return '';
+  c=c.replace(/\s*\(.*?\)\s*/g,' ').replace(/\s+/g,' ').trim();        // tira "(Somente Aparelho)" etc.
+  const low=c.toLowerCase();
+  if(COR_MAP[low]) return COR_MAP[low];                                // Blue->Azul, Black->Preto...
+  return c.charAt(0).toUpperCase()+c.slice(1);
+}
 function extrairCor(nome){
   if(!nome) return '';
   const parts=nome.split(/\s[-–]\s/);                                  // cor após " - " (vem completa: "Deep Blue")
-  if(parts.length>1){ const last=parts[parts.length-1].trim(); if(last.length<=28 && CP_CORES.test(last)) return last; }
-  const m=nome.match(CP_CORES); return m?m[1].replace(/\s+/g,' ').trim():'';  // ou no meio do nome
+  if(parts.length>1){ const last=parts[parts.length-1].trim(); if(last.length<=28 && CP_CORES.test(last)) return corCanon(last); }
+  const m=nome.match(CP_CORES); return m?corCanon(m[1]):'';            // ou no meio do nome
 }
 function extrairVariante(nome){ return extrairGrade(nome)||extrairCor(nome); }   // grade manda; senão cor
 const ORDEM_GRADE={'Grade A+':1,'Grade A':2,'Grade A-':3,'Grade B':4,'Grade B+':3.5,'Grade C':5};
@@ -2466,7 +2484,7 @@ async function abrirPorLink(){
     const menor=ofs.length?Math.min(...ofs.map(o=>o.precoUSD)):0;
     const prod={nome:d.nome||'Produto',img:d.img||'',link:path,precoUSD:menor,ofertas:ofs.length||1};
     COT_HITS=[prod];
-    if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_VARFILTER=''; COT_SHOWALL=false; renderOfertas(); }
+    if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_GRADEFILTER=''; COT_CORFILTER=''; COT_SHOWALL=false; renderOfertas(); }
     else mostrarFallback(prod);
   }catch(e){ msg.textContent='⚠ Não consegui abrir esse link (produtos grandes não abrem pelo navegador). Use a busca.'; }
 }
@@ -2478,40 +2496,40 @@ async function verOfertas(n){
   if(prod.link){ try{ res=await cpDetalhe(prod.link); }catch(e){ res={ofertas:[]}; } }
   if(!prod.img && res.img) prod.img=res.img;
   const ofs=(res.ofertas||[]).filter(o=>o.precoUSD>0);
-  if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_VARFILTER=''; COT_SHOWALL=false; renderOfertas(); }
+  if(ofs.length){ COT_PROD=prod; COT_OFS=ofs; COT_GRADEFILTER=''; COT_CORFILTER=''; COT_SHOWALL=false; renderOfertas(); }
   else mostrarFallback(prod);
 }
 function ofertasVisiveis(){
   let list=COT_OFS.slice();
-  if(COT_VARFILTER==='__outras__') list=list.filter(o=>!o.grade);
-  else if(COT_VARFILTER) list=list.filter(o=>o.variante===COT_VARFILTER);
+  if(COT_GRADEFILTER) list=list.filter(o=>o.grade===COT_GRADEFILTER);
+  if(COT_CORFILTER) list=list.filter(o=>o.cor===COT_CORFILTER);
   const termos=termosDeLojas();
   if(termos.length && !COT_SHOWALL) list=list.filter(o=>termos.some(t=>o.loja.toLowerCase().includes(t)));  // só as lojas marcadas
   const byLoja={}; for(const o of list){ if(!byLoja[o.loja]||o.precoUSD<byLoja[o.loja].precoUSD) byLoja[o.loja]=o; }
   return Object.values(byLoja).sort((a,b)=>a.precoUSD-b.precoUSD).slice(0,12);
 }
+function chipRow(label,vals,active,fn){
+  if(!vals.length) return '';
+  return `<div class="var-row"><span class="var-lbl">${label}</span><div class="var-chips"><span class="var-chip${active===''?' on':''}" onclick="${fn}('')">Todas</span>`+
+    vals.map(v=>`<span class="var-chip${active===v?' on':''}" data-v="${v.replace(/"/g,'&quot;')}" onclick="${fn}(this.dataset.v)">${v.replace(/</g,'&lt;')}</span>`).join('')+`</div></div>`;
+}
 function renderOfertas(){
   const prod=COT_PROD, box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
-  const variantes=ordenarVariantes([...new Set(COT_OFS.map(o=>o.variante).filter(Boolean))]);
+  const grades=ordenarVariantes([...new Set(COT_OFS.map(o=>o.grade).filter(Boolean))]);
+  const cores=[...new Set(COT_OFS.map(o=>o.cor).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const head=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
     `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`;
-  const grades=variantes.filter(v=>v.startsWith('Grade')), cores=variantes.filter(v=>!v.startsWith('Grade'));
-  let chipVals = grades.length ? grades.concat(cores.length?['__outras__']:[]) : cores;   // se tem grade, cores soltas viram "Outras"
-  const lblChip=v=>v==='__outras__'?'Outras cores':v;
-  let chips='';
-  if(chipVals.length>1){
-    chips=`<div class="var-chips"><span class="var-chip${COT_VARFILTER===''?' on':''}" onclick="setVar('')">Todas</span>`+
-      chipVals.map(v=>`<span class="var-chip${COT_VARFILTER===v?' on':''}" onclick="setVar(this.dataset.v)" data-v="${v.replace(/"/g,'&quot;')}">${lblChip(v).replace(/</g,'&lt;')}</span>`).join('')+`</div>`;
-  }
+  const chips=chipRow('Grade',grades,COT_GRADEFILTER,'setGrade')+chipRow('Cor',cores,COT_CORFILTER,'setCor');
   COT_VIS=ofertasVisiveis();
   if(!COT_VIS.length){
-    msg.textContent='Nenhuma das lojas marcadas tem este produto.';
+    msg.textContent='Nenhuma das lojas marcadas tem essa combinação.';
     box.innerHTML=head+chips+
-      `<p class="cot-fallback">Nenhuma das lojas marcadas vende este produto. Marque mais lojas acima ou veja todas:</p>`+
+      `<p class="cot-fallback">Nenhuma das lojas marcadas vende essa combinação. Tente outra grade/cor, marque mais lojas, ou veja todas:</p>`+
       `<div class="prod-hit off" onclick="verTodasLojas()"><div class="ph-info"><b>Ver todas as lojas (${COT_OFS.length})</b></div><span class="ph-go">›</span></div>`;
     return;
   }
-  msg.textContent=`✔ ${COT_SHOWALL?'Todas as lojas':'Lojas conhecidas'} · menor preço já selecionado.${variantes.length>1?' Escolha a cor e a loja.':' Toque na loja pra trocar.'}`;
+  const temVar=grades.length||cores.length;
+  msg.textContent=`✔ ${COT_SHOWALL?'Todas as lojas':'Lojas conhecidas'} · menor preço já selecionado.${temVar?' Escolha grade/cor e a loja.':' Toque na loja pra trocar.'}`;
   const list=COT_VIS.map((o,k)=>{
     const sub=[o.grade,o.cor].filter(Boolean).join(' · ');
     return `<div class="prod-hit off" onclick="usarOfertaVis(${k})">
@@ -2522,35 +2540,39 @@ function renderOfertas(){
 }
 function verTodasLojas(){ COT_SHOWALL=true; renderOfertas(); }
 function onLojaToggle(){ COT_SHOWALL=false; if(COT_OFS&&COT_OFS.length) renderOfertas(); }
-function setVar(v){ COT_VARFILTER=v||''; renderOfertas(); }
+function setGrade(v){ COT_GRADEFILTER=v||''; renderOfertas(); }
+function setCor(v){ COT_CORFILTER=v||''; renderOfertas(); }
 function usarOfertaVis(k){
   const o=COT_VIS[k]; if(!o)return;
-  usarPreco(o.precoUSD,(COT_PROD&&COT_PROD.nome)||o.nome,COT_PROD&&COT_PROD.img,o.loja,o.cor||o.variante);
+  usarPreco(o.precoUSD,(COT_PROD&&COT_PROD.nome)||o.nome,COT_PROD&&COT_PROD.img,o.loja,o.cor,o.grade);
   document.querySelectorAll('#cotResultados .prod-hit.off').forEach((e,i)=>e.classList.toggle('sel',i===k));
 }
 function mostrarFallback(prod){
-  COT_PROD=prod; COT_OFS=[]; COT_VARFILTER='';
+  COT_PROD=prod; COT_OFS=[]; COT_GRADEFILTER=''; COT_CORFILTER='';
   const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
-  usarPreco(prod.precoUSD,prod.nome,prod.img,'','');
+  usarPreco(prod.precoUSD,prod.nome,prod.img,'','','');
   msg.textContent='✔ Usei o menor preço entre as lojas: US$ '+(+prod.precoUSD).toFixed(2)+'.';
   box.innerHTML=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
     `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`+
     `<div class="prod-hit off sel"><div class="ph-info"><b>Menor preço (todas as lojas)</b><small class="badge-min">★ mais barato</small></div><span class="ph-price">US$ ${(+prod.precoUSD).toFixed(2)}</span></div>`+
-    `<p class="cot-fallback">Produto grande: o navegador não abre loja por loja — usei o menor preço do site. Você pode digitar a cor abaixo. (Pra escolher a loja em produtos grandes, dá pra publicar a versão rápida.)</p>`;
+    `<p class="cot-fallback">Produto grande: o navegador não abre loja por loja — usei o menor preço do site. Você pode digitar grade e cor abaixo. (Pra escolher a loja em produtos grandes, dá pra publicar a versão rápida.)</p>`;
 }
-function usarPreco(usd,nome,img,loja,variante){
+function usarPreco(usd,nome,img,loja,cor,grade){
   document.getElementById('cotPreco').value=(+usd).toFixed(2);
-  COT_SEL={nome:nome||'',img:img||'',loja:loja||'',usd:+usd,variante:variante||''};
+  COT_SEL={nome:nome||'',img:img||'',loja:loja||'',usd:+usd,cor:cor||'',grade:grade||''};
   if(nome) document.getElementById('cotBusca').value=nome;
-  const cor=document.getElementById('cotCor'); if(cor && variante!==undefined) cor.value=variante||'';
+  const np=document.getElementById('cotNomePdf'); if(np && nome!==undefined) np.value=nome||'';
+  const cc=document.getElementById('cotCor'); if(cc && cor!==undefined) cc.value=cor||'';
+  const cg=document.getElementById('cotGrade'); if(cg && grade!==undefined) cg.value=grade||'';
   cotCalc();
 }
 /* ---- carrinho de orçamento (vários produtos) ---- */
 function itemAtual(){
   if(!COT_CALC) return null;
-  const cor=(document.getElementById('cotCor').value||'').trim();
-  return {nome:(COT_SEL&&COT_SEL.nome)||document.getElementById('cotBusca').value||'Produto',
-    cor, img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'',
+  const np=document.getElementById('cotNomePdf'), cc=document.getElementById('cotCor'), cg=document.getElementById('cotGrade');
+  const nome=((np&&np.value)||'').trim()||(COT_SEL&&COT_SEL.nome)||'Produto';
+  return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
+    img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'',
     aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
 }
 function adicionarAoCart(){
@@ -2569,7 +2591,7 @@ function renderCart(){
     COT_CART.map((i,k)=>`<div class="cart-item">
       ${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<div class="cart-ph"></div>'}
       <div class="ci-info"><b>${i.nome.replace(/</g,'&lt;')}</b>
-        <small>${i.cor?('🎨 '+i.cor.replace(/</g,'&lt;')):''}${i.cor&&i.loja?' · ':''}${i.loja?i.loja.replace(/</g,'&lt;'):''}</small>
+        <small>${[i.grade,i.cor,i.loja].filter(Boolean).join(' · ').replace(/</g,'&lt;')}</small>
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
       <button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div>`).join('')+
     `<div class="cart-total"><span>Total à vista</span><b>${fmtMoney(tv)}</b></div>`+
@@ -2644,8 +2666,8 @@ async function gerarCotacaoPDF(baixar){
     doc.text(nl.slice(0,2),tx,y+22);
     let sy=y+22+Math.min(nl.length,2)*13+3;
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
-    if(it.cor){ doc.text('Cor/variação: '+it.cor,tx,sy); sy+=13; }
-    doc.text('Produto pronta entrega',tx,sy);
+    const det=[it.grade, it.cor?('Cor: '+it.cor):''].filter(Boolean).join('   ·   ');
+    if(det){ doc.text(det,tx,sy); }
     doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text('À vista',W-M-14,y+24,{align:'right'});
     doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(10,37,80);doc.text(fmtMoney(it.aVista),W-M-14,y+44,{align:'right'});
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);doc.text((it.parcelas||10)+'x de '+fmtMoney(it.parcela),W-M-14,y+62,{align:'right'});
@@ -2714,8 +2736,9 @@ async function gerarCotacaoImagem(){
   if(fotoD){ const fi=await cpLoadImg(fotoD); if(fi){ const s=300; cx.save(); cpRoundRect(cx,cardX+(cardW-s)/2,cardY+40,s,s,18); cx.clip(); cx.fillStyle='#fff'; cx.fillRect(cardX+(cardW-s)/2,cardY+40,s,s); const r=Math.min(s/fi.width,s/fi.height); const dw=fi.width*r,dh=fi.height*r; cx.drawImage(fi,cardX+(cardW-dw)/2,cardY+40+(s-dh)/2,dw,dh); cx.restore(); ty=cardY+380; } }
   // nome
   cx.fillStyle='#1b2430'; cx.font='bold 40px Arial'; cx.textAlign='center';
-  const nome=it.nome+(it.cor?(' · '+it.cor):'');
-  wrapText(cx,nome,W/2,ty,cardW-120,46,2); ty+=110;
+  const nlin=wrapText(cx,it.nome,W/2,ty,cardW-120,46,2); ty+=nlin*46+4;
+  const det=[it.grade,it.cor].filter(Boolean).join(' · ');
+  if(det){ cx.fillStyle='#6a7587'; cx.font='600 28px Arial'; cx.fillText(det,W/2,ty); ty+=54; } else ty+=14;
   // à vista
   cx.fillStyle='#6a7587'; cx.font='600 26px Arial'; cx.fillText('À VISTA (DINHEIRO/PIX)',W/2,ty); ty+=64;
   cx.fillStyle='#0a2550'; cx.font='bold 86px Arial'; cx.fillText(fmtMoney(it.aVista),W/2,ty); ty+=66;
@@ -2746,7 +2769,7 @@ async function enviarCotacaoWhatsApp(){
   salvarNoHistorico(r.itens);
   const itens=r.itens;
   let text=`*Orçamento — ${CHIP7.nome}*\n\n`;
-  text+=itens.map(i=>`• ${i.nome}${i.cor?(' ('+i.cor+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`).join('\n');
+  text+=itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); return `• ${i.nome}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
   if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*Total à vista: ${fmtMoney(tv)}*`; }
   text+=`\n\n_Orçamento válido por 7 dias._\n\n${CHIP7.tel} · ${CHIP7.site}`;
   const file=new File([r.blob],r.fname,{type:'application/pdf'});
