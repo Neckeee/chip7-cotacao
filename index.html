@@ -186,6 +186,13 @@ textarea{min-height:60px;resize:vertical}
 /* ---------- Tela de Cotação ---------- */
 .cot-screen{align-items:flex-start;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0}
 .cot-wrap{width:100%;max-width:560px;margin:0 auto;padding:18px 16px calc(40px + env(safe-area-inset-bottom))}
+.cot-cols{display:flex;flex-direction:column;gap:14px}
+.cot-hint{font-size:11.5px;color:var(--muted);margin:6px 2px 0}
+@media(min-width:860px){
+  .cot-wrap{max-width:980px}
+  .cot-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .cot-col-l,.cot-col-r{min-width:0}
+}
 .cot-head{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
 .cot-head .btn.ghost{background:rgba(255,255,255,.12);color:#fff}
 .cot-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
@@ -246,10 +253,18 @@ textarea{min-height:60px;resize:vertical}
 .cot-addbar{margin-top:14px}
 .ab-actions{display:flex;gap:8px;margin-top:12px}
 .ab-actions .btn{flex:1;white-space:nowrap}
+.cot-card textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fbfcfe;color:var(--text);font-family:inherit;resize:vertical}
+.reversa-out{font-size:13px;margin:6px 2px 0;min-height:0;color:var(--text)}
+.reversa-out b{color:var(--brand)}
+.reversa-out.neg b{color:#c0392b}
 .var-row{display:flex;align-items:flex-start;gap:8px;margin:8px 0 2px}
 .var-lbl{flex:none;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);padding-top:7px;min-width:42px}
 .cot-cart{background:#fff;border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
 .cart-head{font-weight:800;font-size:15px;color:var(--brand);margin-bottom:10px}
+.pc-checklist{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.pc-chip{background:#f1f5fb;border:1px dashed var(--line);border-radius:18px;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--brand);cursor:pointer;user-select:none}
+.pc-chip:hover{background:#e9f0fa}
+.pc-chip.ok{background:#e8f7ec;border-style:solid;border-color:#bfe6c8;color:#15803d;cursor:default}
 .cart-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 .cart-item img,.cart-ph{width:44px;height:44px;flex:none;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
 .ci-info{flex:1;min-width:0}
@@ -447,6 +462,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="wel-choice">
       <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Preço de venda (Paraguai)</small></button>
       <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
+      <button class="wel-btn func" onclick="escolherMontarPC()" style="grid-column:1/-1"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
     </div>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
   </div>
@@ -457,21 +473,25 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
   <div class="cot-wrap">
     <div class="cot-head">
       <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
-      <h2 style="margin:0;color:#fff">💰 Cotar Valores</h2>
+      <h2 style="margin:0;color:#fff" id="cotTitulo">💰 Cotar Valores</h2>
       <span style="flex:1"></span>
+      <button class="btn ghost" id="cotModoBtn" onclick="toggleBuild()">🖥️ Montar PC</button>
       <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico</button>
     </div>
+    <div class="cot-cols">
+    <div class="cot-col-l">
     <div class="cot-card">
-      <label class="cot-lbl">Categoria</label>
+      <label class="cot-lbl">Categoria (define o lucro %)</label>
       <select id="cotCategoria" onchange="onCategoria()">
-        <option value="placa-mae" data-mk="20">Placa-mãe</option>
-        <option value="iphone" data-mk="10">iPhone</option>
-        <option value="processador" data-mk="20">Processador</option>
-        <option value="placa-video" data-mk="20">Placa de vídeo</option>
-        <option value="ssd" data-mk="20">SSD / Armazenamento</option>
-        <option value="memoria" data-mk="20">Memória RAM</option>
-        <option value="notebook" data-mk="20">Notebook</option>
-        <option value="outro" data-mk="20">Outro</option>
+        <option value="placa-mae" data-lucro="30">Placa-mãe — 30%</option>
+        <option value="iphone-novo" data-lucro="12">iPhone (novo) — 12%</option>
+        <option value="recondicionado" data-lucro="30">Recondicionado / Seminovo — 30%</option>
+        <option value="notebook" data-lucro="35">Notebook — 35%</option>
+        <option value="processador" data-lucro="20">Processador — 20%</option>
+        <option value="placa-video" data-lucro="20">Placa de vídeo — 20%</option>
+        <option value="ssd" data-lucro="20">SSD / Armazenamento — 20%</option>
+        <option value="memoria" data-lucro="20">Memória RAM — 20%</option>
+        <option value="outro" data-lucro="20">Outro — 20%</option>
       </select>
       <label class="cot-lbl">Lojas (comprasparaguai)</label>
       <div class="cot-lojas" id="cotLojas"></div>
@@ -479,6 +499,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div class="cot-row">
         <input id="cotBusca" placeholder="Ex.: placa mãe B550" onkeydown="if(event.key==='Enter')pesquisarProdutos()">
         <button class="btn primary" onclick="pesquisarProdutos()">🔄 Pesquisar</button>
+      </div>
+      <div class="cot-row" style="margin-top:8px">
+        <button class="btn ghost" style="flex:1" onclick="buscarNaInternet()">🌐 Pesquisar na internet (Google)</button>
+        <button class="btn ghost" style="flex:1" onclick="compararBrasil()">🛒 Preço no Brasil</button>
       </div>
       <div class="cot-or">— ou cole o link do Paraguai —</div>
       <div class="cot-row">
@@ -488,7 +512,9 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     </div>
     <p class="cot-msg" id="cotBuscaMsg"></p>
     <div id="cotResultados"></div>
-    <div class="cot-card" style="margin-top:14px">
+    </div>
+    <div class="cot-col-r">
+    <div class="cot-card">
       <div class="cot-sep">preço e ajustes</div>
       <div class="cot-grid">
         <div><label class="cot-lbl">Preço no Paraguai (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
@@ -496,13 +522,32 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
       </div>
       <div class="cot-grid">
-        <div><label class="cot-lbl">Margem em cima (%)</label><input id="cotMarkup" type="number" inputmode="decimal" value="20" oninput="cotCalc()"></div>
-        <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucro" type="number" inputmode="decimal" value="600" oninput="cotCalc()"></div>
+        <div><label class="cot-lbl">Lucro (%)</label><input id="cotLucroPct" type="number" inputmode="decimal" value="30" oninput="lucroDePct()"></div>
+        <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucroRs" type="number" inputmode="decimal" placeholder="0" oninput="lucroDeReais()"></div>
       </div>
+      <p class="cot-hint">A categoria já preenche o lucro %. Mexeu no % muda o R$, e vice-versa.</p>
     </div>
     <div class="cot-result" id="cotResult"></div>
     <div class="cot-card cot-addbar" id="cotAddBar" style="display:none">
       <div class="cot-sep">o que vai no orçamento</div>
+      <div id="cotTipoWrap" style="display:none">
+        <label class="cot-lbl">Tipo de peça (no computador)</label>
+        <select id="cotTipo">
+          <option value="">— (avulso)</option>
+          <option value="Processador">Processador</option>
+          <option value="Placa-mãe">Placa-mãe</option>
+          <option value="Memória RAM">Memória RAM</option>
+          <option value="SSD / HD">SSD / HD</option>
+          <option value="Placa de vídeo">Placa de vídeo</option>
+          <option value="Fonte">Fonte</option>
+          <option value="Gabinete">Gabinete</option>
+          <option value="Cooler / Water">Cooler / Water</option>
+          <option value="Teclado / Mouse">Teclado / Mouse</option>
+          <option value="Monitor">Monitor</option>
+          <option value="Windows / Office">Windows / Office</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
       <label class="cot-lbl">Nome no orçamento (PDF)</label>
       <input id="cotNomePdf" placeholder="Nome do produto">
       <div class="cot-grid">
@@ -530,12 +575,30 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <option value="17">17x · 16,79%</option>
         <option value="18">18x · 17,64%</option>
       </select>
+      <label class="cot-lbl">💡 Quero vender à vista por (R$) — opcional</label>
+      <input id="cotVenderPor" type="number" inputmode="decimal" placeholder="veja o lucro desse preço" oninput="calcReversa()">
+      <div class="reversa-out" id="cotReversaOut"></div>
       <div class="ab-actions">
         <button class="btn primary" onclick="adicionarAoCart()">➕ Adicionar ao orçamento</button>
         <button class="btn ghost" onclick="gerarCotacaoImagem()" title="Compartilhar como imagem">🖼️ Imagem</button>
       </div>
     </div>
+    <div class="cot-card" id="cotPedidoCard" style="display:none">
+      <div class="cot-sep">dados do orçamento (opcional)</div>
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Nome do cliente</label><input id="cotCliente" placeholder="Ex.: João Silva"></div>
+        <div><label class="cot-lbl">WhatsApp do cliente</label><input id="cotClienteTel" inputmode="tel" placeholder="(42) 9 9999-9999" oninput="this.value=formatPhoneBR(this.value)"></div>
+      </div>
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Validade (dias)</label><input id="cotValidade" type="number" inputmode="numeric" value="7"></div>
+        <div></div>
+      </div>
+      <label class="cot-lbl">Observações / garantia (vai no PDF)</label>
+      <textarea id="cotObs" rows="2" placeholder="Ex.: Garantia de 90 dias. Bateria 100%."></textarea>
+    </div>
     <div class="cot-cart" id="cotCart" style="display:none"></div>
+    </div><!-- /cot-col-r -->
+    </div><!-- /cot-cols -->
   </div>
 </div>
 
@@ -2292,6 +2355,7 @@ function escolherCotacao(){
   onCategoria();
   if(!document.getElementById('cotDolar').value) buscarDolar();
   cotCalc();
+  setBuildUI();
 }
 function voltarChooser(){ document.getElementById('cotacaoScreen').classList.remove('show'); showChooser(); }
 /* ---------- cotação ---------- */
@@ -2314,10 +2378,19 @@ function renderLojas(){
 function lojasSelecionadas(){ return [...document.querySelectorAll('#cotLojas input:checked')].map(i=>i.value); }
 function onCategoria(){
   const sel=document.getElementById('cotCategoria');
-  const mk=sel.options[sel.selectedIndex].getAttribute('data-mk')||'20';
-  document.getElementById('cotMarkup').value=mk;
+  const lc=sel.options[sel.selectedIndex].getAttribute('data-lucro')||'30';
+  document.getElementById('cotLucroPct').value=lc;
+  cotCalc();   // recalcula e atualiza o Lucro R$ a partir do %
+}
+function custoAtual(){ return (parseFloat(document.getElementById('cotPreco').value)||0)*(parseFloat(document.getElementById('cotDolar').value)||0); }
+function lucroDePct(){ cotCalc(); }                 // % é a âncora; cotCalc recalcula o R$
+function lucroDeReais(){
+  const rs=parseFloat(document.getElementById('cotLucroRs').value)||0, custo=custoAtual();
+  if(custo>0) document.getElementById('cotLucroPct').value=(rs/custo*100).toFixed(1);
   cotCalc();
 }
+function buscarNaInternet(){ const q=(document.getElementById('cotBusca').value||(COT_SEL&&COT_SEL.nome)||'').trim(); if(!q){toast('Digite o que quer pesquisar');return;} window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); }
+function compararBrasil(){ const q=((COT_SEL&&COT_SEL.nome)||document.getElementById('cotBusca').value||'').trim(); if(!q){toast('Pesquise/escolha um produto primeiro');return;} window.open('https://lista.mercadolivre.com.br/'+encodeURIComponent(q),'_blank'); }
 async function buscarDolar(){
   try{
     const r=await fetch('https://economia.awesomeapi.com.br/last/USD-BRL',{cache:'no-store'});
@@ -2333,39 +2406,63 @@ function arredNice(v){                                // sobe de 50 em 50; últi
 }
 // taxas reais da maquininha (% que a loja repassa por nº de parcelas)
 const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
-let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false;
+let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false, COT_BUILD=false;
+const PECAS_PC=['Processador','Placa-mãe','Memória RAM','SSD / HD','Placa de vídeo','Fonte','Gabinete','Cooler / Water'];
+function setBuildUI(){
+  const t=document.getElementById('cotTitulo'); if(t)t.textContent=COT_BUILD?'🖥️ Montar PC':'💰 Cotar Valores';
+  const b=document.getElementById('cotModoBtn'); if(b)b.textContent=COT_BUILD?'💰 Avulso':'🖥️ Montar PC';
+  const w=document.getElementById('cotTipoWrap'); if(w)w.style.display=COT_BUILD?'block':'none';
+  renderCart();
+}
+function toggleBuild(){ COT_BUILD=!COT_BUILD; setBuildUI(); toast(COT_BUILD?'Modo Montar PC ligado':'Modo avulso'); }
+function escolherPeca(tp){ COT_BUILD=true; setBuildUI(); const s=document.getElementById('cotTipo'); if(s)s.value=tp; const i=document.getElementById('cotBusca'); if(i){i.focus();i.scrollIntoView({behavior:'smooth',block:'center'});} }
+function escolherMontarPC(){ escolherCotacao(); COT_BUILD=true; setBuildUI(); }
 function cotCalc(){
   const usd=parseFloat(document.getElementById('cotPreco').value)||0;
   const dolar=parseFloat(document.getElementById('cotDolar').value)||0;
-  const markup=(parseFloat(document.getElementById('cotMarkup').value)||0)/100;
-  const lucro=parseFloat(document.getElementById('cotLucro').value)||0;
+  const pct=parseFloat(document.getElementById('cotLucroPct').value)||0;
   const selP=document.getElementById('cotParcelas');
   const N=parseInt(selP?selP.value:'10',10)||10;
   const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
   const custoBRL=usd*dolar;                  // custo no Paraguai já convertido em REAIS
-  const valorMarkup=custoBRL*markup;         // quanto a margem % adiciona, em reais
-  const aVistaBruto=custoBRL*(1+markup)+lucro;
+  const lucro=custoBRL*pct/100;              // lucro em reais (vem do %)
+  const aVistaBruto=custoBRL+lucro;
   const aVista=arredNice(aVistaBruto);       // preço à vista (dinheiro/PIX), sem taxa de cartão
   const totalCartao=aVista*(1+taxa);         // repassa a taxa da maquininha
   const parcela=arredCima5(totalCartao/N);   // parcela pra cima, múltiplo de 5
   const totalParc=parcela*N;
   COT_CALC = usd ? {usd,dolar,custoBRL,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
+  // sincroniza o campo Lucro (R$) a partir do %, sem atrapalhar quem está digitando nele
+  const rsField=document.getElementById('cotLucroRs');
+  if(rsField && document.activeElement!==rsField) rsField.value = lucro? Math.round(lucro):'';
   const el=document.getElementById('cotResult');
   const bar=document.getElementById('cotAddBar');
   if(!el)return;
-  if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole um link ou informe o preço (US$) para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; return; }
+  if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole um link ou informe o preço (US$) para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; const pc=document.getElementById('cotPedidoCard'); if(pc&&!COT_CART.length)pc.style.display='none'; return; }
   el.innerHTML=`
     <details class="cr-calc" open><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
       <div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
-      <div class="cr-line"><span>+ Margem em cima (${(markup*100).toFixed(0)}%)</span><b>+ ${fmtMoney(valorMarkup)}</b></div>
-      <div class="cr-line"><span>+ Lucro</span><b>+ ${fmtMoney(lucro)}</b></div>
+      <div class="cr-line"><span>+ Lucro (${pct.toFixed(0)}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
       <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
+      <div class="cr-line"><span>💵 Seu lucro (à vista − custo)</span><b>${fmtMoney(aVista-custoBRL)}</b></div>
       <div class="cr-line"><span>+ Taxa maquininha (${N}x · ${(TAXAS_CARTAO[N]||0).toString().replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
     </details>
     <div class="cr-venda big"><b>À vista · dinheiro/PIX</b><span>${fmtMoney(aVista)}</span></div>
     <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
     <div class="cr-sub">Total no cartão ${fmtMoney(totalParc)}</div>`;
   if(bar)bar.style.display='block';
+  const ped=document.getElementById('cotPedidoCard'); if(ped)ped.style.display='block';
+  calcReversa();
+}
+/* cotação reversa: "quero vender por R$ X" -> mostra o lucro */
+function calcReversa(){
+  const out=document.getElementById('cotReversaOut'); if(!out)return;
+  const alvo=parseFloat(document.getElementById('cotVenderPor').value)||0;
+  const custo=COT_CALC?COT_CALC.custoBRL:0;
+  if(!alvo||!custo){ out.textContent=''; out.classList.remove('neg'); return; }
+  const lucro=alvo-custo, margem=custo?(lucro/custo*100):0;
+  out.classList.toggle('neg',lucro<0);
+  out.innerHTML=`Vendendo por <b>${fmtMoney(alvo)}</b> → lucro <b>${fmtMoney(lucro)}</b> (${margem.toFixed(0)}% sobre o custo)`;
 }
 /* ---- leitor do comprasparaguai (mesma lógica da função do servidor, validada) ---- */
 const CP_BASE='https://www.comprasparaguai.com.br';
@@ -2571,7 +2668,9 @@ function itemAtual(){
   if(!COT_CALC) return null;
   const np=document.getElementById('cotNomePdf'), cc=document.getElementById('cotCor'), cg=document.getElementById('cotGrade');
   const nome=((np&&np.value)||'').trim()||(COT_SEL&&COT_SEL.nome)||'Produto';
+  const tp=document.getElementById('cotTipo');
   return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
+    tipo:(COT_BUILD&&tp)?(tp.value||''):'',
     img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'',
     aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
 }
@@ -2584,21 +2683,37 @@ function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
 function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
 function renderCart(){
   const el=document.getElementById('cotCart'); if(!el)return;
-  if(!COT_CART.length){ el.style.display='none'; el.innerHTML=''; return; }
+  const pc=document.getElementById('cotPedidoCard');
+  if(!COT_CART.length && !COT_BUILD){ el.style.display='none'; el.innerHTML=''; if(pc&&!COT_CALC)pc.style.display='none'; return; }
   el.style.display='block';
+  if(pc && (COT_CART.length||COT_CALC)) pc.style.display='block';
   const tv=COT_CART.reduce((s,i)=>s+i.aVista,0);
-  el.innerHTML=`<div class="cart-head">🧾 Orçamento — ${COT_CART.length} ${COT_CART.length>1?'itens':'item'}</div>`+
-    COT_CART.map((i,k)=>`<div class="cart-item">
+  let html='';
+  if(COT_BUILD){
+    html+=`<div class="cart-head">🖥️ Orçamento de Computador</div>`;
+    html+=`<div class="pc-checklist">`+PECAS_PC.map(p=>{
+      const tem=COT_CART.some(i=>i.tipo===p);
+      return tem?`<span class="pc-chip ok">✓ ${p}</span>`:`<span class="pc-chip" onclick="escolherPeca('${p.replace(/'/g,"\\'")}')">+ ${p}</span>`;
+    }).join('')+`</div>`;
+  } else {
+    html+=`<div class="cart-head">🧾 Orçamento — ${COT_CART.length} ${COT_CART.length>1?'itens':'item'}</div>`;
+  }
+  if(!COT_CART.length){
+    html+=`<p class="cot-hint">Cote cada peça (toque em "+ peça" acima ou pesquise) e clique em "Adicionar ao orçamento". As peças aparecem aqui e somam no total.</p>`;
+    el.innerHTML=html; return;
+  }
+  html+=COT_CART.map((i,k)=>`<div class="cart-item">
       ${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<div class="cart-ph"></div>'}
-      <div class="ci-info"><b>${i.nome.replace(/</g,'&lt;')}</b>
+      <div class="ci-info"><b>${((i.tipo?('['+i.tipo+'] '):'')+i.nome).replace(/</g,'&lt;')}</b>
         <small>${[i.grade,i.cor,i.loja].filter(Boolean).join(' · ').replace(/</g,'&lt;')}</small>
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
-      <button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div>`).join('')+
-    `<div class="cart-total"><span>Total à vista</span><b>${fmtMoney(tv)}</b></div>`+
-    `<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar orçamento no WhatsApp</button>`+
-    `<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`+
-    `<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`+
-    `<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
+      <button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div>`).join('');
+  html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
+  html+=`<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar ${COT_BUILD?'no':'orçamento no'} WhatsApp</button>`;
+  html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`;
+  html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`;
+  html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
+  el.innerHTML=html;
 }
 /* ---- PDF do orçamento (logo, foto, preços de venda, validade 7 dias) ---- */
 async function logoPng(){
@@ -2652,17 +2767,23 @@ async function gerarCotacaoPDF(baixar){
     doc.text(CHIP7.endereco,M,fy+14);
     doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site+'   ·   '+CHIP7.email,M,fy+27);
   }
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const cliente=g('cotCliente'), obs=g('cotObs');
+  const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
   const bottom=H-100, rowH=96;
   header(); let y=100;
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);
-  doc.text(itens.length>1?`Orçamento — ${itens.length} itens`:'Orçamento',M,y); y+=12;
+  const titBase=COT_BUILD?'Orçamento de Computador':(itens.length>1?`Orçamento — ${itens.length} itens`:'Orçamento');
+  doc.text(cliente?(titBase+' — '+cliente):titBase,M,y);
+  y+=12;
   for(const it of itens){
     if(y+rowH>bottom){ footer(); doc.addPage(); header(); y=100; }
     doc.setDrawColor(230,234,240);doc.setFillColor(252,253,255);doc.roundedRect(M,y,W-2*M,rowH-8,8,8,'FD');
     let tx=M+14; const foto=fotos[it.img];
     if(foto){ try{ doc.addImage(foto,'JPEG',M+8,y+8,72,72); tx=M+90; }catch(e){} }
     doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
-    const nl=doc.splitTextToSize(it.nome,W-tx-M-150);
+    const nomePdf=(it.tipo?('['+it.tipo+'] '):'')+it.nome;
+    const nl=doc.splitTextToSize(nomePdf,W-tx-M-150);
     doc.text(nl.slice(0,2),tx,y+22);
     let sy=y+22+Math.min(nl.length,2)*13+3;
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
@@ -2682,11 +2803,19 @@ async function gerarCotacaoPDF(baixar){
     doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(95,105,120);doc.text('Parcelado total: '+fmtMoney(tp),W-M-14,y+44,{align:'right'});
     y+=54;
   }
+  // observações / garantia
+  if(obs){
+    const ol=doc.splitTextToSize(obs,W-2*M);
+    if(y+18+ol.length*13>bottom){ footer(); doc.addPage(); header(); y=100; }
+    y+=22; doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text('Observações',M,y);
+    y+=15; doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(80,90,105);doc.text(ol,M,y); y+=ol.length*13;
+  }
   y+=24; if(y>bottom){ footer(); doc.addPage(); header(); y=100; }
-  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);doc.text('Este orçamento é válido por 7 dias.',M,y);
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);
+  doc.text(`Este orçamento é válido por ${validade} ${validade>1?'dias':'dia'}.`,M,y);
   footer();
   const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-  const base=itens.length>1?'Orçamento Chip7':itens[0].nome.replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+  const base=COT_BUILD?'Orçamento PC':(itens.length>1?'Orçamento Chip7':itens[0].nome.replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60));
   const fname=`${base} - ${hoje.getDate()} de ${meses[hoje.getMonth()]}.pdf`;
   const blob=doc.output('blob');
   if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); salvarNoHistorico(itens); }
@@ -2694,7 +2823,7 @@ async function gerarCotacaoPDF(baixar){
 }
 /* ---- histórico de orçamentos (localStorage) ---- */
 function histLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_hist')||'[]'); }catch(e){ return []; } }
-function histSave(arr){ try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(arr.slice(0,60))); }catch(e){} }
+function histSave(arr){ const a=arr.slice(0,60); try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveHist==='function')cloudSaveHist(a); }
 function salvarNoHistorico(itens){
   if(!itens||!itens.length) return;
   const arr=histLoad();
@@ -2705,7 +2834,7 @@ function abrirHistorico(){
   const arr=histLoad(), box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
   msg.textContent=arr.length?`🕘 ${arr.length} orçamento(s) salvos`:'';
   let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
-  if(!arr.length){ box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar um orçamento, ele fica guardado aqui (neste aparelho).</p>`; return; }
+  if(!arr.length){ box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar um orçamento, ele fica guardado aqui e sincronizado com a equipe (no site publicado).</p>`; return; }
   html+=arr.map(h=>{
     const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     const nomes=h.itens.map(i=>i.nome).join(', ');
@@ -2768,17 +2897,25 @@ async function enviarCotacaoWhatsApp(){
   const r=await gerarCotacaoPDF(false); if(!r) return;
   salvarNoHistorico(r.itens);
   const itens=r.itens;
-  let text=`*Orçamento — ${CHIP7.nome}*\n\n`;
-  text+=itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); return `• ${i.nome}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
-  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*Total à vista: ${fmtMoney(tv)}*`; }
-  text+=`\n\n_Orçamento válido por 7 dias._\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const cliente=g('cotCliente'), obs=g('cotObs');
+  const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
+  let text=`*${COT_BUILD?'Orçamento de Computador':'Orçamento'} — ${CHIP7.nome}*\n`;
+  if(cliente) text+=`Para: ${cliente}\n`;
+  text+='\n';
+  text+=itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
+  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; }
+  if(obs) text+=`\n\n${obs}`;
+  text+=`\n\n_Orçamento válido por ${validade} ${validade>1?'dias':'dia'}._\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  const tel=g('cotClienteTel').replace(/\D/g,'');
+  const num= tel ? (tel.length<=11?'55'+tel:tel) : '';
   const file=new File([r.blob],r.fname,{type:'application/pdf'});
   if(navigator.canShare && navigator.canShare({files:[file]})){
     try{ await navigator.share({files:[file],text,title:'Orçamento - Chip7'}); return; }
     catch(e){ if(e&&e.name==='AbortError') return; }
   }
-  downloadBlob(file); toast('📄 PDF baixado — anexe no WhatsApp');
-  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+  downloadBlob(file); toast(num?'📄 PDF baixado — anexe na conversa do cliente':'📄 PDF baixado — anexe no WhatsApp');
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(text),'_blank');
 }
 function renderClientReport(snap){
   CLIENT_SNAP=snap;
@@ -2824,7 +2961,7 @@ async function cloudSignIn(){
   try{
     await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
     cloud.on=true; cloud.status='on'; refreshCloudStatus();
-    cloudSubscribe(); cloudSubscribeProdutos(); await cloudPushLocal();
+    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); await cloudPushLocal();
     return true;
   }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
 }
@@ -2876,6 +3013,29 @@ function cloudSubscribeProdutos(){
       cloudSaveProdutos(getProdutos());
     }
   }, err=>console.warn('Cloud prod sync',err));
+}
+/* sincronização do histórico de orçamentos entre dispositivos */
+let _histCloudTimer=null;
+function cloudSaveHist(arr){
+  if(!cloud.on) return;
+  clearTimeout(_histCloudTimer);
+  _histCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('historico').set({itens:arr, ts:Date.now()}); }catch(e){console.warn('Cloud hist save',e);} }, 800);
+}
+function cloudSubscribeHist(){
+  if(!cloud.ready) return;
+  if(cloud._unsubHist){cloud._unsubHist();cloud._unsubHist=null;}
+  cloud._unsubHist=cloud.db.collection('cotacoes').doc('historico').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){
+      const incoming=JSON.stringify(d.itens);
+      if(incoming!==localStorage.getItem('chip7_cot_hist')){
+        try{localStorage.setItem('chip7_cot_hist',incoming);}catch(e){}
+        if(document.querySelector('.hist-item')) abrirHistorico();   // atualiza a lista se estiver aberta
+      }
+    } else {
+      cloudSaveHist(histLoad());   // ainda não existe na nuvem -> sobe o local
+    }
+  }, err=>console.warn('Cloud hist sync',err));
 }
 function refreshCloudStatus(){
   const el=document.getElementById('cloudStatus'); if(!el)return;
