@@ -483,15 +483,15 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-card">
       <label class="cot-lbl">Categoria (define o lucro %)</label>
       <select id="cotCategoria" onchange="onCategoria()">
-        <option value="placa-mae" data-lucro="30">Placa-mãe — 30%</option>
-        <option value="iphone-novo" data-lucro="12">iPhone (novo) — 12%</option>
-        <option value="recondicionado" data-lucro="30">Recondicionado / Seminovo — 30%</option>
-        <option value="notebook" data-lucro="35">Notebook — 35%</option>
-        <option value="processador" data-lucro="20">Processador — 20%</option>
-        <option value="placa-video" data-lucro="20">Placa de vídeo — 20%</option>
-        <option value="ssd" data-lucro="20">SSD / Armazenamento — 20%</option>
-        <option value="memoria" data-lucro="20">Memória RAM — 20%</option>
-        <option value="outro" data-lucro="20">Outro — 20%</option>
+        <option value="placa-mae" data-lucro="30" data-trazer="20">Placa-mãe — lucro 30% · trazer 20%</option>
+        <option value="iphone-novo" data-lucro="12" data-trazer="10">iPhone (novo) — lucro 12% · trazer 10%</option>
+        <option value="recondicionado" data-lucro="30" data-trazer="10">Recondicionado / Seminovo — lucro 30% · trazer 10%</option>
+        <option value="notebook" data-lucro="35" data-trazer="20">Notebook — lucro 35% · trazer 20%</option>
+        <option value="processador" data-lucro="20" data-trazer="20">Processador — lucro 20% · trazer 20%</option>
+        <option value="placa-video" data-lucro="20" data-trazer="20">Placa de vídeo — lucro 20% · trazer 20%</option>
+        <option value="ssd" data-lucro="20" data-trazer="20">SSD / Armazenamento — lucro 20% · trazer 20%</option>
+        <option value="memoria" data-lucro="20" data-trazer="20">Memória RAM — lucro 20% · trazer 20%</option>
+        <option value="outro" data-lucro="20" data-trazer="20">Outro — lucro 20% · trazer 20%</option>
       </select>
       <label class="cot-lbl">Lojas (comprasparaguai)</label>
       <div class="cot-lojas" id="cotLojas"></div>
@@ -521,11 +521,13 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div><label class="cot-lbl">Cotação do dólar (R$)</label>
           <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
       </div>
+      <label class="cot-lbl">Custo de trazer (%) — 10% iPhone · 20% peças</label>
+      <input id="cotTrazer" type="number" inputmode="decimal" value="20" oninput="cotCalc()">
       <div class="cot-grid">
         <div><label class="cot-lbl">Lucro (%)</label><input id="cotLucroPct" type="number" inputmode="decimal" value="30" oninput="lucroDePct()"></div>
         <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucroRs" type="number" inputmode="decimal" placeholder="0" oninput="lucroDeReais()"></div>
       </div>
-      <p class="cot-hint">A categoria já preenche o lucro %. Mexeu no % muda o R$, e vice-versa.</p>
+      <p class="cot-hint">A categoria preenche trazer % e lucro %. O lucro % muda o R$, e vice-versa.</p>
     </div>
     <div class="cot-result" id="cotResult"></div>
     <div class="cot-card cot-addbar" id="cotAddBar" style="display:none">
@@ -2377,12 +2379,16 @@ function renderLojas(){
 }
 function lojasSelecionadas(){ return [...document.querySelectorAll('#cotLojas input:checked')].map(i=>i.value); }
 function onCategoria(){
-  const sel=document.getElementById('cotCategoria');
-  const lc=sel.options[sel.selectedIndex].getAttribute('data-lucro')||'30';
-  document.getElementById('cotLucroPct').value=lc;
+  const sel=document.getElementById('cotCategoria'), op=sel.options[sel.selectedIndex];
+  document.getElementById('cotLucroPct').value=op.getAttribute('data-lucro')||'30';
+  const tz=document.getElementById('cotTrazer'); if(tz)tz.value=op.getAttribute('data-trazer')||'20';
   cotCalc();   // recalcula e atualiza o Lucro R$ a partir do %
 }
-function custoAtual(){ return (parseFloat(document.getElementById('cotPreco').value)||0)*(parseFloat(document.getElementById('cotDolar').value)||0); }
+function custoAtual(){   // custo total = Paraguai + custo de trazer (é sobre ele que o lucro % incide)
+  const c=(parseFloat(document.getElementById('cotPreco').value)||0)*(parseFloat(document.getElementById('cotDolar').value)||0);
+  const tz=(parseFloat((document.getElementById('cotTrazer')||{}).value)||0)/100;
+  return c*(1+tz);
+}
 function lucroDePct(){ cotCalc(); }                 // % é a âncora; cotCalc recalcula o R$
 function lucroDeReais(){
   const rs=parseFloat(document.getElementById('cotLucroRs').value)||0, custo=custoAtual();
@@ -2421,17 +2427,20 @@ function cotCalc(){
   const usd=parseFloat(document.getElementById('cotPreco').value)||0;
   const dolar=parseFloat(document.getElementById('cotDolar').value)||0;
   const pct=parseFloat(document.getElementById('cotLucroPct').value)||0;
+  const trazerPct=parseFloat((document.getElementById('cotTrazer')||{}).value)||0;
   const selP=document.getElementById('cotParcelas');
   const N=parseInt(selP?selP.value:'10',10)||10;
   const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
   const custoBRL=usd*dolar;                  // custo no Paraguai já convertido em REAIS
-  const lucro=custoBRL*pct/100;              // lucro em reais (vem do %)
-  const aVistaBruto=custoBRL+lucro;
+  const trazer=custoBRL*trazerPct/100;       // custo de trazer (10% iPhone / 20% peças)
+  const custoTotal=custoBRL+trazer;          // custo total (é a base do lucro)
+  const lucro=custoTotal*pct/100;            // lucro em reais (vem do %)
+  const aVistaBruto=custoTotal+lucro;
   const aVista=arredNice(aVistaBruto);       // preço à vista (dinheiro/PIX), sem taxa de cartão
   const totalCartao=aVista*(1+taxa);         // repassa a taxa da maquininha
   const parcela=arredCima5(totalCartao/N);   // parcela pra cima, múltiplo de 5
   const totalParc=parcela*N;
-  COT_CALC = usd ? {usd,dolar,custoBRL,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
+  COT_CALC = usd ? {usd,dolar,custoBRL,trazer,custoTotal,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
   // sincroniza o campo Lucro (R$) a partir do %, sem atrapalhar quem está digitando nele
   const rsField=document.getElementById('cotLucroRs');
   if(rsField && document.activeElement!==rsField) rsField.value = lucro? Math.round(lucro):'';
@@ -2442,9 +2451,11 @@ function cotCalc(){
   el.innerHTML=`
     <details class="cr-calc" open><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
       <div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
+      <div class="cr-line"><span>+ Custo de trazer (${trazerPct.toFixed(0)}%)</span><b>+ ${fmtMoney(trazer)}</b></div>
+      <div class="cr-line"><span>= Custo total</span><b>${fmtMoney(custoTotal)}</b></div>
       <div class="cr-line"><span>+ Lucro (${pct.toFixed(0)}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
       <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
-      <div class="cr-line"><span>💵 Seu lucro (à vista − custo)</span><b>${fmtMoney(aVista-custoBRL)}</b></div>
+      <div class="cr-line"><span>💵 Seu lucro (à vista − custo total)</span><b>${fmtMoney(aVista-custoTotal)}</b></div>
       <div class="cr-line"><span>+ Taxa maquininha (${N}x · ${(TAXAS_CARTAO[N]||0).toString().replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
     </details>
     <div class="cr-venda big"><b>À vista · dinheiro/PIX</b><span>${fmtMoney(aVista)}</span></div>
@@ -2458,7 +2469,7 @@ function cotCalc(){
 function calcReversa(){
   const out=document.getElementById('cotReversaOut'); if(!out)return;
   const alvo=parseFloat(document.getElementById('cotVenderPor').value)||0;
-  const custo=COT_CALC?COT_CALC.custoBRL:0;
+  const custo=COT_CALC?COT_CALC.custoTotal:0;
   if(!alvo||!custo){ out.textContent=''; out.classList.remove('neg'); return; }
   const lucro=alvo-custo, margem=custo?(lucro/custo*100):0;
   out.classList.toggle('neg',lucro<0);
