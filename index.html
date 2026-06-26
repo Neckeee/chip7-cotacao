@@ -237,6 +237,9 @@ textarea{min-height:60px;resize:vertical}
 .ph-info b{font-size:13.5px;display:block;line-height:1.25}
 .ph-info small{color:var(--muted);font-size:12px;display:block;margin-top:1px}
 .ph-go{font-weight:800;color:var(--brand);font-size:20px;flex:none}
+.fav-star{flex:none;font-size:20px;color:#cbd3df;cursor:pointer;line-height:1;padding:0 2px}
+.fav-star.on{color:#f5b301}
+.fav-star:hover{color:#f5b301}
 .ph-price{font-weight:800;color:var(--brand);white-space:nowrap;flex:none}
 .badge-min{display:inline-block;margin-top:2px;background:#e8f7ec;color:#15803d;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700}
 .prod-prodhead{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;font-weight:600}
@@ -271,14 +274,51 @@ textarea{min-height:60px;resize:vertical}
 .ci-info b{font-size:13px;display:block;line-height:1.25}
 .ci-info small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
 .ci-info small b{display:inline;color:var(--brand)}
+.ci-acts{display:flex;flex-direction:column;gap:5px;flex:none}
 .ci-del{flex:none;background:#f4f6fb;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:30px;height:30px;font-size:14px;cursor:pointer}
 .ci-del:hover{background:#ffe9e9;color:#c0392b;border-color:#f3c2c2}
+.ci-dup{flex:none;background:#f4f6fb;border:1px solid var(--line);color:var(--brand);border-radius:8px;width:30px;height:30px;font-size:16px;font-weight:800;cursor:pointer;line-height:1}
+.ci-dup:hover{background:#eef4ff;border-color:var(--brand)}
 .cart-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:2px solid var(--accent)}
 .cart-total span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
 .cart-total b{font-size:22px;font-weight:900;color:var(--brand)}
 .cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
 .cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
 .cart-clear{color:var(--muted)}
+/* barra de ferramentas da cotação */
+.cot-tools{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 14px}
+.cot-tools .btn.ghost{background:rgba(255,255,255,.12);color:#fff;flex:1;min-width:120px;white-space:nowrap}
+/* config de custos/lucros */
+.cfg-list{display:flex;flex-direction:column;gap:8px}
+.cfg-row{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--text)}
+.cfg-nome{flex:1;font-weight:700;font-size:13.5px;min-width:0}
+.cfg-f{display:flex;flex-direction:column;font-size:10.5px;color:var(--muted);font-weight:700;width:74px;flex:none}
+.cfg-f input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fbfcfe;color:var(--text);margin-top:2px}
+/* fornecedores */
+.forn-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:6px;color:var(--text)}
+.fi-info{flex:1;min-width:0}
+.fi-info b{font-size:14px;display:block}
+.fi-info small{display:block;color:var(--muted);font-size:12px;word-break:break-all}
+.fi-acts{display:flex;align-items:center;gap:6px;flex:none}
+.fi-acts .btn{padding:6px 10px;font-size:12.5px}
+.forn-add{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;color:var(--text)}
+.forn-add input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fbfcfe;color:var(--text);margin-top:8px}
+.forn-add .cot-grid input{margin-top:0}
+/* funil de vendas */
+.vendas-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;color:var(--text)}
+.vb-title{font-weight:800;color:var(--brand);font-size:14px;margin-bottom:8px}
+.vb-row{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0}
+.vb-row b{font-weight:800}
+.vb-ok b{color:#15803d}
+.vb-bad b{color:#c0392b}
+.hist-item .st-chips{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.st-chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:14px;cursor:pointer;border:1px solid var(--line);background:#f4f6fb;color:var(--muted)}
+.st-chip.on.s-fechado{background:#e8f7ec;border-color:#bfe6c8;color:#15803d}
+.st-chip.on.s-perdido{background:#ffe9e9;border-color:#f3c2c2;color:#c0392b}
+.st-chip.on.s-enviado{background:var(--brand);border-color:var(--brand);color:#fff}
+/* banner de nova versão */
+.upd-banner{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:3000;background:var(--brand);color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;justify-content:center;font-size:14px;font-weight:600;animation:upFade .3s ease}
+.upd-banner button{background:#fff;color:var(--brand);border:0;border-radius:8px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;flex:none}
 .hist-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;color:var(--text)}
 .hi-info{flex:1;min-width:0}
 .hi-info b{font-size:13.5px;display:block}
@@ -476,7 +516,12 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <h2 style="margin:0;color:#fff" id="cotTitulo">💰 Cotar Valores</h2>
       <span style="flex:1"></span>
       <button class="btn ghost" id="cotModoBtn" onclick="toggleBuild()">🖥️ Montar PC</button>
-      <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico</button>
+    </div>
+    <div class="cot-tools">
+      <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico / Vendas</button>
+      <button class="btn ghost" onclick="abrirFavoritos()">⭐ Favoritos</button>
+      <button class="btn ghost" onclick="abrirConfig()">⚙️ Custos &amp; lucros</button>
+      <button class="btn ghost" onclick="abrirFornecedores()">🏪 Fornecedores</button>
     </div>
     <div class="cot-cols">
     <div class="cot-col-l">
@@ -2167,8 +2212,25 @@ let toastT;function toast(m){const t=document.getElementById('toast');t.textCont
 /* ---------- PWA / iPhone ---------- */
 // registra o service worker (offline) — só funciona via http(s), ignora em file://
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.addEventListener('updatefound',()=>{ const nw=reg.installing; if(!nw)return;
+        nw.addEventListener('statechange',()=>{ if(nw.state==='installed' && navigator.serviceWorker.controller) mostrarUpdate(reg); });
+      });
+      setInterval(()=>reg.update().catch(()=>{}), 60000);   // checa atualização a cada 1 min
+    }).catch(()=>{});
+    let _rl=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(_rl)return; _rl=true; location.reload(); });
+  });
 }
+function mostrarUpdate(reg){
+  if(document.getElementById('updBanner'))return;
+  window._updReg=reg;
+  const b=document.createElement('div'); b.id='updBanner'; b.className='upd-banner';
+  b.innerHTML='✨ Nova versão disponível <button onclick="aplicarUpdate()">Atualizar agora</button>';
+  document.body.appendChild(b);
+}
+function aplicarUpdate(){ const reg=window._updReg; const b=document.getElementById('updBanner'); if(b)b.remove(); if(reg&&reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); } else { location.reload(); } }
 // aviso "Adicionar à Tela de Início" no iPhone/iPad (Safari, fora do modo app)
 function dismissHint(){const h=document.getElementById('installHint');h.classList.remove('show');try{localStorage.setItem('chip7_hint','1');}catch(e){}}
 (function installHint(){
@@ -2379,9 +2441,10 @@ function renderLojas(){
 }
 function lojasSelecionadas(){ return [...document.querySelectorAll('#cotLojas input:checked')].map(i=>i.value); }
 function onCategoria(){
-  const sel=document.getElementById('cotCategoria'), op=sel.options[sel.selectedIndex];
-  document.getElementById('cotLucroPct').value=op.getAttribute('data-lucro')||'30';
-  const tz=document.getElementById('cotTrazer'); if(tz)tz.value=op.getAttribute('data-trazer')||'20';
+  const sel=document.getElementById('cotCategoria');
+  const d=(typeof catDefaults==='function')?catDefaults(sel.value):{lucro:sel.options[sel.selectedIndex].getAttribute('data-lucro')||30,trazer:sel.options[sel.selectedIndex].getAttribute('data-trazer')||20};
+  document.getElementById('cotLucroPct').value=d.lucro;
+  const tz=document.getElementById('cotTrazer'); if(tz)tz.value=d.trazer;
   cotCalc();   // recalcula e atualiza o Lucro R$ a partir do %
 }
 function custoAtual(){   // custo total = Paraguai + custo de trazer (é sobre ele que o lucro % incide)
@@ -2557,10 +2620,30 @@ async function cpDetalhe(link){
   const img=(html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
   return {ofertas,nome:cpDecode(nome),img};
 }
-function htmlProdHit(i,n){ return `<div class="prod-hit" onclick="verOfertas(${n})">
+function htmlProdHit(i,n){ const fav=isFav(i); return `<div class="prod-hit" onclick="verOfertas(${n})">
     ${i.img?`<img class="prod-thumb" src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
     <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)</small></div>
+    <span class="fav-star${fav?' on':''}" onclick="event.stopPropagation();toggleFav(${n})" title="Favoritar">${fav?'★':'☆'}</span>
     <span class="ph-go">›</span></div>`; }
+/* ====== favoritos de produtos ====== */
+function favLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_fav')||'[]'); }catch(e){ return []; } }
+function favSave(a){ try{ localStorage.setItem('chip7_cot_fav',JSON.stringify(a.slice(0,80))); }catch(e){} }
+function favKey(i){ return (i.link||i.nome||'').toLowerCase(); }
+function isFav(i){ const k=favKey(i); return favLoad().some(f=>favKey(f)===k); }
+function toggleFav(n){ const i=COT_HITS[n]; if(!i)return; const k=favKey(i); let a=favLoad(); if(a.some(f=>favKey(f)===k)){ a=a.filter(f=>favKey(f)!==k); toast('Removido dos favoritos'); } else { a.unshift({nome:i.nome,img:i.img,link:i.link,precoUSD:i.precoUSD,ofertas:i.ofertas}); toast('⭐ Salvo nos favoritos'); } favSave(a); renderProdutos(); }
+function abrirFavoritos(){
+  const arr=favLoad(), box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  msg.textContent=`⭐ ${arr.length} favorito(s)`;
+  let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
+  if(!arr.length){ box.innerHTML=html+`<p class="cot-fallback">Nenhum favorito ainda. Na lista de produtos, toque na ☆ pra salvar os que você cota sempre.</p>`; return; }
+  html+=arr.map((f,i)=>`<div class="prod-hit" onclick="cotarFavorito(${i})">
+      ${f.img?`<img class="prod-thumb" src="${imgThumb(f.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
+      <div class="ph-info"><b>${(f.nome||'Produto').replace(/</g,'&lt;')}</b><small>a partir de US$ ${(+f.precoUSD).toFixed(2)}</small></div>
+      <span class="ci-del" onclick="event.stopPropagation();removerFav(${i})" title="Remover">✕</span></div>`).join('');
+  box.innerHTML=html;
+}
+async function cotarFavorito(i){ const f=favLoad()[i]; if(!f)return; COT_HITS=[f]; await verOfertas(0); }
+function removerFav(i){ const a=favLoad(); a.splice(i,1); favSave(a); abrirFavoritos(); }
 function renderProdutos(){
   document.getElementById('cotBuscaMsg').textContent=`✔ ${COT_HITS.length} produto(s) — toque para ver cor, loja e preço:`;
   document.getElementById('cotResultados').innerHTML=COT_HITS.map(htmlProdHit).join('');
@@ -2691,6 +2774,7 @@ function adicionarAoCart(){
   const cc=document.getElementById('cotCart'); if(cc) cc.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
+function duplicarCart(k){ if(COT_CART[k]){ COT_CART.splice(k+1,0,Object.assign({},COT_CART[k])); renderCart(); toast('Item duplicado'); } }
 function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
 function renderCart(){
   const el=document.getElementById('cotCart'); if(!el)return;
@@ -2718,11 +2802,12 @@ function renderCart(){
       <div class="ci-info"><b>${((i.tipo?('['+i.tipo+'] '):'')+i.nome).replace(/</g,'&lt;')}</b>
         <small>${[i.grade,i.cor,i.loja].filter(Boolean).join(' · ').replace(/</g,'&lt;')}</small>
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
-      <button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div>`).join('');
+      <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`).join('');
   html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
   html+=`<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar ${COT_BUILD?'no':'orçamento no'} WhatsApp</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`;
+  html+=`<button class="btn ghost cart-send2" onclick="copiarTexto()">📋 Copiar texto</button>`;
   html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
   el.innerHTML=html;
 }
@@ -2837,25 +2922,94 @@ function histLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_hist
 function histSave(arr){ const a=arr.slice(0,60); try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveHist==='function')cloudSaveHist(a); }
 function salvarNoHistorico(itens){
   if(!itens||!itens.length) return;
+  const cliente=((document.getElementById('cotCliente')||{}).value||'').trim();
   const arr=histLoad();
-  arr.unshift({id:Date.now(),data:new Date().toISOString(),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
   histSave(arr);
 }
+const HIST_ST={enviado:'Enviado',fechado:'✅ Fechado',perdido:'❌ Perdido'};
+function histSetStatus(id,st){ const arr=histLoad(); const h=arr.find(x=>x.id===id); if(h){ h.status=st; histSave(arr); abrirHistorico(); } }
 function abrirHistorico(){
   const arr=histLoad(), box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
-  msg.textContent=arr.length?`🕘 ${arr.length} orçamento(s) salvos`:'';
   let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
-  if(!arr.length){ box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar um orçamento, ele fica guardado aqui e sincronizado com a equipe (no site publicado).</p>`; return; }
+  if(!arr.length){ msg.textContent=''; box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar, ele fica guardado aqui (e sincroniza com a equipe no site publicado).</p>`; return; }
+  msg.textContent=`🕘 ${arr.length} orçamento(s)`;
+  const now=new Date(), mes=now.getMonth(), ano=now.getFullYear();
+  const noMes=arr.filter(h=>{const d=new Date(h.data);return d.getMonth()===mes&&d.getFullYear()===ano;});
+  const soma=l=>l.reduce((s,h)=>s+(h.totalVista||0),0);
+  const fech=noMes.filter(h=>h.status==='fechado'), perd=noMes.filter(h=>h.status==='perdido'), abe=noMes.filter(h=>!h.status||h.status==='enviado');
+  html+=`<div class="vendas-box"><div class="vb-title">📊 Este mês</div>
+    <div class="vb-row vb-ok"><span>✅ Fechado</span><b>${fech.length} · ${fmtMoney(soma(fech))}</b></div>
+    <div class="vb-row"><span>Em aberto</span><b>${abe.length} · ${fmtMoney(soma(abe))}</b></div>
+    <div class="vb-row vb-bad"><span>❌ Perdido</span><b>${perd.length} · ${fmtMoney(soma(perd))}</b></div></div>`;
   html+=arr.map(h=>{
     const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const nomes=h.itens.map(i=>i.nome).join(', ');
-    return `<div class="hist-item"><div class="hi-info"><b>${h.itens.length} item(ns) · ${fmtMoney(h.totalVista)}</b><small>${dt}</small><small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small></div>
+    const nomes=h.itens.map(i=>(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
+    const st=h.status||'enviado';
+    const chips=['enviado','fechado','perdido'].map(s=>`<span class="st-chip s-${s}${st===s?' on':''}" onclick="histSetStatus(${h.id},'${s}')">${HIST_ST[s]}</span>`).join('');
+    const cli=h.cliente?(' · '+h.cliente.replace(/</g,'&lt;')):'';
+    return `<div class="hist-item"><div class="hi-info"><b>${h.itens.length} item(ns) · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}</small><small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small><div class="st-chips">${chips}</div></div>
       <div class="hi-acts"><button class="btn ghost" onclick="reabrirHist(${h.id})">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
   }).join('');
   box.innerHTML=html;
 }
 function reabrirHist(id){ const h=histLoad().find(x=>x.id===id); if(!h)return; COT_CART=h.itens.map(i=>({...i})); renderCart(); renderProdutos(); toast('Orçamento reaberto no carrinho ('+COT_CART.length+')'); const cc=document.getElementById('cotCart'); if(cc)cc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 function excluirHist(id){ histSave(histLoad().filter(x=>x.id!==id)); abrirHistorico(); }
+/* ====== Custos/lucros por categoria (configuráveis) ====== */
+const CAT_LABELS={'placa-mae':'Placa-mãe','iphone-novo':'iPhone (novo)','recondicionado':'Recondicionado / Seminovo','notebook':'Notebook','processador':'Processador','placa-video':'Placa de vídeo','ssd':'SSD / Armazenamento','memoria':'Memória RAM','outro':'Outro'};
+const CAT_BASE={'placa-mae':{lucro:30,trazer:20},'iphone-novo':{lucro:12,trazer:10},'recondicionado':{lucro:30,trazer:10},'notebook':{lucro:35,trazer:20},'processador':{lucro:20,trazer:20},'placa-video':{lucro:20,trazer:20},'ssd':{lucro:20,trazer:20},'memoria':{lucro:20,trazer:20},'outro':{lucro:20,trazer:20}};
+function cfgLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_cfg')||'{}'); }catch(e){ return {}; } }
+function cfgSave(o){ try{ localStorage.setItem('chip7_cot_cfg',JSON.stringify(o)); }catch(e){} if(typeof cloudSaveCfg==='function')cloudSaveCfg(o); }
+function catDefaults(cat){ return Object.assign({}, CAT_BASE[cat]||{lucro:20,trazer:20}, cfgLoad()[cat]||{}); }
+function abrirConfig(){
+  const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  msg.textContent='⚙️ Custos e lucros fixos (por categoria)';
+  box.innerHTML=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`+
+    `<div class="cfg-list">`+Object.keys(CAT_LABELS).map(c=>{const d=catDefaults(c);
+      return `<div class="cfg-row"><div class="cfg-nome">${CAT_LABELS[c]}</div>
+        <label class="cfg-f">Lucro %<input type="number" inputmode="decimal" data-c="${c}" data-k="lucro" value="${d.lucro}"></label>
+        <label class="cfg-f">Trazer %<input type="number" inputmode="decimal" data-c="${c}" data-k="trazer" value="${d.trazer}"></label></div>`;}).join('')+`</div>`+
+    `<button class="btn primary" style="width:100%;margin-top:12px" onclick="salvarConfig()">💾 Salvar custos e lucros</button>`+
+    `<button class="btn ghost" style="width:100%;margin-top:8px" onclick="exportarBackup()">⬇️ Baixar backup dos dados</button>`+
+    `<p class="cot-hint">Esses valores já vêm preenchidos quando você escolhe a categoria. Sincroniza com a equipe no site publicado.</p>`;
+}
+function salvarConfig(){
+  const o={};
+  document.querySelectorAll('#cotResultados .cfg-row input').forEach(inp=>{const c=inp.dataset.c,k=inp.dataset.k,v=parseFloat(inp.value); if(!isNaN(v)){ if(!o[c])o[c]={}; o[c][k]=v; }});
+  cfgSave(o); toast('✔ Custos e lucros salvos'); onCategoria();
+}
+function exportarBackup(){
+  const dados={produtos:(()=>{try{return JSON.parse(localStorage.getItem('chip7_produtos')||'[]')}catch(e){return[]}})(),
+    historico:histLoad(), config:cfgLoad(), fornecedores:fornLoad(), exportadoEm:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+  downloadBlob(new File([blob],'backup-chip7-cotacao-'+new Date().toISOString().slice(0,10)+'.json',{type:'application/json'}));
+  toast('⬇️ Backup baixado');
+}
+/* ====== Fornecedores ====== */
+function fornLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_fornecedores')||'[]'); }catch(e){ return []; } }
+function fornSave(a){ try{ localStorage.setItem('chip7_fornecedores',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveForn==='function')cloudSaveForn(a); }
+function _fv(id){ return ((document.getElementById(id)||{}).value||'').trim(); }
+function abrirFornecedores(){
+  const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  const arr=fornLoad(); msg.textContent=`🏪 ${arr.length} fornecedor(es)`;
+  const esc=s=>(s||'').replace(/</g,'&lt;');
+  let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
+  html+=arr.map((f,i)=>`<div class="forn-item"><div class="fi-info"><b>${esc(f.nome)}</b>
+      ${f.url?`<small>${esc(f.url)}</small>`:''}${f.user?`<small>👤 ${esc(f.user)}</small>`:''}${f.obs?`<small>${esc(f.obs)}</small>`:''}</div>
+      <div class="fi-acts">${f.url?`<button class="btn ghost" onclick="abrirFornSite(${i})">Abrir</button>`:''}${f.busca?`<button class="btn ghost" onclick="buscarNoForn(${i})">Buscar</button>`:''}<button class="ci-del" onclick="removerForn(${i})" title="Remover">✕</button></div></div>`).join('');
+  html+=`<div class="forn-add"><div class="cot-sep">adicionar fornecedor</div>
+    <input id="fnNome" placeholder="Nome (ex.: Fornecedor X)">
+    <input id="fnUrl" placeholder="Site (https://...)">
+    <input id="fnBusca" placeholder="Link de busca com %s (opcional) — ex.: https://site.com/busca?q=%s">
+    <div class="cot-grid"><div><input id="fnUser" placeholder="Login/usuário (opcional)"></div><div><input id="fnObs" placeholder="Observações"></div></div>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="addForn()">➕ Adicionar fornecedor</button>
+    <p class="cot-hint">⚠️ Evite salvar senhas aqui (fica só no sistema). A busca automática com login a gente configura quando você me passar os sites.</p></div>`;
+  box.innerHTML=html;
+}
+function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fornecedor');return;} const a=fornLoad(); a.push({id:Date.now(),nome,url:_fv('fnUrl'),busca:_fv('fnBusca'),user:_fv('fnUser'),obs:_fv('fnObs')}); fornSave(a); abrirFornecedores(); toast('✔ Fornecedor adicionado'); }
+function removerForn(i){ const a=fornLoad(); a.splice(i,1); fornSave(a); abrirFornecedores(); }
+function abrirFornSite(i){ const f=fornLoad()[i]; if(f&&f.url) window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); }
+function buscarNoForn(i){ const f=fornLoad()[i]; if(!f)return; const q=(document.getElementById('cotBusca').value||'').trim()||prompt('O que buscar nesse fornecedor?')||''; if(!q)return; if(f.busca&&f.busca.indexOf('%s')>=0){ window.open(f.busca.replace('%s',encodeURIComponent(q)),'_blank'); } else if(f.url){ window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); } }
 /* ---- compartilhar como imagem (card visual) ---- */
 function cpRoundRect(cx,x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
 function cpLoadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
@@ -2904,20 +3058,29 @@ function wrapText(cx,text,x,y,maxW,lh,maxLines){
   lines.forEach((l,i)=>cx.fillText(l,x,y+i*lh));
   return lines.length;
 }
+function montarTextoOrcamento(itens){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const cliente=g('cotCliente'), obs=g('cotObs'); const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
+  let text=`*${COT_BUILD?'Orçamento de Computador':'Orçamento'} — ${CHIP7.nome}*\n`;
+  if(cliente) text+=`Para: ${cliente}\n`;
+  text+='\n'+itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
+  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; }
+  if(obs) text+=`\n\n${obs}`;
+  text+=`\n\n_Orçamento válido por ${validade} ${validade>1?'dias':'dia'}._\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  return text;
+}
+async function copiarTexto(){
+  const itens=cotItens(); if(!itens.length){ toast('Adicione um produto primeiro'); return; }
+  const t=montarTextoOrcamento(itens);
+  try{ await navigator.clipboard.writeText(t); toast('📋 Texto copiado'); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');toast('📋 Texto copiado');}catch(_){toast('Não consegui copiar');} ta.remove(); }
+}
 async function enviarCotacaoWhatsApp(){
   const r=await gerarCotacaoPDF(false); if(!r) return;
   salvarNoHistorico(r.itens);
   const itens=r.itens;
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
-  const cliente=g('cotCliente'), obs=g('cotObs');
-  const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
-  let text=`*${COT_BUILD?'Orçamento de Computador':'Orçamento'} — ${CHIP7.nome}*\n`;
-  if(cliente) text+=`Para: ${cliente}\n`;
-  text+='\n';
-  text+=itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
-  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; }
-  if(obs) text+=`\n\n${obs}`;
-  text+=`\n\n_Orçamento válido por ${validade} ${validade>1?'dias':'dia'}._\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  const text=montarTextoOrcamento(itens);
   const tel=g('cotClienteTel').replace(/\D/g,'');
   const num= tel ? (tel.length<=11?'55'+tel:tel) : '';
   const file=new File([r.blob],r.fname,{type:'application/pdf'});
@@ -2972,7 +3135,7 @@ async function cloudSignIn(){
   try{
     await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
     cloud.on=true; cloud.status='on'; refreshCloudStatus();
-    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); await cloudPushLocal();
+    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); await cloudPushLocal();
     return true;
   }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
 }
@@ -3047,6 +3210,28 @@ function cloudSubscribeHist(){
       cloudSaveHist(histLoad());   // ainda não existe na nuvem -> sobe o local
     }
   }, err=>console.warn('Cloud hist sync',err));
+}
+/* sincronização dos custos/lucros (config) e fornecedores */
+let _cfgCloudTimer=null,_fornCloudTimer=null;
+function cloudSaveCfg(o){ if(!cloud.on)return; clearTimeout(_cfgCloudTimer); _cfgCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('config').set({cfg:o,ts:Date.now()}); }catch(e){console.warn('Cloud cfg save',e);} },800); }
+function cloudSubscribeCfg(){
+  if(!cloud.ready) return;
+  if(cloud._unsubCfg){cloud._unsubCfg();cloud._unsubCfg=null;}
+  cloud._unsubCfg=cloud.db.collection('cotacoes').doc('config').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && d.cfg){ const inc=JSON.stringify(d.cfg); if(inc!==localStorage.getItem('chip7_cot_cfg')){ try{localStorage.setItem('chip7_cot_cfg',inc);}catch(e){} if(document.querySelector('.cfg-row')) abrirConfig(); else if(document.getElementById('cotCategoria')) onCategoria(); } }
+    else cloudSaveCfg(cfgLoad());
+  }, err=>console.warn('Cloud cfg sync',err));
+}
+function cloudSaveForn(a){ if(!cloud.on)return; clearTimeout(_fornCloudTimer); _fornCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('fornecedores').set({itens:a,ts:Date.now()}); }catch(e){console.warn('Cloud forn save',e);} },800); }
+function cloudSubscribeForn(){
+  if(!cloud.ready) return;
+  if(cloud._unsubForn){cloud._unsubForn();cloud._unsubForn=null;}
+  cloud._unsubForn=cloud.db.collection('cotacoes').doc('fornecedores').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_fornecedores')){ try{localStorage.setItem('chip7_fornecedores',inc);}catch(e){} if(document.querySelector('.forn-item')||document.querySelector('.forn-add')) abrirFornecedores(); } }
+    else cloudSaveForn(fornLoad());
+  }, err=>console.warn('Cloud forn sync',err));
 }
 function refreshCloudStatus(){
   const el=document.getElementById('cloudStatus'); if(!el)return;

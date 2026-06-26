@@ -3,7 +3,7 @@
    - HTML (navegação): NETWORK-FIRST → sempre pega a versão mais nova quando online,
      e cai para o cache quando offline (funciona na visita sem internet).
    - Demais arquivos (ícones, logo, manifest): CACHE-FIRST (rápido + offline). */
-const CACHE = 'chip7-diag-v39';
+const CACHE = 'chip7-diag-v41';
 const ASSETS = [
   './',
   './index.html',
@@ -18,8 +18,10 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // NÃO faz skipWaiting automático: espera o usuário clicar "Atualizar" (banner) p/ não recarregar no meio de um orçamento
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
 });
+self.addEventListener('message', e => { if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting(); });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
