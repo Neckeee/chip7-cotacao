@@ -237,6 +237,9 @@ textarea{min-height:60px;resize:vertical}
 .ph-info b{font-size:13.5px;display:block;line-height:1.25}
 .ph-info small{color:var(--muted);font-size:12px;display:block;margin-top:1px}
 .ph-go{font-weight:800;color:var(--brand);font-size:20px;flex:none}
+.src-tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:5px;padding:1px 6px;margin-right:4px;vertical-align:middle}
+.src-tag.mazer{background:#e8f0ff;color:#1f4fa3;border:1px solid #c5d8f5}
+.src-tag.py{background:#eafaef;color:#15803d;border:1px solid #c7ebd2}
 .fav-star{flex:none;font-size:20px;color:#cbd3df;cursor:pointer;line-height:1;padding:0 2px}
 .fav-star.on{color:#f5b301}
 .fav-star:hover{color:#f5b301}
@@ -285,6 +288,10 @@ textarea{min-height:60px;resize:vertical}
 .cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
 .cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
 .cart-clear{color:var(--muted)}
+/* abas Importados/Fornecedores */
+.cot-tabs{display:flex;gap:6px;margin:4px 0 12px;background:#eef2f7;border-radius:12px;padding:4px}
+.cot-tab{flex:1;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px 8px;border-radius:9px;cursor:pointer}
+.cot-tab.on{background:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(10,37,80,.25)}
 /* barra de ferramentas da cotação */
 .cot-tools{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 14px}
 .cot-tools .btn.ghost{background:rgba(255,255,255,.12);color:#fff;flex:1;min-width:120px;white-space:nowrap}
@@ -520,6 +527,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-tools">
       <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico / Vendas</button>
       <button class="btn ghost" onclick="abrirFavoritos()">⭐ Favoritos</button>
+      <button class="btn ghost" onclick="abrirCatalogo()">📒 Catálogo / Planilhas</button>
       <button class="btn ghost" onclick="abrirConfig()">⚙️ Custos &amp; lucros</button>
       <button class="btn ghost" onclick="abrirFornecedores()">🏪 Fornecedores</button>
     </div>
@@ -528,18 +536,24 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-card">
       <label class="cot-lbl">Categoria (define o lucro %)</label>
       <select id="cotCategoria" onchange="onCategoria()">
-        <option value="placa-mae" data-lucro="30" data-trazer="20">Placa-mãe — lucro 30% · trazer 20%</option>
-        <option value="iphone-novo" data-lucro="12" data-trazer="10">iPhone (novo) — lucro 12% · trazer 10%</option>
-        <option value="recondicionado" data-lucro="30" data-trazer="10">Recondicionado / Seminovo — lucro 30% · trazer 10%</option>
-        <option value="notebook" data-lucro="35" data-trazer="20">Notebook — lucro 35% · trazer 20%</option>
-        <option value="processador" data-lucro="20" data-trazer="20">Processador — lucro 20% · trazer 20%</option>
-        <option value="placa-video" data-lucro="20" data-trazer="20">Placa de vídeo — lucro 20% · trazer 20%</option>
-        <option value="ssd" data-lucro="20" data-trazer="20">SSD / Armazenamento — lucro 20% · trazer 20%</option>
-        <option value="memoria" data-lucro="20" data-trazer="20">Memória RAM — lucro 20% · trazer 20%</option>
-        <option value="outro" data-lucro="20" data-trazer="20">Outro — lucro 20% · trazer 20%</option>
+        <option value="placa-mae" data-lucro="30" data-trazer="20">Placa-mãe</option>
+        <option value="iphone-novo" data-lucro="12" data-trazer="10">iPhone (novo)</option>
+        <option value="recondicionado" data-lucro="30" data-trazer="10">Recondicionado / Seminovo</option>
+        <option value="notebook" data-lucro="35" data-trazer="20">Notebook</option>
+        <option value="processador" data-lucro="20" data-trazer="20">Processador</option>
+        <option value="placa-video" data-lucro="20" data-trazer="20">Placa de vídeo</option>
+        <option value="ssd" data-lucro="20" data-trazer="20">SSD / Armazenamento</option>
+        <option value="memoria" data-lucro="20" data-trazer="20">Memória RAM</option>
+        <option value="outro" data-lucro="20" data-trazer="20">Outro</option>
       </select>
-      <label class="cot-lbl">Lojas (comprasparaguai)</label>
-      <div class="cot-lojas" id="cotLojas"></div>
+      <div class="cot-tabs">
+        <button id="tabImp" class="cot-tab on" onclick="setModo('importados')">🌎 Importados (Paraguai)</button>
+        <button id="tabForn" class="cot-tab" onclick="setModo('fornecedores')">🏪 Fornecedores (BR)</button>
+      </div>
+      <div id="lojasWrap">
+        <label class="cot-lbl">Lojas (comprasparaguai)</label>
+        <div class="cot-lojas" id="cotLojas"></div>
+      </div>
       <label class="cot-lbl">Buscar produto</label>
       <div class="cot-row">
         <input id="cotBusca" placeholder="Ex.: placa mãe B550" onkeydown="if(event.key==='Enter')pesquisarProdutos()">
@@ -562,12 +576,14 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-card">
       <div class="cot-sep">preço e ajustes</div>
       <div class="cot-grid">
-        <div><label class="cot-lbl">Preço no Paraguai (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
-        <div><label class="cot-lbl">Cotação do dólar (R$)</label>
+        <div><label class="cot-lbl" id="lblPreco">Preço no Paraguai (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
+        <div id="colDolar"><label class="cot-lbl">Cotação do dólar (R$)</label>
           <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
       </div>
+      <div id="rowTrazer">
       <label class="cot-lbl">Custo de trazer (%) — 10% iPhone · 20% peças</label>
       <input id="cotTrazer" type="number" inputmode="decimal" value="20" oninput="cotCalc()">
+      </div>
       <div class="cot-grid">
         <div><label class="cot-lbl">Lucro (%)</label><input id="cotLucroPct" type="number" inputmode="decimal" value="30" oninput="lucroDePct()"></div>
         <div><label class="cot-lbl">Lucro (R$)</label><input id="cotLucroRs" type="number" inputmode="decimal" placeholder="0" oninput="lucroDeReais()"></div>
@@ -2418,6 +2434,7 @@ function escolherCotacao(){
   renderLojas();
   onCategoria();
   if(!document.getElementById('cotDolar').value) buscarDolar();
+  setMoedaUI('USD');
   cotCalc();
   setBuildUI();
 }
@@ -2475,7 +2492,16 @@ function arredNice(v){                                // sobe de 50 em 50; últi
 }
 // taxas reais da maquininha (% que a loja repassa por nº de parcelas)
 const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
-let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false, COT_BUILD=false;
+let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false, COT_BUILD=false, COT_MODO='importados';
+function setModo(m){
+  COT_MODO=m;
+  const ti=document.getElementById('tabImp'), tf=document.getElementById('tabForn');
+  if(ti)ti.classList.toggle('on',m==='importados'); if(tf)tf.classList.toggle('on',m==='fornecedores');
+  const lw=document.getElementById('lojasWrap'); if(lw)lw.style.display = m==='importados'?'':'none';
+  const b=document.getElementById('cotBusca'); if(b)b.placeholder = m==='fornecedores'?'Buscar nos seus fornecedores (Mazer, Guarapuava, catálogo...)':'Ex.: placa mãe B550';
+  const box=document.getElementById('cotResultados'); if(box)box.innerHTML='';
+  const msg=document.getElementById('cotBuscaMsg'); if(msg)msg.textContent = m==='fornecedores'?'Pesquise uma peça nos seus fornecedores (preços em R$, sem dólar/trazer).':'';
+}
 const PECAS_PC=['Processador','Placa-mãe','Memória RAM','SSD / HD','Placa de vídeo','Fonte','Gabinete','Cooler / Water'];
 function setBuildUI(){
   const t=document.getElementById('cotTitulo'); if(t)t.textContent=COT_BUILD?'🖥️ Montar PC':'💰 Cotar Valores';
@@ -2494,8 +2520,10 @@ function cotCalc(){
   const selP=document.getElementById('cotParcelas');
   const N=parseInt(selP?selP.value:'10',10)||10;
   const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
-  const custoBRL=usd*dolar;                  // custo no Paraguai já convertido em REAIS
-  const trazer=custoBRL*trazerPct/100;       // custo de trazer (10% iPhone / 20% peças)
+  const moeda=(COT_SEL&&COT_SEL.moeda)||'USD';
+  const brl = moeda==='BRL';                 // Mazer/fornecedor BR: custo já em R$, sem dólar/trazer
+  const custoBRL = brl ? usd : usd*dolar;    // em BRL o campo já está em reais
+  const trazer = brl ? 0 : custoBRL*trazerPct/100;
   const custoTotal=custoBRL+trazer;          // custo total (é a base do lucro)
   const lucro=custoTotal*pct/100;            // lucro em reais (vem do %)
   const aVistaBruto=custoTotal+lucro;
@@ -2513,9 +2541,11 @@ function cotCalc(){
   if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole um link ou informe o preço (US$) para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; const pc=document.getElementById('cotPedidoCard'); if(pc&&!COT_CART.length)pc.style.display='none'; return; }
   el.innerHTML=`
     <details class="cr-calc" open><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
-      <div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
+      ${brl
+        ? `<div class="cr-line"><span>Custo (Mazer · s/ST)</span><b>${fmtMoney(custoBRL)}</b></div>`
+        : `<div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
       <div class="cr-line"><span>+ Custo de trazer (${trazerPct.toFixed(0)}%)</span><b>+ ${fmtMoney(trazer)}</b></div>
-      <div class="cr-line"><span>= Custo total</span><b>${fmtMoney(custoTotal)}</b></div>
+      <div class="cr-line"><span>= Custo total</span><b>${fmtMoney(custoTotal)}</b></div>`}
       <div class="cr-line"><span>+ Lucro (${pct.toFixed(0)}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
       <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
       <div class="cr-line"><span>💵 Seu lucro (à vista − custo total)</span><b>${fmtMoney(aVista-custoTotal)}</b></div>
@@ -2620,9 +2650,13 @@ async function cpDetalhe(link){
   const img=(html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
   return {ofertas,nome:cpDecode(nome),img};
 }
-function htmlProdHit(i,n){ const fav=isFav(i); return `<div class="prod-hit" onclick="verOfertas(${n})">
+function htmlProdHit(i,n){ const fav=isFav(i);
+  const forn = i.fonte && i.fonte!=='Paraguai';
+  const sub = forn ? `<span class="src-tag mazer">🏷️ ${(i.fonte||'Fornecedor').replace(/</g,'&lt;')}</span> ${i.preco?('R$ '+(+i.preco).toFixed(2)):'ver preço'}`
+                   : `<span class="src-tag py">🇵🇾 Paraguai</span> a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)`;
+  return `<div class="prod-hit" onclick="verOfertas(${n})">
     ${i.img?`<img class="prod-thumb" src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
-    <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)</small></div>
+    <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>${sub}</small></div>
     <span class="fav-star${fav?' on':''}" onclick="event.stopPropagation();toggleFav(${n})" title="Favoritar">${fav?'★':'☆'}</span>
     <span class="ph-go">›</span></div>`; }
 /* ====== favoritos de produtos ====== */
@@ -2653,20 +2687,72 @@ async function pesquisarProdutos(){
   const msg=document.getElementById('cotBuscaMsg');
   const box=document.getElementById('cotResultados');
   if(!q){ msg.textContent='Digite o que quer pesquisar (ex.: placa mãe B550).'; return; }
-  msg.textContent='🔄 Buscando produtos no Paraguai...'; box.innerHTML='';
-  buscarDolar();
+  box.innerHTML='';
   try{
-    COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0);
-    if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
+    if(COT_MODO==='fornecedores'){
+      msg.textContent='🔄 Buscando nos seus fornecedores...';
+      COT_HITS = await fornecedorPesquisa(q);
+      if(!COT_HITS.length){ msg.textContent='Nada nos fornecedores. Tente outro termo, ou cadastre no 📒 Catálogo / cole o preço.'; return; }
+    } else {
+      msg.textContent='🔄 Buscando produtos no Paraguai...'; buscarDolar();
+      COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Paraguai',moeda:'USD'},i));
+      if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
+    }
     renderProdutos();
   }catch(e){
-    msg.textContent='⚠ Não consegui buscar agora (o passador pode estar fora do ar). Tente de novo, cole o link ou digite o preço (US$).';
+    msg.textContent='⚠ Não consegui buscar agora. Tente de novo, cole o link ou digite o preço.';
   }
+}
+/* ====== busca nos fornecedores (Mazer + Guarapuava + catálogo manual) ====== */
+async function fornecedorPesquisa(q){
+  const [mz,gu] = await Promise.all([ mazerPesquisa(q).catch(()=>[]), guarapuavaPesquisa(q).catch(()=>[]) ]);
+  const cat = catBuscaLocal(q);
+  return [].concat(cat, mz, gu);
+}
+async function mazerPesquisa(q){
+  try{
+    const r=await fetch('/.netlify/functions/mazer?q='+encodeURIComponent(q));
+    if(!r.ok) return [];
+    const d=await r.json(); if(d.erro||!d.itens) return [];
+    return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Mazer', moeda:'BRL'}));
+  }catch(e){ return []; }
+}
+async function guarapuavaPesquisa(q){
+  try{
+    const r=await fetch('/.netlify/functions/guarapuava?q='+encodeURIComponent(q));
+    if(!r.ok) return [];
+    const d=await r.json(); if(d.erro||!d.itens) return [];
+    return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Guarapuava', moeda:'BRL', direto:true}));
+  }catch(e){ return []; }
+}
+async function verMazer(prod){
+  const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
+  msg.textContent='🔄 Buscando preço de revenda (Mazer)...';
+  let precoST=prod.preco||0, img=prod.img||'';
+  try{ const r=await fetch('/.netlify/functions/mazer?detalhe='+encodeURIComponent(prod.link)); if(r.ok){ const d=await r.json(); if(d.precoST)precoST=d.precoST; if(d.img)img=d.img; } }catch(e){}
+  prod.img=prod.img||img; COT_PROD=prod; COT_OFS=[];
+  box.innerHTML=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
+    `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`+
+    `<div class="prod-hit off sel"><div class="ph-info"><b>🏷️ Mazer</b><small>Preço s/ST · seu custo de revenda</small></div><span class="ph-price">${precoST?fmtMoney(precoST):'—'}</span></div>`+
+    (precoST?'':`<p class="cot-fallback">Não consegui o preço s/ST automático. Verifique no Mazer e digite o custo (R$) abaixo.</p>`);
+  msg.textContent=precoST?('✔ Mazer · custo s/ST '+fmtMoney(precoST)):'⚠ Sem preço automático do Mazer.';
+  usarPreco(precoST||0, prod.nome, prod.img, 'Mazer', '', '', 'BRL');
+}
+function usarFornecedorDireto(prod){
+  const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
+  const preco=prod.preco||0; COT_PROD=prod; COT_OFS=[];
+  box.innerHTML=`<div class="prod-back" onclick="renderProdutos()">‹ voltar aos produtos</div>`+
+    `<div class="prod-prodhead">${prod.img?`<img src="${imgThumb(prod.img)}" alt="" onerror="this.style.display='none'">`:''}<b>${(prod.nome||'').replace(/</g,'&lt;')}</b></div>`+
+    `<div class="prod-hit off sel"><div class="ph-info"><b>🏷️ ${(prod.fonte||'Fornecedor').replace(/</g,'&lt;')}</b><small>seu custo de revenda (R$)</small></div><span class="ph-price">${preco?fmtMoney(preco):'—'}</span></div>`;
+  msg.textContent=preco?('✔ '+(prod.fonte||'Fornecedor')+' · custo '+fmtMoney(preco)):'⚠ Sem preço — digite o custo (R$) abaixo.';
+  usarPreco(preco, prod.nome, prod.img, prod.fonte||'', '', '', 'BRL');
 }
 async function abrirPorLink(){
   const url=(document.getElementById('cotLink').value||'').trim();
   const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
-  if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole um link de produto do comprasparaguai (ex.: .../celular-..._64041/).'; return; }
+  if(/mazer\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); return verMazer({nome:'Produto Mazer',link:path,fonte:'Mazer',moeda:'BRL',img:''}); }
+  if(/distribuidoraguarapuava\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); msg.textContent='🔄 Abrindo (Guarapuava)...'; try{ const r=await fetch('/.netlify/functions/guarapuava?detalhe='+encodeURIComponent(path)); const d=r.ok?await r.json():{}; return usarFornecedorDireto({nome:d.nome||'Produto Guarapuava',link:path,fonte:'Guarapuava',moeda:'BRL',img:d.img||'',preco:d.preco||0}); }catch(e){ msg.textContent='⚠ Não consegui abrir (Guarapuava).'; return; } }
+  if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole um link do comprasparaguai, mazer.com.br ou distribuidoraguarapuava.com.br.'; return; }
   msg.textContent='🔄 Abrindo o produto...'; box.innerHTML=''; buscarDolar();
   const path=url.replace(/^https?:\/\/[^/]+/,'');
   try{
@@ -2681,6 +2767,8 @@ async function abrirPorLink(){
 }
 async function verOfertas(n){
   const prod=COT_HITS[n]; if(!prod)return;
+  if(prod.fonte==='Mazer') return verMazer(prod);
+  if(prod.moeda==='BRL') return usarFornecedorDireto(prod);   // Guarapuava / catálogo manual (preço já em R$)
   const msg=document.getElementById('cotBuscaMsg');
   msg.textContent='🔄 Buscando cor, loja e preço...';
   let res={ofertas:[]};
@@ -2748,14 +2836,22 @@ function mostrarFallback(prod){
     `<div class="prod-hit off sel"><div class="ph-info"><b>Menor preço (todas as lojas)</b><small class="badge-min">★ mais barato</small></div><span class="ph-price">US$ ${(+prod.precoUSD).toFixed(2)}</span></div>`+
     `<p class="cot-fallback">Produto grande: o navegador não abre loja por loja — usei o menor preço do site. Você pode digitar grade e cor abaixo. (Pra escolher a loja em produtos grandes, dá pra publicar a versão rápida.)</p>`;
 }
-function usarPreco(usd,nome,img,loja,cor,grade){
+function usarPreco(usd,nome,img,loja,cor,grade,moeda){
   document.getElementById('cotPreco').value=(+usd).toFixed(2);
-  COT_SEL={nome:nome||'',img:img||'',loja:loja||'',usd:+usd,cor:cor||'',grade:grade||''};
+  COT_SEL={nome:nome||'',img:img||'',loja:loja||'',usd:+usd,cor:cor||'',grade:grade||'',moeda:moeda||'USD'};
   if(nome) document.getElementById('cotBusca').value=nome;
   const np=document.getElementById('cotNomePdf'); if(np && nome!==undefined) np.value=nome||'';
   const cc=document.getElementById('cotCor'); if(cc && cor!==undefined) cc.value=cor||'';
   const cg=document.getElementById('cotGrade'); if(cg && grade!==undefined) cg.value=grade||'';
+  setMoedaUI(moeda||'USD');
   cotCalc();
+}
+function setMoedaUI(moeda){
+  const brl = moeda==='BRL';
+  const fonte=(COT_SEL&&COT_SEL.loja)||'';
+  const lp=document.getElementById('lblPreco'); if(lp) lp.textContent = brl?('Custo '+(fonte?fonte+' ':'')+'(R$)'):'Preço no Paraguai (US$)';
+  const cd=document.getElementById('colDolar'); if(cd) cd.style.display = brl?'none':'';
+  const rt=document.getElementById('rowTrazer'); if(rt) rt.style.display = brl?'none':'';
 }
 /* ---- carrinho de orçamento (vários produtos) ---- */
 function itemAtual(){
@@ -3010,6 +3106,72 @@ function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fo
 function removerForn(i){ const a=fornLoad(); a.splice(i,1); fornSave(a); abrirFornecedores(); }
 function abrirFornSite(i){ const f=fornLoad()[i]; if(f&&f.url) window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); }
 function buscarNoForn(i){ const f=fornLoad()[i]; if(!f)return; const q=(document.getElementById('cotBusca').value||'').trim()||prompt('O que buscar nesse fornecedor?')||''; if(!q)return; if(f.busca&&f.busca.indexOf('%s')>=0){ window.open(f.busca.replace('%s',encodeURIComponent(q)),'_blank'); } else if(f.url){ window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); } }
+/* ====== catálogo manual (planilhas) — fornecedores sem site ====== */
+function catLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_catalogo')||'[]'); }catch(e){ return []; } }
+function catSave(a){ try{ localStorage.setItem('chip7_cot_catalogo',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveCat==='function')cloudSaveCat(a); }
+function semAcento(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function catBuscaLocal(q){
+  const termos=semAcento(q).split(/\s+/).filter(Boolean);
+  return catLoad().filter(c=>{ const t=semAcento((c.nome||'')+' '+(c.fornecedor||'')); return termos.every(x=>t.includes(x)); })
+    .map(c=>({nome:c.nome, preco:+c.preco||0, precoUSD:0, ofertas:1, img:'', fonte:c.fornecedor||'Catálogo', moeda:'BRL', direto:true}));
+}
+function nomesFornecedores(){
+  const s=new Set(['Mazer','Guarapuava']);
+  catLoad().forEach(c=>c.fornecedor&&s.add(c.fornecedor));
+  fornLoad().forEach(f=>f.nome&&s.add(f.nome));
+  return [...s];
+}
+function abrirCatalogo(){
+  const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  const arr=catLoad(); msg.textContent=`📒 ${arr.length} item(ns) no catálogo manual`;
+  const esc=s=>(s||'').replace(/</g,'&lt;');
+  const opts=nomesFornecedores().map(n=>`<option value="${esc(n)}">`).join('');
+  let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
+  html+=`<div class="forn-add"><div class="cot-sep">adicionar produto ao catálogo</div>
+    <input id="ctForn" list="ctFornList" placeholder="Fornecedor (escolha ou digite)"><datalist id="ctFornList">${opts}</datalist>
+    <div class="cot-row" style="margin-top:8px"><input id="ctNome" placeholder="Produto (ex.: SSD Kingston 480GB)" style="flex:2"><input id="ctPreco" type="number" inputmode="decimal" placeholder="Custo R$" style="flex:1"></div>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="addCat()">➕ Adicionar ao catálogo</button>
+    <div class="cot-row" style="margin-top:8px"><button class="btn ghost" style="flex:1" onclick="exportarCSV()">⬇️ Exportar planilha (CSV)</button><label class="btn ghost" style="flex:1;text-align:center;cursor:pointer">⬆️ Importar CSV<input type="file" accept=".csv,text/csv" onchange="importarCSV(this)" style="display:none"></label></div>
+    <p class="cot-hint">Abre no Excel/Google Sheets. Formato: Fornecedor; Produto; Preço. Sincroniza com a equipe (site publicado).</p></div>`;
+  // agrupa por fornecedor
+  const grupos={}; arr.forEach((c,i)=>{ (grupos[c.fornecedor||'—']=grupos[c.fornecedor||'—']||[]).push(Object.assign({_i:i},c)); });
+  Object.keys(grupos).sort().forEach(g=>{
+    html+=`<div class="cot-sep" style="text-align:left;color:#fff">${esc(g)} (${grupos[g].length})</div>`;
+    html+=grupos[g].map(c=>`<div class="forn-item"><div class="fi-info"><b>${esc(c.nome)}</b><small>${fmtMoney(+c.preco||0)}</small></div>
+      <div class="fi-acts"><button class="ci-del" onclick="removerCat(${c._i})" title="Remover">✕</button></div></div>`).join('');
+  });
+  box.innerHTML=html;
+}
+function addCat(){
+  const forn=_fv('ctForn'), nome=_fv('ctNome'), preco=parseFloat((document.getElementById('ctPreco')||{}).value)||0;
+  if(!forn){toast('Diga o fornecedor');return;} if(!nome){toast('Diga o produto');return;}
+  const a=catLoad(); a.unshift({fornecedor:forn,nome,preco}); catSave(a); abrirCatalogo(); toast('✔ Adicionado ao catálogo');
+}
+function removerCat(i){ const a=catLoad(); a.splice(i,1); catSave(a); abrirCatalogo(); }
+function exportarCSV(){
+  const a=catLoad();
+  let csv='Fornecedor;Produto;Preço\n'+a.map(c=>`"${(c.fornecedor||'').replace(/"/g,'""')}";"${(c.nome||'').replace(/"/g,'""')}";${(+c.preco||0).toFixed(2).replace('.',',')}`).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  downloadBlob(new File([blob],'catalogo-fornecedores-'+new Date().toISOString().slice(0,10)+'.csv',{type:'text/csv'}));
+  toast('⬇️ Planilha exportada');
+}
+function importarCSV(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const linhas=String(rd.result).split(/\r?\n/).filter(l=>l.trim());
+      const a=catLoad(); let add=0;
+      for(let k=0;k<linhas.length;k++){
+        const l=linhas[k]; if(/fornecedor.*produto.*pre/i.test(l)) continue;   // pula cabeçalho
+        const col=l.split(/;|\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(s=>s.replace(/^"|"$/g,'').trim());
+        if(col.length>=3){ const preco=parseFloat(col[2].replace(/\./g,'').replace(',','.'))||0; if(col[1]) { a.push({fornecedor:col[0]||'Importado',nome:col[1],preco}); add++; } }
+      }
+      catSave(a); abrirCatalogo(); toast('✔ '+add+' itens importados');
+    }catch(e){ toast('Não consegui ler o CSV'); }
+  };
+  rd.readAsText(f,'utf-8'); inp.value='';
+}
 /* ---- compartilhar como imagem (card visual) ---- */
 function cpRoundRect(cx,x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
 function cpLoadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
@@ -3135,7 +3297,7 @@ async function cloudSignIn(){
   try{
     await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
     cloud.on=true; cloud.status='on'; refreshCloudStatus();
-    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); await cloudPushLocal();
+    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); cloudSubscribeCat(); await cloudPushLocal();
     return true;
   }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
 }
@@ -3232,6 +3394,17 @@ function cloudSubscribeForn(){
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_fornecedores')){ try{localStorage.setItem('chip7_fornecedores',inc);}catch(e){} if(document.querySelector('.forn-item')||document.querySelector('.forn-add')) abrirFornecedores(); } }
     else cloudSaveForn(fornLoad());
   }, err=>console.warn('Cloud forn sync',err));
+}
+let _catCloudTimer=null;
+function cloudSaveCat(a){ if(!cloud.on)return; clearTimeout(_catCloudTimer); _catCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('catalogo').set({itens:a,ts:Date.now()}); }catch(e){console.warn('Cloud cat save',e);} },800); }
+function cloudSubscribeCat(){
+  if(!cloud.ready) return;
+  if(cloud._unsubCat){cloud._unsubCat();cloud._unsubCat=null;}
+  cloud._unsubCat=cloud.db.collection('cotacoes').doc('catalogo').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_cot_catalogo')){ try{localStorage.setItem('chip7_cot_catalogo',inc);}catch(e){} if(document.getElementById('ctForn')) abrirCatalogo(); } }
+    else cloudSaveCat(catLoad());
+  }, err=>console.warn('Cloud cat sync',err));
 }
 function refreshCloudStatus(){
   const el=document.getElementById('cloudStatus'); if(!el)return;
