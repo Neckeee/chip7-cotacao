@@ -54,9 +54,10 @@ function parseST(html){
   const m=seg.match(/(\d{1,3}(?:\.\d{3})*,\d{2})(?!\s*%)/);   // 1º valor em R$ que não é porcentagem = s/ST
   return m?precoNum(m[1]):null;
 }
+function semAcento(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 function parseBusca(html,q){
   const cards=html.split(/<div class="box-img-listagem"/i).slice(1);
-  const termos=q.toLowerCase().split(/\s+/).filter(Boolean);
+  const termos=semAcento(q).split(/\s+/).filter(Boolean);
   const out=[]; const vistos=new Set();
   for(const c of cards){
     const lk=c.match(/href="(\/produtos\/detalhe\/slug\/[^"]+)"/i);
@@ -64,7 +65,7 @@ function parseBusca(html,q){
     const pr=c.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
     if(lk&&nm){
       const nome=decode(nm[1].replace(/<[^>]+>/g,' ')).replace(/^C[oó]d:\s*\d+\s*/i,'').trim();
-      const low=nome.toLowerCase();
+      const low=semAcento(nome);
       if(termos.every(t=>low.includes(t)) && !vistos.has(lk[1])){
         vistos.add(lk[1]);
         out.push({nome, link:lk[1], preco: pr?precoNum(pr[1]):null});
