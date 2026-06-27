@@ -695,14 +695,20 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div class="cot-card">
           <div class="cot-sep">croqui do local</div>
           <div class="cam-tools">
-            <button class="cam-tool on" id="ctParede" onclick="camTool('parede')">✏️ Parede</button>
+            <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
+            <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Muro</button>
             <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
+            <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
             <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
             <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
             <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
           </div>
+          <div class="cam-tools" style="margin-top:-2px">
+            <button class="cam-tool" onclick="camModelo('casa')">🏠 Casa pronta</button>
+            <button class="cam-tool" onclick="camModelo('loja')">🏪 Loja pronta</button>
+          </div>
           <canvas id="camCanvas" class="cam-canvas" width="640" height="460"></canvas>
-          <p class="cot-hint">Parede: arraste pra desenhar. Câmera: toque pra colocar (numerada); toque de novo numa câmera pra girar o ângulo de visão. Apagar: toque no item.</p>
+          <p class="cot-hint">Cômodo/Muro: arraste. Câmera/DVR: toque pra colocar (toque de novo na câmera pra girar). Use um modelo pronto pra começar rápido. Apagar: toque no item.</p>
         </div>
         <div class="cot-card" style="margin-top:14px">
           <div class="cot-sep">pontos de câmera</div>
@@ -715,6 +721,13 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cot-grid">
             <div><label class="cot-lbl">Cliente</label><input id="camCliente" placeholder="Nome do cliente"></div>
             <div><label class="cot-lbl">WhatsApp</label><input id="camTel" inputmode="tel" placeholder="(42) 9 9999-9999" oninput="this.value=formatPhoneBR(this.value)"></div>
+          </div>
+          <label class="cot-lbl">Endereço da instalação</label>
+          <div class="cot-row"><input id="camEndereco" placeholder="Rua, nº, bairro, cidade"><button class="btn ghost" onclick="camLocalizar()" title="Usar minha localização (GPS)">📍</button></div>
+          <div class="cot-row" id="camMapaLink" style="display:none;margin-top:4px"></div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Técnico(s) responsável(is)</label><input id="camTecnico" placeholder="Ex.: Matheus, João"></div>
+            <div><label class="cot-lbl">Tipo de parede</label><select id="camParede"><option>Alvenaria</option><option>Madeira</option><option>Drywall</option><option>Misto</option></select></div>
           </div>
           <div class="cot-grid">
             <div><label class="cot-lbl">Data de início</label><input id="camData" type="date"></div>
@@ -732,8 +745,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
             <div><label class="cot-lbl">R$ por hora</label><input id="camHoraV" type="number" inputmode="decimal" value="120" oninput="camCalc()"></div>
           </div>
           <label class="cot-lbl">Itens (câmeras, DVR, fonte, conectores...)</label>
+          <div class="cot-row"><input id="camBuscaPeca" placeholder="Buscar peça no catálogo/fornecedor" onkeydown="if(event.key==='Enter')camBuscarPeca()"><button class="btn ghost" onclick="camBuscarPeca()">🔎</button></div>
+          <div id="camBuscaRes"></div>
           <div id="camItens"></div>
-          <button class="btn ghost" style="width:100%;margin-top:8px" onclick="camAddItem()">➕ Adicionar item</button>
+          <button class="btn ghost" style="width:100%;margin-top:8px" onclick="camAddItem()">➕ Adicionar item manual</button>
           <label class="cot-lbl">Parcelar no cartão em</label>
           <select id="camParcelas" onchange="camCalc()"></select>
           <label class="cot-lbl">Observações</label>
@@ -3432,7 +3447,7 @@ function renderClientReport(snap){
 }
 
 /* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
-let CAM={paredes:[],cameras:[],textos:[],itens:[],_calc:null}, camTipoTool='parede', camCtx=null;
+let CAM={comodos:[],paredes:[],cameras:[],textos:[],dvr:null,itens:[],_calc:null}, camTipoTool='comodo', camCtx=null;
 function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
 function camInit(){
   const sel=document.getElementById('camParcelas');
@@ -3442,33 +3457,78 @@ function camInit(){
   if(!CAM.itens.length) CAM.itens.push({desc:'',qtd:1,valor:0});
   renderCamItens(); renderCamPontos(); camRedraw(); camCalc();
 }
-function camTool(t){ camTipoTool=t; [['parede','ctParede'],['camera','ctCamera'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
-function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.paredes=[];CAM.cameras=[];CAM.textos=[]; camRedraw(); renderCamPontos(); }
+function camTool(t){ camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
+function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.dvr=null; camRedraw(); renderCamPontos(); }
+function camModelo(tipo){
+  const W=640,H=460;
+  if(tipo==='casa'){
+    CAM.comodos=[{x:60,y:60,w:520,h:340}]; // contorno
+    CAM.paredes=[{x1:320,y1:60,x2:320,y2:240},{x1:320,y1:240,x2:580,y2:240},{x1:60,y1:240,x2:200,y2:240}];
+    CAM.textos=[{x:150,y:160,t:'Sala'},{x:430,y:150,t:'Quartos'},{x:130,y:330,t:'Garagem'}];
+    CAM.cameras=[{x:90,y:90,ang:45,local:'Frente',tipo:'Bullet'},{x:550,y:90,ang:135,local:'Lateral',tipo:'Bullet'},{x:120,y:300,ang:0,local:'Garagem',tipo:'Dome'}];
+    CAM.dvr={x:430,y:330};
+  } else {
+    CAM.comodos=[{x:60,y:80,w:520,h:300}];
+    CAM.paredes=[{x1:60,y1:200,x2:380,y2:200},{x1:380,y1:80,x2:380,y2:380}];
+    CAM.textos=[{x:160,y:140,t:'Loja'},{x:200,y:300,t:'Caixa'},{x:460,y:230,t:'Estoque'}];
+    CAM.cameras=[{x:90,y:110,ang:45,local:'Entrada',tipo:'Dome'},{x:550,y:110,ang:135,local:'Estoque',tipo:'Bullet'},{x:200,y:350,ang:270,local:'Caixa',tipo:'Dome'}];
+    CAM.dvr={x:520,y:350};
+  }
+  camTool('camera'); camRedraw(); renderCamPontos();
+  toast('Modelo carregado — ajuste à vontade');
+}
+async function camLocalizar(){
+  if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
+  toast('📍 Pegando localização...');
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude:la,longitude:lo}=pos.coords;
+    try{
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+lo+'&zoom=18&addressdetails=1',{headers:{'Accept':'application/json'}});
+      const d=await r.json();
+      const end=d.display_name||(la.toFixed(5)+', '+lo.toFixed(5));
+      document.getElementById('camEndereco').value=end;
+    }catch(e){ document.getElementById('camEndereco').value=la.toFixed(5)+', '+lo.toFixed(5); }
+    const link=document.getElementById('camMapaLink');
+    if(link){ link.style.display='block'; link.innerHTML=`<a href="https://www.google.com/maps?q=${la},${lo}" target="_blank" rel="noopener" style="color:#bfe3ff;font-size:13px">🗺️ Ver no mapa</a>`; }
+    toast('✔ Endereço preenchido');
+  }, err=>{ toast('Não consegui o GPS (permita a localização)'); }, {enableHighAccuracy:true,timeout:8000});
+}
 function camPos(cv,e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height)}; }
 function camBindCanvas(cv){
   if(cv._bound)return; cv._bound=true; let start=null;
   cv.addEventListener('pointerdown',e=>{ e.preventDefault(); try{cv.setPointerCapture(e.pointerId);}catch(_){}
     const p=camPos(cv,e);
-    if(camTipoTool==='parede'){ start=p; }
+    if(camTipoTool==='parede'||camTipoTool==='comodo'){ start=p; }
     else if(camTipoTool==='camera'){ camTapCamera(p); }
+    else if(camTipoTool==='dvr'){ CAM.dvr={x:p.x,y:p.y}; camRedraw(); }
     else if(camTipoTool==='texto'){ const t=prompt('Texto no croqui (ex.: Garagem, Portão):'); if(t){CAM.textos.push({x:p.x,y:p.y,t});camRedraw();} }
     else if(camTipoTool==='apagar'){ camApagarEm(p); }
   });
-  cv.addEventListener('pointermove',e=>{ if(camTipoTool==='parede'&&start){ const p=camPos(cv,e); camRedraw(); const ctx=camCtx; ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(p.x,p.y);ctx.stroke(); } });
-  cv.addEventListener('pointerup',e=>{ if(camTipoTool==='parede'&&start){ const p=camPos(cv,e); if(Math.hypot(p.x-start.x,p.y-start.y)>8) CAM.paredes.push({x1:start.x,y1:start.y,x2:p.x,y2:p.y}); start=null; camRedraw(); } });
+  cv.addEventListener('pointermove',e=>{ if(!start)return; const p=camPos(cv,e); camRedraw(); const ctx=camCtx;
+    if(camTipoTool==='parede'){ ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(p.x,p.y);ctx.stroke(); }
+    else if(camTipoTool==='comodo'){ ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=3;ctx.strokeRect(start.x,start.y,p.x-start.x,p.y-start.y); } });
+  cv.addEventListener('pointerup',e=>{ if(!start)return; const p=camPos(cv,e);
+    if(camTipoTool==='parede'){ if(Math.hypot(p.x-start.x,p.y-start.y)>8) CAM.paredes.push({x1:start.x,y1:start.y,x2:p.x,y2:p.y}); }
+    else if(camTipoTool==='comodo'){ const x=Math.min(start.x,p.x),y=Math.min(start.y,p.y),w=Math.abs(p.x-start.x),h=Math.abs(p.y-start.y); if(w>20&&h>20) CAM.comodos.push({x,y,w,h}); }
+    start=null; camRedraw(); });
 }
 function camTapCamera(p){ const hit=CAM.cameras.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(hit){ hit.ang=(hit.ang+45)%360; } else { CAM.cameras.push({x:p.x,y:p.y,ang:90,local:'',tipo:'Bullet'}); } camRedraw(); renderCamPontos(); }
 function distPtSeg(p,w){ const dx=w.x2-w.x1,dy=w.y2-w.y1,l2=dx*dx+dy*dy; let t=l2?((p.x-w.x1)*dx+(p.y-w.y1)*dy)/l2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(p.x-(w.x1+t*dx),p.y-(w.y1+t*dy)); }
 function camApagarEm(p){
   let i=CAM.cameras.findIndex(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(i>=0){CAM.cameras.splice(i,1);camRedraw();renderCamPontos();return;}
+  if(CAM.dvr && Math.hypot(CAM.dvr.x-p.x,CAM.dvr.y-p.y)<24){ CAM.dvr=null; camRedraw(); return; }
   i=CAM.textos.findIndex(t=>Math.hypot(t.x-p.x,t.y-p.y)<24); if(i>=0){CAM.textos.splice(i,1);camRedraw();return;}
-  let best=-1,bd=14; CAM.paredes.forEach((w,k)=>{const d=distPtSeg(p,w);if(d<bd){bd=d;best=k;}}); if(best>=0){CAM.paredes.splice(best,1);camRedraw();}
+  let best=-1,bd=14; CAM.paredes.forEach((w,k)=>{const d=distPtSeg(p,w);if(d<bd){bd=d;best=k;}}); if(best>=0){CAM.paredes.splice(best,1);camRedraw();return;}
+  i=CAM.comodos.findIndex(c=>p.x>=c.x-6&&p.x<=c.x+c.w+6&&p.y>=c.y-6&&p.y<=c.y+c.h+6 && (Math.abs(p.x-c.x)<10||Math.abs(p.x-(c.x+c.w))<10||Math.abs(p.y-c.y)<10||Math.abs(p.y-(c.y+c.h))<10)); if(i>=0){CAM.comodos.splice(i,1);camRedraw();}
 }
 function camRedraw(){
   const cv=document.getElementById('camCanvas'); if(!cv||!camCtx)return; const ctx=camCtx,W=cv.width,Hh=cv.height;
   ctx.clearRect(0,0,W,Hh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,Hh);
   ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.strokeStyle='#0a2550'; ctx.lineWidth=4; ctx.lineCap='round'; CAM.paredes.forEach(w=>{ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();});
+  ctx.strokeStyle='#0a2550'; ctx.lineWidth=4; ctx.lineCap='round';
+  CAM.comodos.forEach(c=>{ctx.strokeRect(c.x,c.y,c.w,c.h);});
+  CAM.paredes.forEach(w=>{ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();});
+  if(CAM.dvr){ const d=CAM.dvr; ctx.fillStyle='#16407e'; ctx.fillRect(d.x-16,d.y-12,32,24); ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('DVR',d.x,d.y); ctx.textAlign='left'; ctx.textBaseline='alphabetic'; }
   ctx.fillStyle='#1b2430'; ctx.font='bold 14px Arial'; ctx.textBaseline='alphabetic'; CAM.textos.forEach(t=>ctx.fillText(t.t,t.x,t.y));
   CAM.cameras.forEach((c,i)=>{
     const a=c.ang*Math.PI/180, R=58, sp=Math.PI/4.5;
@@ -3487,6 +3547,18 @@ function renderCamPontos(){
     <select onchange="CAM.cameras[${i}].tipo=this.value">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>`).join('');
   camCalc();
 }
+async function camBuscarPeca(){
+  const q=(document.getElementById('camBuscaPeca').value||'').trim();
+  const res=document.getElementById('camBuscaRes'); if(!res)return; if(!q){res.innerHTML='';return;}
+  res.innerHTML='<p class="cot-hint" style="margin:6px 0">🔄 Buscando no catálogo e fornecedores...</p>';
+  let achados=[];
+  try{ achados=await fornecedorPesquisa(q); }catch(e){ achados=catBuscaLocal(q); }
+  achados=achados.filter(x=>x.preco>0).slice(0,12);
+  if(!achados.length){ res.innerHTML='<p class="cot-hint" style="margin:6px 0">Nada no catálogo/fornecedores. Cadastre no 📒 Catálogo ou use "Adicionar item manual".</p>'; return; }
+  CAM._busca=achados;
+  res.innerHTML=achados.map((a,k)=>`<div class="prod-hit" onclick="camUsarPeca(${k})"><div class="ph-info"><b>${(a.nome||'').replace(/</g,'&lt;')}</b><small><span class="src-tag mazer">${(a.fonte||'Catálogo').replace(/</g,'&lt;')}</span> R$ ${(+a.preco).toFixed(2)}</small></div><span class="ph-go">+</span></div>`).join('');
+}
+function camUsarPeca(k){ const a=(CAM._busca||[])[k]; if(!a)return; CAM.itens.push({desc:a.nome,qtd:1,valor:+a.preco||0}); document.getElementById('camBuscaRes').innerHTML=''; document.getElementById('camBuscaPeca').value=''; renderCamItens(); camCalc(); toast('✔ '+a.nome); }
 function camAddItem(){ CAM.itens.push({desc:'',qtd:1,valor:0}); renderCamItens(); }
 function renderCamItens(){
   const box=document.getElementById('camItens'); if(!box)return;
@@ -3518,6 +3590,7 @@ async function gerarCameraPDF(baixar){
   const W=doc.internal.pageSize.getWidth(),Hp=doc.internal.pageSize.getHeight(),M=42,hoje=new Date();
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   const cliente=g('camCliente'), data=g('camData'), cob=g('camCobertura'), obs=g('camObs');
+  const endereco=g('camEndereco'), tecnico=g('camTecnico'), parede=g('camParede');
   doc.setFillColor(10,37,80);doc.rect(0,0,W,84,'F');
   const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,18,48,48);}catch(e){}}
   const hx=M+(logo?60:0); doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
@@ -3526,8 +3599,12 @@ async function gerarCameraPDF(baixar){
   let y=100; doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(12);
   doc.text(cliente?('Orçamento para '+cliente):'Orçamento de câmeras',M,y); y+=15;
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
-  const info=[]; if(data)info.push('Início: '+data.split('-').reverse().join('/')); info.push(CAM.cameras.length+' câmera(s)'); if(cob)info.push('Cobertura ~'+cob+'%');
+  const info=[]; if(data)info.push('Início: '+data.split('-').reverse().join('/')); info.push(CAM.cameras.length+' câmera(s)'); if(cob)info.push('Cobertura ~'+cob+'%'); if(parede)info.push('Parede: '+parede);
   doc.text(info.join('   ·   '),M,y); y+=12;
+  if(endereco){ const el=doc.splitTextToSize('Endereço: '+endereco,W-2*M); doc.text(el,M,y); y+=el.length*11+2; }
+  if(tecnico){ doc.text('Técnico(s): '+tecnico,M,y); y+=11; }
+  if(CAM.dvr){ doc.text('Local do DVR marcado no croqui.',M,y); y+=11; }
+  y+=2;
   try{ const cv=document.getElementById('camCanvas'); const im=cv.toDataURL('image/jpeg',0.85); const iw=W-2*M, ih=iw*(cv.height/cv.width); doc.addImage(im,'JPEG',M,y,iw,ih); doc.setDrawColor(225,230,238);doc.rect(M,y,iw,ih); y+=ih+12; }catch(e){}
   if(CAM.cameras.length){ doc.autoTable({startY:y,head:[['#','Local','Tipo']],body:CAM.cameras.map((c,i)=>[i+1,c.local||'-',c.tipo||'-']),theme:'grid',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+12; }
   const body=[]; CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0).forEach(it=>body.push([it.desc,String(it.qtd),fmtMoney(it.valor),fmtMoney(it.qtd*it.valor)]));
@@ -3554,7 +3631,9 @@ async function enviarCameraWhatsApp(){
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   let text=`*Orçamento de Câmeras (CFTV) — ${CHIP7.nome}*\n`;
   if(g('camCliente'))text+=`Para: ${g('camCliente')}\n`;
-  text+=`\n📹 ${CAM.cameras.length} câmera(s)`+(g('camCobertura')?` · cobertura ~${g('camCobertura')}%`:'')+`\n💰 Total: ${fmtMoney(c.total)}\n💳 ${c.parcelas}x de ${fmtMoney(c.parcela)}\n`;
+  if(g('camEndereco'))text+=`Endereço: ${g('camEndereco')}\n`;
+  text+=`\n📹 ${CAM.cameras.length} câmera(s)`+(g('camCobertura')?` · cobertura ~${g('camCobertura')}%`:'')+(g('camParede')?` · parede ${g('camParede')}`:'')+`\n💰 Total: ${fmtMoney(c.total)}\n💳 ${c.parcelas}x de ${fmtMoney(c.parcela)}\n`;
+  if(g('camTecnico'))text+=`👷 Técnico(s): ${g('camTecnico')}\n`;
   if(g('camObs'))text+=`\n${g('camObs')}\n`;
   text+=`\n_Orçamento válido por 7 dias._\n${CHIP7.tel} · ${CHIP7.site}`;
   const tel=g('camTel').replace(/\D/g,''); const num=tel?(tel.length<=11?'55'+tel:tel):'';
