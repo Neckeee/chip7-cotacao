@@ -240,6 +240,8 @@ textarea{min-height:60px;resize:vertical}
 .src-tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:5px;padding:1px 6px;margin-right:4px;vertical-align:middle}
 .src-tag.mazer{background:#e8f0ff;color:#1f4fa3;border:1px solid #c5d8f5}
 .src-tag.py{background:#eafaef;color:#15803d;border:1px solid #c7ebd2}
+.diag-ok{color:#15803d!important;font-weight:700}
+.diag-err{color:#c0392b!important;font-weight:700}
 .fav-star{flex:none;font-size:20px;color:#cbd3df;cursor:pointer;line-height:1;padding:0 2px}
 .fav-star.on{color:#f5b301}
 .fav-star:hover{color:#f5b301}
@@ -288,6 +290,17 @@ textarea{min-height:60px;resize:vertical}
 .cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
 .cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
 .cart-clear{color:var(--muted)}
+/* módulo câmera (croqui) */
+.cam-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.cam-tool{background:#f1f5fb;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
+.cam-tool.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.cam-canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:#fff;touch-action:none}
+.cam-pt{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.cam-pt-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.cam-pt input,.cam-pt select{flex:1;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-item{display:flex;gap:6px;margin-top:6px}
+.cam-item input{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text);min-width:0}
+.cam-item .ci-del{flex:none}
 /* abas Importados/Fornecedores */
 .cot-tabs{display:flex;gap:6px;margin:4px 0 12px;background:#eef2f7;border-radius:12px;padding:4px}
 .cot-tab{flex:1;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px 8px;border-radius:9px;cursor:pointer}
@@ -509,7 +522,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="wel-choice">
       <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Preço de venda (Paraguai)</small></button>
       <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
-      <button class="wel-btn func" onclick="escolherMontarPC()" style="grid-column:1/-1"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
+      <button class="wel-btn func" onclick="escolherMontarPC()"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
+      <button class="wel-btn cli" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
     </div>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
   </div>
@@ -553,6 +567,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div id="lojasWrap">
         <label class="cot-lbl">Lojas (comprasparaguai)</label>
         <div class="cot-lojas" id="cotLojas"></div>
+      </div>
+      <div id="fornLojasWrap" style="display:none">
+        <label class="cot-lbl">Fornecedores a buscar</label>
+        <div class="cot-lojas" id="fornLojas"></div>
       </div>
       <label class="cot-lbl">Buscar produto</label>
       <div class="cot-row">
@@ -662,6 +680,72 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-cart" id="cotCart" style="display:none"></div>
     </div><!-- /cot-col-r -->
     </div><!-- /cot-cols -->
+  </div>
+</div>
+
+<!-- TELA DE ORÇAMENTO DE CÂMERA (CFTV) -->
+<div class="welcome cot-screen" id="cameraScreen">
+  <div class="cot-wrap">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">📹 Orçamento de Câmera</h2>
+    </div>
+    <div class="cot-cols">
+      <div class="cot-col-l">
+        <div class="cot-card">
+          <div class="cot-sep">croqui do local</div>
+          <div class="cam-tools">
+            <button class="cam-tool on" id="ctParede" onclick="camTool('parede')">✏️ Parede</button>
+            <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
+            <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
+            <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
+            <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
+          </div>
+          <canvas id="camCanvas" class="cam-canvas" width="640" height="460"></canvas>
+          <p class="cot-hint">Parede: arraste pra desenhar. Câmera: toque pra colocar (numerada); toque de novo numa câmera pra girar o ângulo de visão. Apagar: toque no item.</p>
+        </div>
+        <div class="cot-card" style="margin-top:14px">
+          <div class="cot-sep">pontos de câmera</div>
+          <div id="camPontos"><p class="cot-hint" style="margin:0">Adicione câmeras no croqui — elas aparecem aqui numeradas pra você dizer o local e o tipo.</p></div>
+        </div>
+      </div>
+      <div class="cot-col-r">
+        <div class="cot-card">
+          <div class="cot-sep">dados</div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Cliente</label><input id="camCliente" placeholder="Nome do cliente"></div>
+            <div><label class="cot-lbl">WhatsApp</label><input id="camTel" inputmode="tel" placeholder="(42) 9 9999-9999" oninput="this.value=formatPhoneBR(this.value)"></div>
+          </div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Data de início</label><input id="camData" type="date"></div>
+            <div><label class="cot-lbl">Cobertura da área (%)</label><input id="camCobertura" type="number" inputmode="numeric" placeholder="ex.: 80"></div>
+          </div>
+        </div>
+        <div class="cot-card" style="margin-top:14px">
+          <div class="cot-sep">materiais e serviço</div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Metros de cabo</label><input id="camCaboM" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
+            <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
+          </div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Horas técnicas</label><input id="camHoras" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
+            <div><label class="cot-lbl">R$ por hora</label><input id="camHoraV" type="number" inputmode="decimal" value="120" oninput="camCalc()"></div>
+          </div>
+          <label class="cot-lbl">Itens (câmeras, DVR, fonte, conectores...)</label>
+          <div id="camItens"></div>
+          <button class="btn ghost" style="width:100%;margin-top:8px" onclick="camAddItem()">➕ Adicionar item</button>
+          <label class="cot-lbl">Parcelar no cartão em</label>
+          <select id="camParcelas" onchange="camCalc()"></select>
+          <label class="cot-lbl">Observações</label>
+          <textarea id="camObs" rows="2" placeholder="Garantia, prazo de instalação, condições..."></textarea>
+        </div>
+        <div class="cot-result" id="camResult"></div>
+        <div class="ab-actions" style="margin-top:12px">
+          <button class="btn primary" onclick="enviarCameraWhatsApp()">📲 Enviar no WhatsApp</button>
+          <button class="btn ghost" onclick="gerarCameraPDF(true)">📄 PDF</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2423,7 +2507,7 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   document.getElementById('chooser').classList.add('show');
 }
@@ -2498,6 +2582,8 @@ function setModo(m){
   const ti=document.getElementById('tabImp'), tf=document.getElementById('tabForn');
   if(ti)ti.classList.toggle('on',m==='importados'); if(tf)tf.classList.toggle('on',m==='fornecedores');
   const lw=document.getElementById('lojasWrap'); if(lw)lw.style.display = m==='importados'?'':'none';
+  const fw=document.getElementById('fornLojasWrap'); if(fw)fw.style.display = m==='fornecedores'?'':'none';
+  if(m==='fornecedores') renderFornLojas();
   const b=document.getElementById('cotBusca'); if(b)b.placeholder = m==='fornecedores'?'Buscar nos seus fornecedores (Mazer, Guarapuava, catálogo...)':'Ex.: placa mãe B550';
   const box=document.getElementById('cotResultados'); if(box)box.innerHTML='';
   const msg=document.getElementById('cotBuscaMsg'); if(msg)msg.textContent = m==='fornecedores'?'Pesquise uma peça nos seus fornecedores (preços em R$, sem dólar/trazer).':'';
@@ -2692,7 +2778,15 @@ async function pesquisarProdutos(){
     if(COT_MODO==='fornecedores'){
       msg.textContent='🔄 Buscando nos seus fornecedores...';
       COT_HITS = await fornecedorPesquisa(q);
-      if(!COT_HITS.length){ msg.textContent='Nada nos fornecedores. Tente outro termo, ou cadastre no 📒 Catálogo / cole o preço.'; return; }
+      if(!COT_HITS.length){
+        msg.textContent='Nada encontrado nos fornecedores.';
+        let h='';
+        if(COT_FORN_ERROS.length) h+=`<p class="cot-fallback">⚠️ ${COT_FORN_ERROS.join('<br>')}</p>`;
+        h+=`<button class="btn ghost" style="width:100%;margin-top:6px" onclick="testarFornecedores()">🔌 Testar conexão dos fornecedores</button>`;
+        h+=`<p class="cot-hint">Dica: cadastre no 📒 Catálogo (fornecedor sem site) ou digite o preço (R$) direto.</p>`;
+        box.innerHTML=h; return;
+      }
+      if(COT_FORN_ERROS.length){ renderProdutos(); document.getElementById('cotBuscaMsg').textContent='✔ '+COT_HITS.length+' resultado(s) · ⚠️ '+COT_FORN_ERROS.join(' · '); return; }
     } else {
       msg.textContent='🔄 Buscando produtos no Paraguai...'; buscarDolar();
       COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Paraguai',moeda:'USD'},i));
@@ -2704,26 +2798,62 @@ async function pesquisarProdutos(){
   }
 }
 /* ====== busca nos fornecedores (Mazer + Guarapuava + catálogo manual) ====== */
+let COT_FORN_ERROS=[];
+function renderFornLojas(){
+  const box=document.getElementById('fornLojas'); if(!box)return;
+  const fontes=['Mazer','Guarapuava',...new Set(catLoad().map(c=>c.fornecedor).filter(Boolean))];
+  const ja={}; [...box.querySelectorAll('input')].forEach(i=>ja[i.value]=i.checked);   // preserva marcações
+  box.innerHTML=fontes.map(f=>`<label class="loja-chip"><input type="checkbox" value="${f.replace(/"/g,'&quot;')}" ${ja[f]===false?'':'checked'} onchange="renderFornLojas()"> ${f.replace(/</g,'&lt;')}</label>`).join('');
+}
+function fornSelecionadas(){ return [...document.querySelectorAll('#fornLojas input:checked')].map(i=>i.value); }
 async function fornecedorPesquisa(q){
-  const [mz,gu] = await Promise.all([ mazerPesquisa(q).catch(()=>[]), guarapuavaPesquisa(q).catch(()=>[]) ]);
-  const cat = catBuscaLocal(q);
+  COT_FORN_ERROS=[];
+  const sel=fornSelecionadas(); const usa=n=> !sel.length || sel.includes(n);
+  const [mz,gu] = await Promise.all([
+    usa('Mazer') ? mazerPesquisa(q).catch(()=>[]) : Promise.resolve([]),
+    usa('Guarapuava') ? guarapuavaPesquisa(q).catch(()=>[]) : Promise.resolve([])
+  ]);
+  const cat = catBuscaLocal(q).filter(c=>usa(c.fonte));
   return [].concat(cat, mz, gu);
 }
-async function mazerPesquisa(q){
+async function fornFetch(nome,fn,url){
   try{
-    const r=await fetch('/.netlify/functions/mazer?q='+encodeURIComponent(q));
-    if(!r.ok) return [];
-    const d=await r.json(); if(d.erro||!d.itens) return [];
-    return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Mazer', moeda:'BRL'}));
-  }catch(e){ return []; }
+    const r=await fetch(url);
+    if(r.status===404){ COT_FORN_ERROS.push(nome+': função não publicada no Netlify'); return null; }
+    const d=await r.json();
+    if(d&&d.erro){ COT_FORN_ERROS.push(nome+': '+d.erro); return null; }
+    return d;
+  }catch(e){ COT_FORN_ERROS.push(nome+': sem conexão'); return null; }
+}
+async function mazerPesquisa(q){
+  const d=await fornFetch('Mazer','mazer','/.netlify/functions/mazer?q='+encodeURIComponent(q));
+  if(!d||!d.itens) return [];
+  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Mazer', moeda:'BRL'}));
 }
 async function guarapuavaPesquisa(q){
-  try{
-    const r=await fetch('/.netlify/functions/guarapuava?q='+encodeURIComponent(q));
-    if(!r.ok) return [];
-    const d=await r.json(); if(d.erro||!d.itens) return [];
-    return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Guarapuava', moeda:'BRL', direto:true}));
-  }catch(e){ return []; }
+  const d=await fornFetch('Guarapuava','guarapuava','/.netlify/functions/guarapuava?q='+encodeURIComponent(q));
+  if(!d||!d.itens) return [];
+  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Guarapuava', moeda:'BRL', direto:true}));
+}
+async function testarFornecedores(){
+  const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
+  msg.textContent='🔌 Testando conexão com os fornecedores...';
+  box.innerHTML='<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>';
+  const alvos=[['Mazer','/.netlify/functions/mazer?q=ssd'],['Guarapuava','/.netlify/functions/guarapuava?q=ssd']];
+  let html='';
+  for(const [nome,url] of alvos){
+    let st,cor;
+    try{ const r=await fetch(url); const d=await r.json().catch(()=>({}));
+      if(r.status===404){ st='❌ função não publicada (faça o deploy com a pasta netlify)'; cor='err'; }
+      else if(d.erro){ st = /credenciais|configurad/i.test(d.erro) ? '⚠️ falta cadastrar o login (variáveis no Netlify)' : ('❌ '+d.erro); cor='err'; }
+      else if(d.itens){ st='✅ funcionando — '+d.itens.length+' resultado(s)'; cor='ok'; }
+      else { st='❓ resposta inesperada'; cor='err'; }
+    }catch(e){ st='❌ sem conexão'; cor='err'; }
+    html+=`<div class="forn-item"><div class="fi-info"><b>${nome}</b><small class="diag-${cor}">${st}</small></div></div>`;
+  }
+  box.innerHTML='<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>'+html+
+    `<p class="cot-hint">Se aparecer "falta cadastrar o login": no Netlify → Site configuration → Environment variables, crie MAZER_USER, MAZER_PASS, GUARA_USER, GUARA_PASS e faça um novo deploy.</p>`;
+  msg.textContent='Diagnóstico dos fornecedores';
 }
 async function verMazer(prod){
   const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
@@ -3090,6 +3220,7 @@ function abrirFornecedores(){
   const arr=fornLoad(); msg.textContent=`🏪 ${arr.length} fornecedor(es)`;
   const esc=s=>(s||'').replace(/</g,'&lt;');
   let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
+  html+=`<button class="btn ghost" style="width:100%;margin-bottom:10px" onclick="testarFornecedores()">🔌 Testar conexão (Mazer / Guarapuava)</button>`;
   html+=arr.map((f,i)=>`<div class="forn-item"><div class="fi-info"><b>${esc(f.nome)}</b>
       ${f.url?`<small>${esc(f.url)}</small>`:''}${f.user?`<small>👤 ${esc(f.user)}</small>`:''}${f.obs?`<small>${esc(f.obs)}</small>`:''}</div>
       <div class="fi-acts">${f.url?`<button class="btn ghost" onclick="abrirFornSite(${i})">Abrir</button>`:''}${f.busca?`<button class="btn ghost" onclick="buscarNoForn(${i})">Buscar</button>`:''}<button class="ci-del" onclick="removerForn(${i})" title="Remover">✕</button></div></div>`).join('');
@@ -3131,8 +3262,9 @@ function abrirCatalogo(){
     <input id="ctForn" list="ctFornList" placeholder="Fornecedor (escolha ou digite)"><datalist id="ctFornList">${opts}</datalist>
     <div class="cot-row" style="margin-top:8px"><input id="ctNome" placeholder="Produto (ex.: SSD Kingston 480GB)" style="flex:2"><input id="ctPreco" type="number" inputmode="decimal" placeholder="Custo R$" style="flex:1"></div>
     <button class="btn primary" style="width:100%;margin-top:8px" onclick="addCat()">➕ Adicionar ao catálogo</button>
-    <div class="cot-row" style="margin-top:8px"><button class="btn ghost" style="flex:1" onclick="exportarCSV()">⬇️ Exportar planilha (CSV)</button><label class="btn ghost" style="flex:1;text-align:center;cursor:pointer">⬆️ Importar CSV<input type="file" accept=".csv,text/csv" onchange="importarCSV(this)" style="display:none"></label></div>
-    <p class="cot-hint">Abre no Excel/Google Sheets. Formato: Fornecedor; Produto; Preço. Sincroniza com a equipe (site publicado).</p></div>`;
+    <div class="cot-row" style="margin-top:8px"><button class="btn ghost" style="flex:1" onclick="exportarCSV()">⬇️ Exportar planilha</button><label class="btn ghost" style="flex:1;text-align:center;cursor:pointer">⬆️ Importar Excel/CSV<input type="file" accept=".csv,.xlsx,.xls" onchange="importarPlanilha(this)" style="display:none"></label></div>
+    ${arr.length?`<button class="btn ghost" style="width:100%;margin-top:8px;color:#c0392b" onclick="limparCatalogo()">🗑️ Apagar todo o catálogo</button>`:''}
+    <p class="cot-hint">Importa planilha do Excel (.xlsx) ou CSV — ele acha sozinho as colunas Produto e Preço. Os itens entram no fornecedor digitado acima. Sincroniza com a equipe (site publicado).</p></div>`;
   // agrupa por fornecedor
   const grupos={}; arr.forEach((c,i)=>{ (grupos[c.fornecedor||'—']=grupos[c.fornecedor||'—']||[]).push(Object.assign({_i:i},c)); });
   Object.keys(grupos).sort().forEach(g=>{
@@ -3155,22 +3287,59 @@ function exportarCSV(){
   downloadBlob(new File([blob],'catalogo-fornecedores-'+new Date().toISOString().slice(0,10)+'.csv',{type:'text/csv'}));
   toast('⬇️ Planilha exportada');
 }
-function importarCSV(inp){
-  const f=inp.files&&inp.files[0]; if(!f)return;
-  const rd=new FileReader();
-  rd.onload=()=>{
-    try{
-      const linhas=String(rd.result).split(/\r?\n/).filter(l=>l.trim());
-      const a=catLoad(); let add=0;
-      for(let k=0;k<linhas.length;k++){
-        const l=linhas[k]; if(/fornecedor.*produto.*pre/i.test(l)) continue;   // pula cabeçalho
-        const col=l.split(/;|\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(s=>s.replace(/^"|"$/g,'').trim());
-        if(col.length>=3){ const preco=parseFloat(col[2].replace(/\./g,'').replace(',','.'))||0; if(col[1]) { a.push({fornecedor:col[0]||'Importado',nome:col[1],preco}); add++; } }
-      }
-      catSave(a); abrirCatalogo(); toast('✔ '+add+' itens importados');
-    }catch(e){ toast('Não consegui ler o CSV'); }
-  };
-  rd.readAsText(f,'utf-8'); inp.value='';
+function limparCatalogo(){ if(!confirm('Apagar TODO o catálogo manual? (não dá pra desfazer)'))return; catSave([]); abrirCatalogo(); toast('🗑️ Catálogo apagado'); }
+let _xlsxLib=null;
+async function loadXLSX(){
+  if(window.XLSX) return window.XLSX;
+  if(!_xlsxLib){ _xlsxLib=new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'; s.onload=()=>res(window.XLSX); s.onerror=()=>rej(new Error('sheetjs')); document.head.appendChild(s); }); }
+  return _xlsxLib;
+}
+function parsePrecoBR(v){ if(v==null)return 0; let s=String(v).replace(/[^\d.,]/g,''); if(!s)return 0; if(/,\d{1,2}$/.test(s)) s=s.replace(/\./g,'').replace(',','.'); else if(s.split('.').length>2) s=s.replace(/\./g,''); const n=parseFloat(s); return isNaN(n)?0:n; }
+function parseCsvLine(l){ return l.split(/;|\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(s=>s.replace(/^"|"$/g,'').trim()); }
+function mapearPlanilha(rows, forn){
+  if(!rows||!rows.length) return [];
+  let nameCol=-1, priceCol=-1, headerRow=-1;
+  for(let r=0;r<Math.min(rows.length,6);r++){
+    (rows[r]||[]).forEach((c,i)=>{ const t=String(c).toLowerCase().trim();
+      if(nameCol<0 && /produto|descri|nome|item|modelo/.test(t)){ nameCol=i; headerRow=r; }
+      if(priceCol<0 && /^\s*(pre[çc]o|valor|custo)/.test(t)){ priceCol=i; if(headerRow<0)headerRow=r; }
+    });
+    if(nameCol>=0&&priceCol>=0) break;
+  }
+  const ehNumerico=s=>{ s=String(s).trim(); return s!=='' && /^[r$\s]*[\d.]+(,\d{1,2})?[r$\s]*$/i.test(s); };
+  const out=[]; const start=headerRow>=0?headerRow+1:0;
+  for(let r=start;r<rows.length;r++){
+    const row=rows[r]||[];
+    let nome, nmIdx=nameCol;
+    if(nameCol>=0){ nome=String(row[nameCol]||'').trim(); }
+    else { let best='',bi=-1; row.forEach((c,i)=>{ const s=String(c||'').trim(); if(s.length>best.length && !ehNumerico(s)) {best=s;bi=i;} }); nome=best; nmIdx=bi; }
+    let preco = priceCol>=0 ? parsePrecoBR(row[priceCol]) : 0;
+    if(!preco){ for(let i=0;i<row.length;i++){ if(i===nmIdx)continue; if(ehNumerico(row[i])){ const p=parsePrecoBR(row[i]); if(p>0){ preco=p; break; } } } }
+    if(nome && nome.length>2 && preco>0 && !/^(produto|descri[çc][ãa]o|nome)$/i.test(nome)) out.push({fornecedor:forn, nome, preco});
+  }
+  return out;
+}
+async function importarPlanilha(inp){
+  const f=inp.files&&inp.files[0]; if(!f){ return; } inp.value='';
+  const forn=_fv('ctForn')||prompt('Nome do fornecedor desta planilha:')||'Importado';
+  toast('📥 Lendo a planilha...');
+  try{
+    let rows=[];
+    if(/\.xlsx?$/i.test(f.name)){
+      const XLSX=await loadXLSX();
+      const buf=await f.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const sh=wb.Sheets[wb.SheetNames[0]];
+      rows=XLSX.utils.sheet_to_json(sh,{header:1,raw:false,defval:''});
+    }else{
+      const txt=await new Promise(res=>{const rd=new FileReader();rd.onload=()=>res(String(rd.result));rd.readAsText(f,'utf-8');});
+      rows=txt.split(/\r?\n/).filter(l=>l.trim()).map(parseCsvLine);
+    }
+    const itens=mapearPlanilha(rows, forn);
+    if(!itens.length){ toast('Não achei colunas de Produto/Preço na planilha.'); return; }
+    const a=catLoad(); itens.forEach(x=>a.push(x)); catSave(a); abrirCatalogo();
+    toast('✔ '+itens.length+' itens importados em "'+forn+'"');
+  }catch(e){ console.warn('import',e); toast('Não consegui ler a planilha. Tente salvar como .xlsx ou CSV.'); }
 }
 /* ---- compartilhar como imagem (card visual) ---- */
 function cpRoundRect(cx,x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
@@ -3260,6 +3429,138 @@ function renderClientReport(snap){
   rep.innerHTML=`<div class="cr-bar no-print"><img src="logo-chip7.png" alt="Chip7"><b>Seu Diagnóstico Tecnológico</b><span style="flex:1"></span><button class="btn primary" onclick="window.print()">📄 Salvar / Imprimir PDF</button></div>`+buildReport(snap);
   rep.style.display='block';rep.style.background='#fff';rep.style.minHeight='100vh';
   window.scrollTo(0,0);
+}
+
+/* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
+let CAM={paredes:[],cameras:[],textos:[],itens:[],_calc:null}, camTipoTool='parede', camCtx=null;
+function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
+function camInit(){
+  const sel=document.getElementById('camParcelas');
+  if(sel && !sel.options.length){ sel.innerHTML=Object.keys(TAXAS_CARTAO).map(n=>`<option value="${n}"${n=='10'?' selected':''}>${n}x · ${String(TAXAS_CARTAO[n]).replace('.',',')}%</option>`).join(''); }
+  const dt=document.getElementById('camData'); if(dt && !dt.value) dt.value=new Date().toISOString().slice(0,10);
+  const cv=document.getElementById('camCanvas'); if(cv){ camCtx=cv.getContext('2d'); camBindCanvas(cv); }
+  if(!CAM.itens.length) CAM.itens.push({desc:'',qtd:1,valor:0});
+  renderCamItens(); renderCamPontos(); camRedraw(); camCalc();
+}
+function camTool(t){ camTipoTool=t; [['parede','ctParede'],['camera','ctCamera'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
+function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.paredes=[];CAM.cameras=[];CAM.textos=[]; camRedraw(); renderCamPontos(); }
+function camPos(cv,e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height)}; }
+function camBindCanvas(cv){
+  if(cv._bound)return; cv._bound=true; let start=null;
+  cv.addEventListener('pointerdown',e=>{ e.preventDefault(); try{cv.setPointerCapture(e.pointerId);}catch(_){}
+    const p=camPos(cv,e);
+    if(camTipoTool==='parede'){ start=p; }
+    else if(camTipoTool==='camera'){ camTapCamera(p); }
+    else if(camTipoTool==='texto'){ const t=prompt('Texto no croqui (ex.: Garagem, Portão):'); if(t){CAM.textos.push({x:p.x,y:p.y,t});camRedraw();} }
+    else if(camTipoTool==='apagar'){ camApagarEm(p); }
+  });
+  cv.addEventListener('pointermove',e=>{ if(camTipoTool==='parede'&&start){ const p=camPos(cv,e); camRedraw(); const ctx=camCtx; ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(p.x,p.y);ctx.stroke(); } });
+  cv.addEventListener('pointerup',e=>{ if(camTipoTool==='parede'&&start){ const p=camPos(cv,e); if(Math.hypot(p.x-start.x,p.y-start.y)>8) CAM.paredes.push({x1:start.x,y1:start.y,x2:p.x,y2:p.y}); start=null; camRedraw(); } });
+}
+function camTapCamera(p){ const hit=CAM.cameras.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(hit){ hit.ang=(hit.ang+45)%360; } else { CAM.cameras.push({x:p.x,y:p.y,ang:90,local:'',tipo:'Bullet'}); } camRedraw(); renderCamPontos(); }
+function distPtSeg(p,w){ const dx=w.x2-w.x1,dy=w.y2-w.y1,l2=dx*dx+dy*dy; let t=l2?((p.x-w.x1)*dx+(p.y-w.y1)*dy)/l2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(p.x-(w.x1+t*dx),p.y-(w.y1+t*dy)); }
+function camApagarEm(p){
+  let i=CAM.cameras.findIndex(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(i>=0){CAM.cameras.splice(i,1);camRedraw();renderCamPontos();return;}
+  i=CAM.textos.findIndex(t=>Math.hypot(t.x-p.x,t.y-p.y)<24); if(i>=0){CAM.textos.splice(i,1);camRedraw();return;}
+  let best=-1,bd=14; CAM.paredes.forEach((w,k)=>{const d=distPtSeg(p,w);if(d<bd){bd=d;best=k;}}); if(best>=0){CAM.paredes.splice(best,1);camRedraw();}
+}
+function camRedraw(){
+  const cv=document.getElementById('camCanvas'); if(!cv||!camCtx)return; const ctx=camCtx,W=cv.width,Hh=cv.height;
+  ctx.clearRect(0,0,W,Hh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,Hh);
+  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.strokeStyle='#0a2550'; ctx.lineWidth=4; ctx.lineCap='round'; CAM.paredes.forEach(w=>{ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();});
+  ctx.fillStyle='#1b2430'; ctx.font='bold 14px Arial'; ctx.textBaseline='alphabetic'; CAM.textos.forEach(t=>ctx.fillText(t.t,t.x,t.y));
+  CAM.cameras.forEach((c,i)=>{
+    const a=c.ang*Math.PI/180, R=58, sp=Math.PI/4.5;
+    ctx.fillStyle='rgba(43,108,176,.18)'; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.arc(c.x,c.y,R,a-sp,a+sp); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#1f4fa3'; ctx.beginPath(); ctx.arc(c.x,c.y,12,0,6.3); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(i+1),c.x,c.y);
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  });
+}
+function renderCamPontos(){
+  const box=document.getElementById('camPontos'); if(!box)return;
+  if(!CAM.cameras.length){ box.innerHTML='<p class="cot-hint" style="margin:0">Adicione câmeras no croqui — elas aparecem aqui numeradas pra você dizer o local e o tipo.</p>'; camCalc(); return; }
+  const tipos=['Bullet','Dome','Speed Dome','IP Wi-Fi','Externa','Interna'];
+  box.innerHTML=CAM.cameras.map((c,i)=>`<div class="cam-pt"><span class="cam-pt-n">${i+1}</span>
+    <input value="${(c.local||'').replace(/"/g,'&quot;')}" placeholder="Local (ex.: Garagem)" oninput="CAM.cameras[${i}].local=this.value">
+    <select onchange="CAM.cameras[${i}].tipo=this.value">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>`).join('');
+  camCalc();
+}
+function camAddItem(){ CAM.itens.push({desc:'',qtd:1,valor:0}); renderCamItens(); }
+function renderCamItens(){
+  const box=document.getElementById('camItens'); if(!box)return;
+  box.innerHTML=CAM.itens.map((it,i)=>`<div class="cam-item">
+    <input style="flex:2" value="${(it.desc||'').replace(/"/g,'&quot;')}" placeholder="Descrição (ex.: Câmera Bullet 1080p)" oninput="CAM.itens[${i}].desc=this.value">
+    <input style="width:46px" type="number" inputmode="numeric" value="${it.qtd}" oninput="CAM.itens[${i}].qtd=+this.value||0;camCalc()">
+    <input style="width:78px" type="number" inputmode="decimal" value="${it.valor}" placeholder="R$" oninput="CAM.itens[${i}].valor=+this.value||0;camCalc()">
+    <button class="ci-del" onclick="CAM.itens.splice(${i},1);renderCamItens();camCalc()">✕</button></div>`).join('');
+  camCalc();
+}
+function camCalc(){
+  const num=id=>parseFloat((document.getElementById(id)||{}).value)||0;
+  const cabo=num('camCaboM')*num('camCaboV'), mao=num('camHoras')*num('camHoraV');
+  const itens=CAM.itens.reduce((s,it)=>s+(it.qtd||0)*(it.valor||0),0);
+  const total=cabo+mao+itens;
+  const sel=document.getElementById('camParcelas'); const N=parseInt(sel?sel.value:'10',10)||10;
+  const parcela=arredCima5(total*(1+(TAXAS_CARTAO[N]||0)/100)/N);
+  CAM._calc={total,cabo,mao,itens,parcela,parcelas:N,totalParc:parcela*N};
+  const el=document.getElementById('camResult'); if(!el)return;
+  if(!total){ el.innerHTML='<p class="cot-result-empty">Preencha materiais/serviço para ver o total.</p>'; return; }
+  el.innerHTML=`<div class="cr-venda big"><b>Total · ${CAM.cameras.length} câmera(s)</b><span>${fmtMoney(total)}</span></div>
+    <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
+    <div class="cr-sub">Cabo ${fmtMoney(cabo)} · Mão de obra ${fmtMoney(mao)} · Itens ${fmtMoney(itens)}</div>`;
+}
+async function gerarCameraPDF(baixar){
+  if(!window.jspdf){toast('PDF indisponível');return null;}
+  camCalc(); const c=CAM._calc; if(!c||!c.total){toast('Preencha o orçamento (materiais/serviço) primeiro');return null;}
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(),Hp=doc.internal.pageSize.getHeight(),M=42,hoje=new Date();
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const cliente=g('camCliente'), data=g('camData'), cob=g('camCobertura'), obs=g('camObs');
+  doc.setFillColor(10,37,80);doc.rect(0,0,W,84,'F');
+  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,18,48,48);}catch(e){}}
+  const hx=M+(logo?60:0); doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);doc.text('Orçamento de CFTV (câmeras)',hx,52);doc.text(CHIP7.endereco,hx,65);
+  doc.setFontSize(10);doc.setTextColor(220,230,245);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
+  let y=100; doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(12);
+  doc.text(cliente?('Orçamento para '+cliente):'Orçamento de câmeras',M,y); y+=15;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
+  const info=[]; if(data)info.push('Início: '+data.split('-').reverse().join('/')); info.push(CAM.cameras.length+' câmera(s)'); if(cob)info.push('Cobertura ~'+cob+'%');
+  doc.text(info.join('   ·   '),M,y); y+=12;
+  try{ const cv=document.getElementById('camCanvas'); const im=cv.toDataURL('image/jpeg',0.85); const iw=W-2*M, ih=iw*(cv.height/cv.width); doc.addImage(im,'JPEG',M,y,iw,ih); doc.setDrawColor(225,230,238);doc.rect(M,y,iw,ih); y+=ih+12; }catch(e){}
+  if(CAM.cameras.length){ doc.autoTable({startY:y,head:[['#','Local','Tipo']],body:CAM.cameras.map((c,i)=>[i+1,c.local||'-',c.tipo||'-']),theme:'grid',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+12; }
+  const body=[]; CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0).forEach(it=>body.push([it.desc,String(it.qtd),fmtMoney(it.valor),fmtMoney(it.qtd*it.valor)]));
+  if(c.cabo>0)body.push(['Cabeamento ('+g('camCaboM')+' m)','','',fmtMoney(c.cabo)]);
+  if(c.mao>0)body.push(['Mão de obra ('+g('camHoras')+' h)','','',fmtMoney(c.mao)]);
+  if(body.length){ doc.autoTable({startY:y,head:[['Item','Qtd','Unit.','Total']],body,theme:'striped',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},columnStyles:{1:{halign:'center'},2:{halign:'right'},3:{halign:'right'}},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+10; }
+  if(y>Hp-150){ doc.addPage(); y=60; }
+  doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(20,28,40);doc.text('Total',M+14,y+23);
+  doc.setFontSize(19);doc.setTextColor(10,37,80);doc.text(fmtMoney(c.total),W-M-14,y+25,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(95,105,120);doc.text(c.parcelas+'x de '+fmtMoney(c.parcela)+' no cartão',W-M-14,y+44,{align:'right'}); y+=66;
+  if(obs){ const ol=doc.splitTextToSize(obs,W-2*M); if(y+ol.length*13>Hp-110){doc.addPage();y=60;} doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text('Observações',M,y);y+=14;doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(80,90,105);doc.text(ol,M,y);y+=ol.length*13+6; }
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(196,84,28);doc.text('Orçamento válido por 7 dias.',M,y);
+  const fy=Hp-66;doc.setDrawColor(225,230,238);doc.line(M,fy-14,W-M,fy-14);
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text(CHIP7.nome+'  ·  CNPJ '+CHIP7.cnpj,M,fy);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text(CHIP7.endereco,M,fy+14);doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site,M,fy+27);
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const fname='Orçamento Câmeras'+(cliente?(' - '+cliente):'')+' - '+hoje.getDate()+' de '+meses[hoje.getMonth()]+'.pdf';
+  const blob=doc.output('blob'); if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); }
+  return {blob,fname};
+}
+async function enviarCameraWhatsApp(){
+  const r=await gerarCameraPDF(false); if(!r)return; const c=CAM._calc;
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  let text=`*Orçamento de Câmeras (CFTV) — ${CHIP7.nome}*\n`;
+  if(g('camCliente'))text+=`Para: ${g('camCliente')}\n`;
+  text+=`\n📹 ${CAM.cameras.length} câmera(s)`+(g('camCobertura')?` · cobertura ~${g('camCobertura')}%`:'')+`\n💰 Total: ${fmtMoney(c.total)}\n💳 ${c.parcelas}x de ${fmtMoney(c.parcela)}\n`;
+  if(g('camObs'))text+=`\n${g('camObs')}\n`;
+  text+=`\n_Orçamento válido por 7 dias._\n${CHIP7.tel} · ${CHIP7.site}`;
+  const tel=g('camTel').replace(/\D/g,''); const num=tel?(tel.length<=11?'55'+tel:tel):'';
+  const file=new File([r.blob],r.fname,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){ try{await navigator.share({files:[file],text,title:'Orçamento Câmeras - Chip7'});return;}catch(e){if(e&&e.name==='AbortError')return;} }
+  downloadBlob(file); toast('📄 PDF baixado — anexe no WhatsApp'); window.open('https://wa.me/'+num+'?text='+encodeURIComponent(text),'_blank');
 }
 
 /* ================================================================
