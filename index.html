@@ -290,6 +290,8 @@ textarea{min-height:60px;resize:vertical}
 .cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
 .cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
 .cart-clear{color:var(--muted)}
+.frete-tag{display:flex;justify-content:space-between;align-items:center;background:#eef4ff;border:1px solid #c5d8f5;color:#1f4fa3;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;margin-top:8px}
+.frete-tag span{color:#c0392b;cursor:pointer;font-weight:700;text-decoration:underline;font-size:12px}
 /* módulo câmera (croqui) */
 .cam-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .cam-tool{background:#f1f5fb;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
@@ -672,7 +674,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       </div>
       <div class="cot-grid">
         <div><label class="cot-lbl">Validade (dias)</label><input id="cotValidade" type="number" inputmode="numeric" value="7"></div>
-        <div></div>
+        <div><label class="cot-lbl">Previsão de entrega (dias)</label><input id="cotPrazo" type="number" inputmode="numeric" placeholder="ex.: 7"></div>
       </div>
       <label class="cot-lbl">Observações / garantia (vai no PDF)</label>
       <textarea id="cotObs" rows="2" placeholder="Ex.: Garantia de 90 dias. Bateria 100%."></textarea>
@@ -2883,6 +2885,29 @@ async function verMazer(prod){
   msg.textContent=precoST?('✔ Mazer · custo s/ST '+fmtMoney(precoST)):'⚠ Sem preço automático do Mazer.';
   usarPreco(precoST||0, prod.nome, prod.img, 'Mazer', '', '', 'BRL');
 }
+function parseFotoHTML(html){
+  let m=html.match(/<img[^>]+class="[^"]*product-image-photo[^"]*"[^>]+src="([^"]+)"/i)
+      || html.match(/<img[^>]+src="([^"]+)"[^>]+class="[^"]*product-image-photo[^"]*"/i);   // Magento (Fagundez/Guarapuava)
+  if(m) return m[1];
+  m=html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i); if(m) return m[1];
+  m=html.match(/<img[^>]+src="([^"]+(?:media\/catalog|\/produto|\/product|\/fotos)[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i); if(m) return m[1];
+  return '';
+}
+async function buscarFotoFornecedor(fornecedor, nome){
+  if(!nome) return '';
+  const cfg=freteDoFornecedor(fornecedor);
+  const urls=[];
+  if(cfg.busca && cfg.busca.indexOf('%s')>=0) urls.push(cfg.busca.replace('%s',encodeURIComponent(nome)));
+  if(cfg.url){ const base=cfg.url.replace(/^https?:\/\//,'').replace(/\/+$/,''); urls.push('https://'+base+'/catalogsearch/result/?q='+encodeURIComponent(nome)); }
+  for(const u of urls){ try{ const html=await cpProxy(u); const img=parseFotoHTML(html); if(img) return img; }catch(e){} }
+  return '';
+}
+function setFotoProd(img){
+  if(!img) return;
+  if(COT_PROD) COT_PROD.img=img; if(COT_SEL) COT_SEL.img=img;
+  const ph=document.querySelector('#cotResultados .prod-prodhead');
+  if(ph && !ph.querySelector('img')) ph.insertAdjacentHTML('afterbegin',`<img src="${imgThumb(img)}" alt="" onerror="this.style.display='none'">`);
+}
 function usarFornecedorDireto(prod){
   const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
   const preco=prod.preco||0; COT_PROD=prod; COT_OFS=[];
@@ -2891,6 +2916,7 @@ function usarFornecedorDireto(prod){
     `<div class="prod-hit off sel"><div class="ph-info"><b>🏷️ ${(prod.fonte||'Fornecedor').replace(/</g,'&lt;')}</b><small>seu custo de revenda (R$)</small></div><span class="ph-price">${preco?fmtMoney(preco):'—'}</span></div>`;
   msg.textContent=preco?('✔ '+(prod.fonte||'Fornecedor')+' · custo '+fmtMoney(preco)):'⚠ Sem preço — digite o custo (R$) abaixo.';
   usarPreco(preco, prod.nome, prod.img, prod.fonte||'', '', '', 'BRL');
+  if(!prod.img){ buscarFotoFornecedor(prod.fonte, prod.nome).then(setFotoProd).catch(()=>{}); }   // puxa a foto do site do fornecedor
 }
 async function abrirPorLink(){
   const url=(document.getElementById('cotLink').value||'').trim();
@@ -3006,8 +3032,33 @@ function itemAtual(){
   const tp=document.getElementById('cotTipo');
   return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
     tipo:(COT_BUILD&&tp)?(tp.value||''):'',
-    img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'',
+    img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'', fonte:(COT_SEL&&COT_SEL.loja)||'',
+    custoBRL:COT_CALC.custoTotal, lucroPct:parseFloat((document.getElementById('cotLucroPct')||{}).value)||0,
     aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
+}
+function recomputaItem(i){
+  const pct=i.lucroPct||0;
+  i.aVista=arredNice((i.custoBRL||0)*(1+pct/100));
+  const N=i.parcelas||10, taxa=(TAXAS_CARTAO[N]||0)/100;
+  i.parcela=arredCima5(i.aVista*(1+taxa)/N); i.totalParc=i.parcela*N;
+}
+function dividirFrete(){
+  const porForn={}; COT_CART.forEach(i=>{ if(i.fonte) (porForn[i.fonte]=porForn[i.fonte]||[]).push(i); });
+  let aplicou=0, totalFrete=0;
+  Object.keys(porForn).forEach(f=>{
+    const fr=freteDoFornecedor(f); if(!fr.frete) return;
+    const itens=porForn[f], share=fr.frete/itens.length; totalFrete+=fr.frete;
+    itens.forEach(i=>{ if(i.custoBRLbase==null) i.custoBRLbase=i.custoBRL||0; i.custoBRL=i.custoBRLbase+share; i.freteShare=share; recomputaItem(i); aplicou++; });
+  });
+  if(!aplicou){ toast('Cadastre o Frete do fornecedor em 🏪 Fornecedores (e os itens precisam ser dele).'); return; }
+  // sugere a previsão de entrega = maior prazo entre os fornecedores do carrinho
+  const prazos=Object.keys(porForn).map(f=>freteDoFornecedor(f).prazo).filter(p=>p>0);
+  const pc=document.getElementById('cotPrazo'); if(pc && !pc.value && prazos.length) pc.value=Math.max(...prazos);
+  renderCart(); toast('🚚 Frete de '+fmtMoney(totalFrete)+' embutido em '+aplicou+' produto(s)');
+}
+function tirarFrete(){
+  let n=0; COT_CART.forEach(i=>{ if(i.custoBRLbase!=null){ i.custoBRL=i.custoBRLbase; delete i.custoBRLbase; delete i.freteShare; recomputaItem(i); n++; } });
+  if(n){ renderCart(); toast('Frete removido dos preços'); } else toast('Não tinha frete embutido');
 }
 function adicionarAoCart(){
   const it=itemAtual(); if(!it){ toast('Calcule um preço primeiro.'); return; }
@@ -3045,6 +3096,12 @@ function renderCart(){
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
       <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`).join('');
   html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
+  const temFornecedor=COT_CART.some(i=>i.fonte), freteAplicado=COT_CART.some(i=>i.custoBRLbase!=null);
+  if(temFornecedor){
+    html+= freteAplicado
+      ? `<div class="frete-tag">🚚 Frete embutido nos preços <span onclick="tirarFrete()">tirar</span></div>`
+      : `<button class="btn ghost cart-send2" onclick="dividirFrete()">🚚 Dividir frete dos fornecedores nos produtos</button>`;
+  }
   html+=`<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar ${COT_BUILD?'no':'orçamento no'} WhatsApp</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`;
@@ -3147,6 +3204,8 @@ async function gerarCotacaoPDF(baixar){
     y+=22; doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text('Observações',M,y);
     y+=15; doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(80,90,105);doc.text(ol,M,y); y+=ol.length*13;
   }
+  const prazo=parseInt(g('cotPrazo'),10)||0;
+  if(prazo){ y+=20; if(y>bottom){ footer(); doc.addPage(); header(); y=100; } doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40); doc.text(`Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}.`,M,y); }
   y+=24; if(y>bottom){ footer(); doc.addPage(); header(); y=100; }
   doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);
   doc.text(`Este orçamento é válido por ${validade} ${validade>1?'dias':'dia'}.`,M,y);
@@ -3237,18 +3296,21 @@ function abrirFornecedores(){
   let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
   html+=`<button class="btn ghost" style="width:100%;margin-bottom:10px" onclick="testarFornecedores()">🔌 Testar conexão (Mazer / Guarapuava)</button>`;
   html+=arr.map((f,i)=>`<div class="forn-item"><div class="fi-info"><b>${esc(f.nome)}</b>
+      ${(f.frete||f.prazo)?`<small>🚚 ${f.frete?('Frete '+fmtMoney(+f.frete)):''}${f.frete&&f.prazo?' · ':''}${f.prazo?(f.prazo+' dias'):''}</small>`:''}
       ${f.url?`<small>${esc(f.url)}</small>`:''}${f.user?`<small>👤 ${esc(f.user)}</small>`:''}${f.obs?`<small>${esc(f.obs)}</small>`:''}</div>
       <div class="fi-acts">${f.url?`<button class="btn ghost" onclick="abrirFornSite(${i})">Abrir</button>`:''}${f.busca?`<button class="btn ghost" onclick="buscarNoForn(${i})">Buscar</button>`:''}<button class="ci-del" onclick="removerForn(${i})" title="Remover">✕</button></div></div>`).join('');
   html+=`<div class="forn-add"><div class="cot-sep">adicionar fornecedor</div>
-    <input id="fnNome" placeholder="Nome (ex.: Fornecedor X)">
-    <input id="fnUrl" placeholder="Site (https://...)">
-    <input id="fnBusca" placeholder="Link de busca com %s (opcional) — ex.: https://site.com/busca?q=%s">
+    <input id="fnNome" placeholder="Nome (ex.: Fagundez)">
+    <div class="cot-grid"><div><input id="fnFrete" type="number" inputmode="decimal" placeholder="Frete fixo (R$)"></div><div><input id="fnPrazo" type="number" inputmode="numeric" placeholder="Prazo de entrega (dias)"></div></div>
+    <input id="fnUrl" placeholder="Site (https://...) — pra puxar as fotos">
+    <input id="fnBusca" placeholder="Link de busca do site com %s (ex.: https://site.com/busca?q=%s)">
     <div class="cot-grid"><div><input id="fnUser" placeholder="Login/usuário (opcional)"></div><div><input id="fnObs" placeholder="Observações"></div></div>
     <button class="btn primary" style="width:100%;margin-top:8px" onclick="addForn()">➕ Adicionar fornecedor</button>
-    <p class="cot-hint">⚠️ Evite salvar senhas aqui (fica só no sistema). A busca automática com login a gente configura quando você me passar os sites.</p></div>`;
+    <p class="cot-hint">O <b>Frete</b> é dividido entre os produtos do orçamento (botão "Dividir frete"). O <b>Site</b> + <b>Link de busca</b> servem pra puxar a foto do produto (catálogo Excel + fotos do site).</p></div>`;
   box.innerHTML=html;
 }
-function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fornecedor');return;} const a=fornLoad(); a.push({id:Date.now(),nome,url:_fv('fnUrl'),busca:_fv('fnBusca'),user:_fv('fnUser'),obs:_fv('fnObs')}); fornSave(a); abrirFornecedores(); toast('✔ Fornecedor adicionado'); }
+function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fornecedor');return;} const a=fornLoad(); a.push({id:Date.now(),nome,frete:parseFloat((document.getElementById('fnFrete')||{}).value)||0,prazo:parseInt((document.getElementById('fnPrazo')||{}).value,10)||0,url:_fv('fnUrl'),busca:_fv('fnBusca'),user:_fv('fnUser'),obs:_fv('fnObs')}); fornSave(a); abrirFornecedores(); toast('✔ Fornecedor adicionado'); }
+function freteDoFornecedor(nome){ const f=fornLoad().find(x=>(x.nome||'').toLowerCase()===(nome||'').toLowerCase()); return f?{frete:+f.frete||0,prazo:+f.prazo||0,url:f.url||'',busca:f.busca||''}:{frete:0,prazo:0,url:'',busca:''}; }
 function removerForn(i){ const a=fornLoad(); a.splice(i,1); fornSave(a); abrirFornecedores(); }
 function abrirFornSite(i){ const f=fornLoad()[i]; if(f&&f.url) window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); }
 function buscarNoForn(i){ const f=fornLoad()[i]; if(!f)return; const q=(document.getElementById('cotBusca').value||'').trim()||prompt('O que buscar nesse fornecedor?')||''; if(!q)return; if(f.busca&&f.busca.indexOf('%s')>=0){ window.open(f.busca.replace('%s',encodeURIComponent(q)),'_blank'); } else if(f.url){ window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); } }
@@ -3411,6 +3473,8 @@ function montarTextoOrcamento(itens){
   if(cliente) text+=`Para: ${cliente}\n`;
   text+='\n'+itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
   if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; }
+  const prazo=parseInt(g('cotPrazo'),10)||0;
+  if(prazo) text+=`\n\n🚚 Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}`;
   if(obs) text+=`\n\n${obs}`;
   text+=`\n\n_Orçamento válido por ${validade} ${validade>1?'dias':'dia'}._\n\n${CHIP7.tel} · ${CHIP7.site}`;
   return text;
