@@ -522,7 +522,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <h1 class="wel-title">Chip7 Informática</h1>
     <p class="wel-tag">O que você quer fazer?</p>
     <div class="wel-choice">
-      <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Preço de venda (Paraguai)</small></button>
+      <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Importados e fornecedores</small></button>
       <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
       <button class="wel-btn func" onclick="escolherMontarPC()"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
       <button class="wel-btn cli" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
@@ -563,11 +563,11 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <option value="outro" data-lucro="20" data-trazer="20">Outro</option>
       </select>
       <div class="cot-tabs">
-        <button id="tabImp" class="cot-tab on" onclick="setModo('importados')">🌎 Importados (Paraguai)</button>
+        <button id="tabImp" class="cot-tab on" onclick="setModo('importados')">🌎 Importados</button>
         <button id="tabForn" class="cot-tab" onclick="setModo('fornecedores')">🏪 Fornecedores (BR)</button>
       </div>
       <div id="lojasWrap">
-        <label class="cot-lbl">Lojas (comprasparaguai)</label>
+        <label class="cot-lbl">Lojas (importados)</label>
         <div class="cot-lojas" id="cotLojas"></div>
       </div>
       <div id="fornLojasWrap" style="display:none">
@@ -583,9 +583,9 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <button class="btn ghost" style="flex:1" onclick="buscarNaInternet()">🌐 Pesquisar na internet (Google)</button>
         <button class="btn ghost" style="flex:1" onclick="compararBrasil()">🛒 Preço no Brasil</button>
       </div>
-      <div class="cot-or">— ou cole o link do Paraguai —</div>
+      <div class="cot-or" id="cotOr">— ou cole o link do produto —</div>
       <div class="cot-row">
-        <input id="cotLink" placeholder="https://www.comprasparaguai.com.br/..." onkeydown="if(event.key==='Enter')abrirPorLink()">
+        <input id="cotLink" placeholder="Cole o link (comprasparaguai, mazer, guarapuava...)" onkeydown="if(event.key==='Enter')abrirPorLink()">
         <button class="btn ghost" onclick="abrirPorLink()">Abrir</button>
       </div>
     </div>
@@ -596,7 +596,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <div class="cot-card">
       <div class="cot-sep">preço e ajustes</div>
       <div class="cot-grid">
-        <div><label class="cot-lbl" id="lblPreco">Preço no Paraguai (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
+        <div><label class="cot-lbl" id="lblPreco">Custo importado (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
         <div id="colDolar"><label class="cot-lbl">Cotação do dólar (R$)</label>
           <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
       </div>
@@ -2565,8 +2565,11 @@ function onCategoria(){
   const tz=document.getElementById('cotTrazer'); if(tz)tz.value=d.trazer;
   cotCalc();   // recalcula e atualiza o Lucro R$ a partir do %
 }
-function custoAtual(){   // custo total = Paraguai + custo de trazer (é sobre ele que o lucro % incide)
-  const c=(parseFloat(document.getElementById('cotPreco').value)||0)*(parseFloat(document.getElementById('cotDolar').value)||0);
+function custoAtual(){   // custo total (base do lucro %): importado = US$×dólar×(1+trazer); fornecedor = R$ + frete
+  const preco=parseFloat(document.getElementById('cotPreco').value)||0;
+  const moeda=(COT_SEL&&COT_SEL.moeda)||'USD';
+  if(moeda==='BRL'){ const fr=(typeof freteDoFornecedor==='function'?freteDoFornecedor((COT_SEL&&COT_SEL.loja)||'').frete:0)||0; return preco+fr; }
+  const c=preco*(parseFloat(document.getElementById('cotDolar').value)||0);
   const tz=(parseFloat((document.getElementById('cotTrazer')||{}).value)||0)/100;
   return c*(1+tz);
 }
@@ -2624,32 +2627,36 @@ function cotCalc(){
   const N=parseInt(selP?selP.value:'10',10)||10;
   const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
   const moeda=(COT_SEL&&COT_SEL.moeda)||'USD';
-  const brl = moeda==='BRL';                 // Mazer/fornecedor BR: custo já em R$, sem dólar/trazer
+  const brl = moeda==='BRL';                 // fornecedor BR: custo já em R$, sem dólar/trazer
+  const fonteNome=(COT_SEL&&COT_SEL.loja)||'Fornecedor';
+  const frete = brl ? ((typeof freteDoFornecedor==='function'?freteDoFornecedor(fonteNome).frete:0)||0) : 0;
   const custoBRL = brl ? usd : usd*dolar;    // em BRL o campo já está em reais
-  const trazer = brl ? 0 : custoBRL*trazerPct/100;
-  const custoTotal=custoBRL+trazer;          // custo total (é a base do lucro)
+  const extra = brl ? frete : custoBRL*trazerPct/100;   // frete (BR) ou custo de trazer (importado)
+  const custoTotal=custoBRL+extra;           // custo total (base do lucro)
+  const custoBase = brl ? custoBRL : custoTotal;        // base p/ dividir frete no orçamento
   const lucro=custoTotal*pct/100;            // lucro em reais (vem do %)
-  const aVistaBruto=custoTotal+lucro;
-  const aVista=arredNice(aVistaBruto);       // preço à vista (dinheiro/PIX), sem taxa de cartão
+  const aVista=arredNice(custoTotal+lucro);  // preço à vista (dinheiro/PIX), sem taxa de cartão
   const totalCartao=aVista*(1+taxa);         // repassa a taxa da maquininha
   const parcela=arredCima5(totalCartao/N);   // parcela pra cima, múltiplo de 5
   const totalParc=parcela*N;
-  COT_CALC = usd ? {usd,dolar,custoBRL,trazer,custoTotal,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
-  // sincroniza o campo Lucro (R$) a partir do %, sem atrapalhar quem está digitando nele
+  COT_CALC = usd ? {usd,dolar,custoBRL,trazer:extra,frete,custoTotal,custoBase,fonte:fonteNome,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
   const rsField=document.getElementById('cotLucroRs');
   if(rsField && document.activeElement!==rsField) rsField.value = lucro? Math.round(lucro):'';
+  const pctTxt = (pct%1? pct.toFixed(1):pct.toFixed(0)).replace('.',',');
+  const fEsc=fonteNome.replace(/</g,'&lt;');
   const el=document.getElementById('cotResult');
   const bar=document.getElementById('cotAddBar');
   if(!el)return;
-  if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole um link ou informe o preço (US$) para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; const pc=document.getElementById('cotPedidoCard'); if(pc&&!COT_CART.length)pc.style.display='none'; return; }
+  if(!usd){ el.innerHTML='<p class="cot-result-empty">Pesquise um produto, cole o link ou informe o preço para ver o preço de venda.</p>'; if(bar)bar.style.display='none'; const pc=document.getElementById('cotPedidoCard'); if(pc&&!COT_CART.length)pc.style.display='none'; return; }
   el.innerHTML=`
     <details class="cr-calc" open><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
       ${brl
-        ? `<div class="cr-line"><span>Custo (Mazer · s/ST)</span><b>${fmtMoney(custoBRL)}</b></div>`
-        : `<div class="cr-line"><span>Custo no Paraguai</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
-      <div class="cr-line"><span>+ Custo de trazer (${trazerPct.toFixed(0)}%)</span><b>+ ${fmtMoney(trazer)}</b></div>
+        ? `<div class="cr-line"><span>Custo (${fEsc})</span><b>${fmtMoney(custoBRL)}</b></div>`
+          + (frete?`<div class="cr-line"><span>+ Frete (${fEsc})</span><b>+ ${fmtMoney(frete)}</b></div><div class="cr-line"><span>= Custo total</span><b>${fmtMoney(custoTotal)}</b></div>`:'')
+        : `<div class="cr-line"><span>Custo importado</span><b>US$ ${usd.toFixed(2)} · ${fmtMoney(custoBRL)}</b></div>
+      <div class="cr-line"><span>+ Custo de trazer (${trazerPct.toFixed(0)}%)</span><b>+ ${fmtMoney(extra)}</b></div>
       <div class="cr-line"><span>= Custo total</span><b>${fmtMoney(custoTotal)}</b></div>`}
-      <div class="cr-line"><span>+ Lucro (${pct.toFixed(0)}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
+      <div class="cr-line"><span>+ Lucro (${pctTxt}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
       <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
       <div class="cr-line"><span>💵 Seu lucro (à vista − custo total)</span><b>${fmtMoney(aVista-custoTotal)}</b></div>
       <div class="cr-line"><span>+ Taxa maquininha (${N}x · ${(TAXAS_CARTAO[N]||0).toString().replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
@@ -2756,7 +2763,7 @@ async function cpDetalhe(link){
 function htmlProdHit(i,n){ const fav=isFav(i);
   const forn = i.fonte && i.fonte!=='Paraguai';
   const sub = forn ? `<span class="src-tag mazer">🏷️ ${(i.fonte||'Fornecedor').replace(/</g,'&lt;')}</span> ${i.preco?('R$ '+(+i.preco).toFixed(2)):'ver preço'}`
-                   : `<span class="src-tag py">🇵🇾 Paraguai</span> a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)`;
+                   : `<span class="src-tag py">🌎 Importado</span> a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)`;
   return `<div class="prod-hit" onclick="verOfertas(${n})">
     ${i.img?`<img class="prod-thumb" src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
     <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>${sub}</small></div>
@@ -2805,7 +2812,7 @@ async function pesquisarProdutos(){
       }
       if(COT_FORN_ERROS.length){ renderProdutos(); document.getElementById('cotBuscaMsg').textContent='✔ '+COT_HITS.length+' resultado(s) · ⚠️ '+COT_FORN_ERROS.join(' · '); return; }
     } else {
-      msg.textContent='🔄 Buscando produtos no Paraguai...'; buscarDolar();
+      msg.textContent='🔄 Buscando produtos importados...'; buscarDolar();
       COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Paraguai',moeda:'USD'},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
     }
@@ -3020,7 +3027,7 @@ function usarPreco(usd,nome,img,loja,cor,grade,moeda){
 function setMoedaUI(moeda){
   const brl = moeda==='BRL';
   const fonte=(COT_SEL&&COT_SEL.loja)||'';
-  const lp=document.getElementById('lblPreco'); if(lp) lp.textContent = brl?('Custo '+(fonte?fonte+' ':'')+'(R$)'):'Preço no Paraguai (US$)';
+  const lp=document.getElementById('lblPreco'); if(lp) lp.textContent = brl?('Custo '+(fonte?fonte+' ':'')+'(R$)'):'Custo importado (US$)';
   const cd=document.getElementById('colDolar'); if(cd) cd.style.display = brl?'none':'';
   const rt=document.getElementById('rowTrazer'); if(rt) rt.style.display = brl?'none':'';
 }
@@ -3033,32 +3040,31 @@ function itemAtual(){
   return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
     tipo:(COT_BUILD&&tp)?(tp.value||''):'',
     img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'', fonte:(COT_SEL&&COT_SEL.loja)||'',
-    custoBRL:COT_CALC.custoTotal, lucroPct:parseFloat((document.getElementById('cotLucroPct')||{}).value)||0,
+    custoBase:COT_CALC.custoBase, custoBRL:COT_CALC.custoTotal, lucroPct:parseFloat((document.getElementById('cotLucroPct')||{}).value)||0,
     aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
 }
 function recomputaItem(i){
   const pct=i.lucroPct||0;
-  i.aVista=arredNice((i.custoBRL||0)*(1+pct/100));
+  const custo=(i.custoBase!=null?i.custoBase:(i.custoBRL||0))+(i.freteShare||0);
+  i.custoBRL=custo;
+  i.aVista=arredNice(custo*(1+pct/100));
   const N=i.parcelas||10, taxa=(TAXAS_CARTAO[N]||0)/100;
   i.parcela=arredCima5(i.aVista*(1+taxa)/N); i.totalParc=i.parcela*N;
 }
-function dividirFrete(){
+let COT_FRETE_TOTAL=0;
+function aplicarFreteCart(){   // divide o frete fixo de cada fornecedor entre os produtos dele (automático)
+  COT_FRETE_TOTAL=0;
   const porForn={}; COT_CART.forEach(i=>{ if(i.fonte) (porForn[i.fonte]=porForn[i.fonte]||[]).push(i); });
-  let aplicou=0, totalFrete=0;
+  COT_CART.forEach(i=>{ i.freteShare=0; });
   Object.keys(porForn).forEach(f=>{
-    const fr=freteDoFornecedor(f); if(!fr.frete) return;
-    const itens=porForn[f], share=fr.frete/itens.length; totalFrete+=fr.frete;
-    itens.forEach(i=>{ if(i.custoBRLbase==null) i.custoBRLbase=i.custoBRL||0; i.custoBRL=i.custoBRLbase+share; i.freteShare=share; recomputaItem(i); aplicou++; });
+    const fr=freteDoFornecedor(f).frete||0; if(!fr) return;
+    const itens=porForn[f], share=fr/itens.length; COT_FRETE_TOTAL+=fr;
+    itens.forEach(i=>{ i.freteShare=share; });
   });
-  if(!aplicou){ toast('Cadastre o Frete do fornecedor em 🏪 Fornecedores (e os itens precisam ser dele).'); return; }
-  // sugere a previsão de entrega = maior prazo entre os fornecedores do carrinho
+  COT_CART.forEach(i=>{ if(i.custoBase!=null) recomputaItem(i); });
+  // sugere previsão de entrega = maior prazo entre os fornecedores do carrinho
   const prazos=Object.keys(porForn).map(f=>freteDoFornecedor(f).prazo).filter(p=>p>0);
   const pc=document.getElementById('cotPrazo'); if(pc && !pc.value && prazos.length) pc.value=Math.max(...prazos);
-  renderCart(); toast('🚚 Frete de '+fmtMoney(totalFrete)+' embutido em '+aplicou+' produto(s)');
-}
-function tirarFrete(){
-  let n=0; COT_CART.forEach(i=>{ if(i.custoBRLbase!=null){ i.custoBRL=i.custoBRLbase; delete i.custoBRLbase; delete i.freteShare; recomputaItem(i); n++; } });
-  if(n){ renderCart(); toast('Frete removido dos preços'); } else toast('Não tinha frete embutido');
 }
 function adicionarAoCart(){
   const it=itemAtual(); if(!it){ toast('Calcule um preço primeiro.'); return; }
@@ -3074,6 +3080,7 @@ function renderCart(){
   if(!COT_CART.length && !COT_BUILD){ el.style.display='none'; el.innerHTML=''; if(pc&&!COT_CALC)pc.style.display='none'; return; }
   el.style.display='block';
   if(pc && (COT_CART.length||COT_CALC)) pc.style.display='block';
+  aplicarFreteCart();   // divide o frete fixo dos fornecedores entre os produtos (automático)
   const tv=COT_CART.reduce((s,i)=>s+i.aVista,0);
   let html='';
   if(COT_BUILD){
@@ -3096,11 +3103,8 @@ function renderCart(){
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
       <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`).join('');
   html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
-  const temFornecedor=COT_CART.some(i=>i.fonte), freteAplicado=COT_CART.some(i=>i.custoBRLbase!=null);
-  if(temFornecedor){
-    html+= freteAplicado
-      ? `<div class="frete-tag">🚚 Frete embutido nos preços <span onclick="tirarFrete()">tirar</span></div>`
-      : `<button class="btn ghost cart-send2" onclick="dividirFrete()">🚚 Dividir frete dos fornecedores nos produtos</button>`;
+  if(COT_FRETE_TOTAL>0){
+    html+=`<div class="frete-tag">🚚 Frete ${fmtMoney(COT_FRETE_TOTAL)} já dividido e embutido nos preços</div>`;
   }
   html+=`<button class="btn primary cart-send" onclick="enviarCotacaoWhatsApp()">📲 Enviar ${COT_BUILD?'no':'orçamento no'} WhatsApp</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`;
