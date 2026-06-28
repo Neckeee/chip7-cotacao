@@ -204,7 +204,17 @@ textarea{min-height:60px;resize:vertical}
 .cot-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 @media(max-width:480px){.cot-grid{grid-template-columns:1fr}}
 .cot-msg{font-size:13px;color:rgba(255,255,255,.92);margin:8px 0 0;min-height:16px;font-weight:600}
-.cot-sep{text-align:center;color:var(--muted);font-size:12px;margin:2px 0 8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.cot-sep{display:flex;align-items:center;gap:8px;color:var(--brand);font-size:12px;margin:18px 0 11px;text-transform:uppercase;letter-spacing:.5px;font-weight:800}
+.cot-sep:first-child{margin-top:2px}
+.cot-sep::before{content:'';width:4px;height:14px;background:var(--accent2);border-radius:3px;flex:none}
+.cot-sep::after{content:'';flex:1;height:1px;background:var(--line)}
+.mod-switch{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.mod-switch button{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.mod-switch button.on{background:#fff;color:var(--brand);border-color:#fff}
+.mod-switch.dark button{background:#eef2f7;color:var(--brand);border-color:var(--line)}
+.mod-switch.dark button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.topbar-mods{background:#eef2f7;color:var(--brand);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:800;cursor:pointer;margin-right:10px;white-space:nowrap}
+.topbar-mods:hover{background:#e2e8f4}
 .cot-result{background:#fff;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
 .cot-result-empty{margin:0;color:var(--muted);font-size:13.5px;text-align:center}
 .cr-calc{background:#f4f6fb;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:13px}
@@ -300,17 +310,24 @@ textarea{min-height:60px;resize:vertical}
 .cam-wrap{position:relative}
 .cam-canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:#fff;touch-action:none}
 .cam-esc{width:78px;padding:7px 8px;border:1px solid var(--line);border-radius:9px;font-size:13px;background:#fbfcfe;color:var(--text)}
-.cam-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin:7px 2px 0}
-.cam-leg b{display:inline-flex;align-items:center;gap:4px;font-weight:600}
-.cam-leg i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.cam-leg{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--text);margin:8px 0 0;background:#f6f8fc;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.cam-leg b{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.cam-leg i{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.12)}
 .cam-fs-close{display:none}
 .cam-wrap.fs{position:fixed;inset:0;z-index:9998;background:#0b1430;padding:10px;overflow:auto;border-radius:0}
 .cam-wrap.fs .cam-canvas{max-width:1100px;margin:0 auto}
 .cam-wrap.fs .cam-fs-close{display:block;margin:10px auto 0;background:#fff;color:#0b1430}
 .cam-wrap.fs .cam-leg{justify-content:center;color:#cfe0ff}
-.cam-pt{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.cam-pt{display:block;padding:9px;margin-bottom:8px;border:1px solid var(--line);border-radius:11px;background:#fff;box-shadow:0 1px 2px rgba(16,42,90,.05)}
+.cam-pt-top{display:flex;align-items:center;gap:8px}
+.cam-pt-bot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
 .cam-pt-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
-.cam-pt input,.cam-pt select{flex:1;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-pt input,.cam-pt select{flex:1;min-width:0;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-pt-addfoto{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#0b3b6f;background:#eef4ff;border:1px dashed #9cc0ff;border-radius:9px;padding:7px 10px;cursor:pointer}
+.cam-pt-foto{position:relative;width:54px;height:54px;flex:none}
+.cam-pt-foto img{width:54px;height:54px;object-fit:cover;border-radius:9px;border:1px solid var(--line)}
+.cam-pt-foto .foto-del{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#dc2626;color:#fff;font-size:11px;cursor:pointer;line-height:1}
+.cam-sinal{display:inline-flex;align-items:center;gap:4px;color:#fff;font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:8px}
 .cam-item{display:flex;align-items:center;gap:6px;margin-top:6px}
 .cam-item input{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text);min-width:0}
 .cam-item .ci-del{flex:none}
@@ -553,6 +570,12 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <span style="flex:1"></span>
       <button class="btn ghost" id="cotModoBtn" onclick="toggleBuild()">🖥️ Montar PC</button>
     </div>
+    <div class="mod-switch">
+      <button onclick="irModulo('diagnostico')">🩺 Diagnóstico</button>
+      <button class="on" onclick="irModulo('cotacao')">💰 Cotações</button>
+      <button onclick="irModulo('montar')">🖥️ Montar PC</button>
+      <button onclick="irModulo('camera')">📹 Câmeras</button>
+    </div>
     <div class="cot-tools">
       <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico / Vendas</button>
       <button class="btn ghost" onclick="abrirFavoritos()">⭐ Favoritos</button>
@@ -598,7 +621,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       </div>
       <div class="cot-or" id="cotOr">— ou cole o link do produto —</div>
       <div class="cot-row">
-        <input id="cotLink" placeholder="Cole o link (comprasparaguai, mazer, guarapuava...)" onkeydown="if(event.key==='Enter')abrirPorLink()">
+        <input id="cotLink" placeholder="Cole o link do produto (importados, mazer, guarapuava...)" onkeydown="if(event.key==='Enter')abrirPorLink()">
         <button class="btn ghost" onclick="abrirPorLink()">Abrir</button>
       </div>
     </div>
@@ -705,6 +728,12 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
       <h2 style="margin:0;color:#fff">📹 Orçamento de Câmera</h2>
     </div>
+    <div class="mod-switch">
+      <button onclick="irModulo('diagnostico')">🩺 Diagnóstico</button>
+      <button onclick="irModulo('cotacao')">💰 Cotações</button>
+      <button onclick="irModulo('montar')">🖥️ Montar PC</button>
+      <button class="on" onclick="irModulo('camera')">📹 Câmeras</button>
+    </div>
     <div class="cot-cols">
       <div class="cot-col-l">
         <div class="cot-card">
@@ -733,6 +762,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
             <button class="cam-tool" onclick="camFull()">⛶ Tela cheia</button>
             <input id="camEscala" class="cam-esc" inputmode="decimal" placeholder="m/quadr." title="Metros que cada quadradinho do croqui representa (pra medir cabo)" oninput="camCalcCabo()">
             <button class="cam-tool" onclick="camSomarCabos()">📏 Somar cabos</button>
+            <button class="cam-tool" id="ctSat" onclick="camSatelite()" title="Puxar a vista de cima (satélite) do endereço como fundo do croqui — opcional">🛰️ Satélite</button>
           </div>
           <canvas id="camCanvas" class="cam-canvas" width="900" height="620"></canvas>
           <div class="cam-leg">
@@ -840,6 +870,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <span>Diagnóstico Tecnológico<small>Levantamento em campo</small></span>
       </div>
       <div class="spacer"></div>
+      <button class="topbar-mods" onclick="showChooser()" title="Trocar de módulo (Cotações, Câmeras...)">⧉ Módulos</button>
       <div class="score-pill" title="Pontuação geral da infraestrutura">
         <span class="score-dot" id="scoreDot"></span>
         <span>Nota</span>
@@ -2572,7 +2603,20 @@ function showChooser(){
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ document.getElementById('chooser').classList.remove('show'); window.scrollTo(0,0); }
+function escolherDiagnostico(){ document.getElementById('cotacaoScreen').classList.remove('show'); document.getElementById('cameraScreen').classList.remove('show'); document.getElementById('chooser').classList.remove('show'); window.scrollTo(0,0); }
+/* ---- navegação integrada entre os 4 módulos ---- */
+function irModulo(m){
+  ['cotacaoScreen','cameraScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  if(m==='cotacao'){ COT_BUILD=false; escolherCotacao(); }
+  else if(m==='montar'){ escolherMontarPC(); }
+  else if(m==='camera'){ escolherCamera(); }
+  else if(m==='diagnostico'){ escolherDiagnostico(); }
+  else showChooser();
+}
+function modSwitchHTML(ativo){
+  const mods=[['diagnostico','🩺','Diagnóstico'],['cotacao','💰','Cotações'],['montar','🖥️','Montar PC'],['camera','📹','Câmeras']];
+  return '<div class="mod-switch">'+mods.map(([k,ic,nm])=>`<button class="${k===ativo?'on':''}" onclick="irModulo('${k}')">${ic} ${nm}</button>`).join('')+'</div>';
+}
 function escolherCotacao(){
   document.getElementById('chooser').classList.remove('show');
   document.getElementById('cotacaoScreen').classList.add('show');
@@ -2722,7 +2766,7 @@ function calcReversa(){
   out.classList.toggle('neg',lucro<0);
   out.innerHTML=`Vendendo por <b>${fmtMoney(alvo)}</b> → lucro <b>${fmtMoney(lucro)}</b> (${margem.toFixed(0)}% sobre o custo)`;
 }
-/* ---- leitor do comprasparaguai (mesma lógica da função do servidor, validada) ---- */
+/* ---- leitor da loja de importados (mesma lógica da função do servidor, validada) ---- */
 const CP_BASE='https://www.comprasparaguai.com.br';
 const CP_PRICE=/US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/i;
 const LOJAS_TERMOS={nissei:['nissei'],mega:['mega eletr'],cellshop:['cellshop','cell shop'],shoppingchina:['shopping china'],mobilezone:['mobile zone'],atacado:['atacado connect'],visaovip:['visãovip','visaovip','visão vip','visao vip'],stargames:['star games']};
@@ -2805,7 +2849,7 @@ async function cpDetalhe(link){
   return {ofertas,nome:cpDecode(nome),img};
 }
 function htmlProdHit(i,n){ const fav=isFav(i);
-  const forn = i.fonte && i.fonte!=='Paraguai';
+  const forn = i.fonte && i.fonte!=='Importados';
   const sub = forn ? `<span class="src-tag mazer">🏷️ ${(i.fonte||'Fornecedor').replace(/</g,'&lt;')}</span> ${i.preco?('R$ '+(+i.preco).toFixed(2)):'ver preço'}`
                    : `<span class="src-tag py">🌎 Importado</span> a partir de US$ ${(+i.precoUSD).toFixed(2)} · ${i.ofertas||1} loja(s)`;
   return `<div class="prod-hit" onclick="verOfertas(${n})">
@@ -2857,7 +2901,7 @@ async function pesquisarProdutos(){
       if(COT_FORN_ERROS.length){ renderProdutos(); document.getElementById('cotBuscaMsg').textContent='✔ '+COT_HITS.length+' resultado(s) · ⚠️ '+COT_FORN_ERROS.join(' · '); return; }
     } else {
       msg.textContent='🔄 Buscando produtos importados...'; buscarDolar();
-      COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Paraguai',moeda:'USD'},i));
+      COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
     }
     renderProdutos();
@@ -2983,7 +3027,7 @@ async function abrirPorLink(){
   const msg=document.getElementById('cotBuscaMsg'), box=document.getElementById('cotResultados');
   if(/mazer\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); return verMazer({nome:'Produto Mazer',link:path,fonte:'Mazer',moeda:'BRL',img:''}); }
   if(/distribuidoraguarapuava\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); msg.textContent='🔄 Abrindo (Guarapuava)...'; try{ const r=await fetch('/.netlify/functions/guarapuava?detalhe='+encodeURIComponent(path)); const d=r.ok?await r.json():{}; return usarFornecedorDireto({nome:d.nome||'Produto Guarapuava',link:path,fonte:'Guarapuava',moeda:'BRL',img:d.img||'',preco:d.preco||0}); }catch(e){ msg.textContent='⚠ Não consegui abrir (Guarapuava).'; return; } }
-  if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole um link do comprasparaguai, mazer.com.br ou distribuidoraguarapuava.com.br.'; return; }
+  if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole o link de um produto (loja de importados, mazer.com.br ou distribuidoraguarapuava.com.br).'; return; }
   msg.textContent='🔄 Abrindo o produto...'; box.innerHTML=''; buscarDolar();
   const path=url.replace(/^https?:\/\/[^/]+/,'');
   try{
@@ -3355,18 +3399,33 @@ function abrirFornecedores(){
   html+=arr.map((f,i)=>`<div class="forn-item"><div class="fi-info"><b>${esc(f.nome)}</b>
       ${(f.frete||f.prazo)?`<small>🚚 ${f.frete?('Frete '+fmtMoney(+f.frete)):''}${f.frete&&f.prazo?' · ':''}${f.prazo?(f.prazo+' dias'):''}</small>`:''}
       ${f.url?`<small>${esc(f.url)}</small>`:''}${f.user?`<small>👤 ${esc(f.user)}</small>`:''}${f.obs?`<small>${esc(f.obs)}</small>`:''}</div>
-      <div class="fi-acts">${f.url?`<button class="btn ghost" onclick="abrirFornSite(${i})">Abrir</button>`:''}${f.busca?`<button class="btn ghost" onclick="buscarNoForn(${i})">Buscar</button>`:''}<button class="ci-del" onclick="removerForn(${i})" title="Remover">✕</button></div></div>`).join('');
-  html+=`<div class="forn-add"><div class="cot-sep">adicionar fornecedor</div>
+      <div class="fi-acts"><button class="btn ghost" onclick="editForn(${i})" title="Editar">✏️</button>${f.url?`<button class="btn ghost" onclick="abrirFornSite(${i})">Abrir</button>`:''}${f.busca?`<button class="btn ghost" onclick="buscarNoForn(${i})">Buscar</button>`:''}<button class="ci-del" onclick="removerForn(${i})" title="Remover">✕</button></div></div>`).join('');
+  html+=`<div class="forn-add"><div class="cot-sep" id="fnFormTitle">adicionar fornecedor</div>
     <input id="fnNome" placeholder="Nome (ex.: Fagundez)">
     <div class="cot-grid"><div><input id="fnFrete" type="number" inputmode="decimal" placeholder="Frete fixo (R$)"></div><div><input id="fnPrazo" type="number" inputmode="numeric" placeholder="Prazo de entrega (dias)"></div></div>
     <input id="fnUrl" placeholder="Site (https://...) — pra puxar as fotos">
     <input id="fnBusca" placeholder="Link de busca do site com %s (ex.: https://site.com/busca?q=%s)">
     <div class="cot-grid"><div><input id="fnUser" placeholder="Login/usuário (opcional)"></div><div><input id="fnObs" placeholder="Observações"></div></div>
-    <button class="btn primary" style="width:100%;margin-top:8px" onclick="addForn()">➕ Adicionar fornecedor</button>
+    <div class="cot-row" style="margin-top:8px"><button class="btn primary" style="flex:1" id="fnAddBtn" onclick="addForn()">➕ Adicionar fornecedor</button><button class="btn ghost" id="fnCancelBtn" style="display:none" onclick="cancelForn()">Cancelar</button></div>
     <p class="cot-hint">O <b>Frete</b> é dividido entre os produtos do orçamento (botão "Dividir frete"). O <b>Site</b> + <b>Link de busca</b> servem pra puxar a foto do produto (catálogo Excel + fotos do site).</p></div>`;
   box.innerHTML=html;
+  if(_fornEdit!=null) _fornFillForm(arr[_fornEdit]);
 }
-function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fornecedor');return;} const a=fornLoad(); a.push({id:Date.now(),nome,frete:parseFloat((document.getElementById('fnFrete')||{}).value)||0,prazo:parseInt((document.getElementById('fnPrazo')||{}).value,10)||0,url:_fv('fnUrl'),busca:_fv('fnBusca'),user:_fv('fnUser'),obs:_fv('fnObs')}); fornSave(a); abrirFornecedores(); toast('✔ Fornecedor adicionado'); }
+let _fornEdit=null;
+function _fornFillForm(f){ if(!f)return; const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  set('fnNome',f.nome||''); set('fnFrete',f.frete||''); set('fnPrazo',f.prazo||''); set('fnUrl',f.url||''); set('fnBusca',f.busca||''); set('fnUser',f.user||''); set('fnObs',f.obs||'');
+  const t=document.getElementById('fnFormTitle'); if(t)t.textContent='editar fornecedor';
+  const b=document.getElementById('fnAddBtn'); if(b)b.innerHTML='💾 Salvar alterações';
+  const c=document.getElementById('fnCancelBtn'); if(c)c.style.display='';
+}
+function editForn(i){ _fornEdit=i; _fornFillForm(fornLoad()[i]); const el=document.getElementById('fnNome'); if(el){ el.scrollIntoView({block:'center'}); el.focus(); } }
+function cancelForn(){ _fornEdit=null; abrirFornecedores(); }
+function addForn(){ const nome=_fv('fnNome'); if(!nome){toast('Dê um nome ao fornecedor');return;}
+  const dados={nome,frete:parseFloat((document.getElementById('fnFrete')||{}).value)||0,prazo:parseInt((document.getElementById('fnPrazo')||{}).value,10)||0,url:_fv('fnUrl'),busca:_fv('fnBusca'),user:_fv('fnUser'),obs:_fv('fnObs')};
+  const a=fornLoad();
+  if(_fornEdit!=null && a[_fornEdit]){ a[_fornEdit]=Object.assign({},a[_fornEdit],dados); _fornEdit=null; fornSave(a); abrirFornecedores(); toast('💾 Fornecedor atualizado'); }
+  else { a.push(Object.assign({id:Date.now()},dados)); fornSave(a); abrirFornecedores(); toast('✔ Fornecedor adicionado'); }
+}
 function freteDoFornecedor(nome){ const f=fornLoad().find(x=>(x.nome||'').toLowerCase()===(nome||'').toLowerCase()); return f?{frete:+f.frete||0,prazo:+f.prazo||0,url:f.url||'',busca:f.busca||''}:{frete:0,prazo:0,url:'',busca:''}; }
 function removerForn(i){ const a=fornLoad(); a.splice(i,1); fornSave(a); abrirFornecedores(); }
 function abrirFornSite(i){ const f=fornLoad()[i]; if(f&&f.url) window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); }
@@ -3568,7 +3627,7 @@ function renderClientReport(snap){
 }
 
 /* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
-let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[],_calc:null}, camTipoTool='comodo', camCtx=null, camCaboAtual=null;
+let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[],bg:null,bgImg:null,bgOn:false,coords:null,_calc:null}, camTipoTool='comodo', camCtx=null, camCaboAtual=null;
 function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
 function camInit(){
   const sel=document.getElementById('camParcelas');
@@ -3615,8 +3674,26 @@ function camSinal(cam){ let best=null; const segs=paredeSegs();
 }
 function sinalCor(p){ return p>=60?'#16a34a':p>=30?'#d97706':'#dc2626'; }
 function ehIP(c){ return /ip|wi-?fi|wifi/i.test(c.tipo||''); }
+/* ---- Vista de satélite (opcional, fundo do croqui) ---- */
+function _ctSatBtn(on){ const b=document.getElementById('ctSat'); if(b)b.classList.toggle('on',on); }
+function camGeocode(addr){ return fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(addr),{headers:{'Accept':'application/json'}}).then(r=>r.json()).then(a=>(a&&a[0])?{lat:parseFloat(a[0].lat),lon:parseFloat(a[0].lon)}:null).catch(()=>null); }
+function camEsriURL(lat,lon,latM){ const dLat=latM/111000, aspect=900/620, dLon=(latM*aspect)/(111000*Math.cos(lat*Math.PI/180)); const bbox=[lon-dLon,lat-dLat,lon+dLon,lat+dLat].join(','); return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox='+bbox+'&bboxSR=4326&imageSR=4326&size=900,620&format=jpg&f=image'; }
+function camCarregarImg(srcs){ return new Promise(res=>{ let i=0; const go=()=>{ if(i>=srcs.length){res(null);return;} const im=new Image(); im.crossOrigin='anonymous'; im.onload=()=>res(im); im.onerror=()=>{i++;go();}; im.src=srcs[i]; }; go(); }); }
+async function camSatelite(){
+  if(CAM.bgOn){ CAM.bgOn=false; camRedraw(); _ctSatBtn(false); toast('Fundo de satélite removido'); return; }
+  if(CAM.bgImg && CAM.coords){ CAM.bgOn=true; camRedraw(); _ctSatBtn(true); return; }
+  let c=CAM.coords; const end=(document.getElementById('camEndereco').value||'').trim();
+  if(!c){ if(end.length<6){ toast('Preencha o endereço (ou use 📍) pra puxar o satélite'); return; } toast('🛰️ Localizando o endereço...'); c=await camGeocode(end); if(!c){ toast('Não achei esse endereço no mapa'); return; } CAM.coords=c; }
+  toast('🛰️ Baixando a vista de cima...');
+  const latM=40, url=camEsriURL(c.lat,c.lon,latM), raw=url.replace(/^https?:\/\//,'');
+  const im=await camCarregarImg(['https://images.weserv.nl/?url='+encodeURIComponent(raw)+'&w=900&output=jpg', url]);
+  if(!im){ toast('Não consegui carregar o satélite agora'); return; }
+  CAM.bgImg=im; CAM.bgOn=true;
+  const esc=document.getElementById('camEscala'); if(esc && !parseFloat(esc.value)){ const Hh=document.getElementById('camCanvas').height; esc.value=(2*latM/(Hh/20)).toFixed(2); camCalcCabo(); }
+  camRedraw(); _ctSatBtn(true); toast('🛰️ Satélite aplicado — desenhe as paredes/câmeras por cima');
+}
 function camModelo(tipo){
-  CAM.cabos=[]; CAM.postes=[]; CAM.marcas=[]; camCaboAtual=null;
+  CAM.cabos=[]; CAM.postes=[]; CAM.marcas=[]; camCaboAtual=null; CAM.bgOn=false; _ctSatBtn(false);
   if(tipo==='casa'){
     CAM.comodos=[{x:80,y:80,w:740,h:460}];
     CAM.paredes=[{x1:450,y1:80,x2:450,y2:330,tipo:'Alvenaria'},{x1:450,y1:330,x2:820,y2:330,tipo:'Alvenaria'},{x1:80,y1:330,x2:280,y2:330,tipo:'Alvenaria'}];
@@ -3634,12 +3711,13 @@ function camModelo(tipo){
   toast('Modelo carregado — ajuste à vontade');
 }
 let _camMapaT=null;
-function camMapaUpdate(){ clearTimeout(_camMapaT); _camMapaT=setTimeout(()=>{ const end=(document.getElementById('camEndereco').value||'').trim(); const mp=document.getElementById('camMapa'); if(!mp)return; if(end.length<6){ mp.style.display='none'; return; } mp.style.display='block'; mp.src='https://maps.google.com/maps?q='+encodeURIComponent(end)+'&output=embed'; }, 700); }
+function camMapaUpdate(){ CAM.coords=null; CAM.bgImg=null; clearTimeout(_camMapaT); _camMapaT=setTimeout(()=>{ const end=(document.getElementById('camEndereco').value||'').trim(); const mp=document.getElementById('camMapa'); if(!mp)return; if(end.length<6){ mp.style.display='none'; return; } mp.style.display='block'; mp.src='https://maps.google.com/maps?q='+encodeURIComponent(end)+'&output=embed'; }, 700); }
 async function camLocalizar(){
   if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
   toast('📍 Pegando localização...');
   navigator.geolocation.getCurrentPosition(async pos=>{
     const {latitude:la,longitude:lo}=pos.coords;
+    CAM.coords={lat:la,lon:lo}; CAM.bgImg=null;
     try{
       const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+lo+'&zoom=18&addressdetails=1',{headers:{'Accept':'application/json'}});
       const d=await r.json();
@@ -3691,7 +3769,9 @@ function camApagarEm(p){
 function camRedraw(){
   const cv=document.getElementById('camCanvas'); if(!cv||!camCtx)return; const ctx=camCtx,W=cv.width,Hh=cv.height;
   ctx.clearRect(0,0,W,Hh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,Hh);
-  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const sat = CAM.bgOn && CAM.bgImg;
+  if(sat){ try{ ctx.drawImage(CAM.bgImg,0,0,W,Hh); ctx.fillStyle='rgba(255,255,255,.28)'; ctx.fillRect(0,0,W,Hh); }catch(e){} }
+  ctx.strokeStyle=sat?'rgba(255,255,255,.35)':'#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   // 1) Cobertura Wi-Fi (ondas verde→amarelo→vermelho, enfraquecendo p/ fora)
   CAM.wifi.forEach(w=>{ const rng=CAM_ALC[w.alc||0]*(w.tipo==='ap'?1.25:1);
     const grd=ctx.createRadialGradient(w.x,w.y,4,w.x,w.y,rng*1.12);
@@ -3732,14 +3812,8 @@ function camRedraw(){
   CAM.wifi.forEach(w=>{ ctx.font='22px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(w.tipo==='ap'?'📡':'📶', w.x, w.y);
     ctx.font='bold 9px Arial'; ctx.fillStyle='#0b3b6f'; ctx.fillText(CAM_ALCNOME[w.alc||0], w.x, w.y+18); });
   ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  // 9) Câmeras (cone + número)
-  CAM.cameras.forEach((c,i)=>{
-    const a=c.ang*Math.PI/180, R=70, sp=Math.PI/4.5;
-    ctx.fillStyle='rgba(43,108,176,.18)'; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.arc(c.x,c.y,R,a-sp,a+sp); ctx.closePath(); ctx.fill();
-    ctx.fillStyle='#1f4fa3'; ctx.beginPath(); ctx.arc(c.x,c.y,12,0,6.3); ctx.fill();
-    ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(i+1),c.x,c.y);
-    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  });
+  // 9) Câmeras — visual muda conforme o modelo
+  CAM.cameras.forEach((c,i)=>camDesenharCamera(ctx,c,i));
   // 10) Sinal das câmeras IP/Wi-Fi (linha colorida + % + ⛔ bloqueio na parede)
   if(CAM.wifi.length){ CAM.cameras.forEach(c=>{ if(!ehIP(c))return; const s=camSinal(c); if(!s)return; const col=sinalCor(s.pct);
     ctx.strokeStyle=col; ctx.lineWidth=2.4; ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(s.w.x,s.w.y); ctx.stroke(); ctx.setLineDash([]);
@@ -3750,15 +3824,58 @@ function camRedraw(){
     ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   }); }
 }
+function hexToRgb(h){ h=String(h||'').replace('#',''); const n=parseInt(h,16); return ((n>>16)&255)+','+((n>>8)&255)+','+(n&255); }
+function roundRectPath(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function camTipoInfo(t){ t=(t||'').toLowerCase();
+  if(t.indexOf('speed')>=0) return {cor:'#db2777',forma:'speed'};
+  if(t.indexOf('ip')>=0||t.indexOf('wi')>=0) return {cor:'#0d9488',forma:'ip'};
+  if(t.indexOf('dome')>=0) return {cor:'#7c3aed',forma:'dome'};
+  if(t.indexOf('externa')>=0) return {cor:'#b45309',forma:'bullet'};
+  if(t.indexOf('interna')>=0) return {cor:'#475569',forma:'dome'};
+  return {cor:'#1f4fa3',forma:'bullet'};
+}
+function camDesenharCamera(ctx,c,i){
+  const a=c.ang*Math.PI/180, R=70, sp=Math.PI/4.5, info=camTipoInfo(c.tipo), col=info.cor;
+  ctx.fillStyle='rgba('+hexToRgb(col)+',.16)'; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.arc(c.x,c.y,R,a-sp,a+sp); ctx.closePath(); ctx.fill();
+  ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(a); ctx.fillStyle=col; ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+  if(info.forma==='bullet'){
+    roundRectPath(ctx,-8,-7,20,14,5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#dbe9ff'; ctx.beginPath(); ctx.arc(10,0,3,0,6.3); ctx.fill();
+  } else if(info.forma==='speed'){
+    ctx.beginPath(); ctx.arc(0,0,13,0,6.3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,6,0,6.3); ctx.fill();
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(0,0,3,0,6.3); ctx.fill();
+  } else if(info.forma==='ip'){
+    ctx.beginPath(); ctx.arc(0,0,12,0,6.3); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; [4,7.5].forEach(r=>{ ctx.beginPath(); ctx.arc(0,2,r,-Math.PI*0.82,-Math.PI*0.18); ctx.stroke(); });
+  } else { // dome
+    ctx.beginPath(); ctx.arc(0,0,12,0,6.3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.arc(0,0,6.5,0,6.3); ctx.fill();
+  }
+  ctx.restore();
+  // badge do número
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(c.x-13,c.y-13,8.5,0,6.3); ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(i+1),c.x-13,c.y-13);
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+}
 function renderCamPontos(){
   const box=document.getElementById('camPontos'); if(!box)return;
   if(!CAM.cameras.length){ box.innerHTML='<p class="cot-hint" style="margin:0">Adicione câmeras no croqui — elas aparecem aqui numeradas pra você dizer o local e o tipo.</p>'; camCalc(); return; }
   const tipos=['Bullet','Dome','Speed Dome','IP Wi-Fi','Externa','Interna'];
-  box.innerHTML=CAM.cameras.map((c,i)=>`<div class="cam-pt"><span class="cam-pt-n">${i+1}</span>
-    <input value="${(c.local||'').replace(/"/g,'&quot;')}" placeholder="Local (ex.: Garagem)" oninput="CAM.cameras[${i}].local=this.value">
-    <select onchange="CAM.cameras[${i}].tipo=this.value">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>`).join('');
+  box.innerHTML=CAM.cameras.map((c,i)=>{
+    let sinal='';
+    if(CAM.wifi.length && ehIP(c)){ const s=camSinal(c); if(s){ const cor=sinalCor(s.pct), lbl=s.pct>=60?'bom':s.pct>=30?'médio':'fraco'; sinal=`<span class="cam-sinal" style="background:${cor}">📶 ${s.pct}% · ${lbl}${s.hits.length?(' · '+s.hits.length+' parede'+(s.hits.length>1?'s':'')):''}</span>`; } }
+    const foto=c.foto?`<div class="cam-pt-foto"><img src="${c.foto}" alt="local"><button class="foto-del" onclick="camDelFotoPonto(${i})" title="Remover foto">✕</button></div>`
+      :`<label class="cam-pt-addfoto" title="Foto do local onde a câmera será instalada">📷 Foto do local<input type="file" accept="image/*" capture="environment" style="display:none" onchange="camAddFotoPonto(${i},this)"></label>`;
+    return `<div class="cam-pt"><div class="cam-pt-top"><span class="cam-pt-n" style="background:${camTipoInfo(c.tipo).cor}">${i+1}</span>
+      <input value="${(c.local||'').replace(/"/g,'&quot;')}" placeholder="Local (ex.: Garagem)" oninput="CAM.cameras[${i}].local=this.value">
+      <select onchange="CAM.cameras[${i}].tipo=this.value;camRedraw();renderCamPontos()">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="cam-pt-bot">${foto}${sinal}</div></div>`;
+  }).join('');
   camCaboAuto();
 }
+function camAddFotoPonto(i,input){ const f=input.files&&input.files[0]; if(!f)return; compressImage(f,720,0.6).then(d=>{ if(CAM.cameras[i]){ CAM.cameras[i].foto=d; renderCamPontos(); toast('📷 Foto do local adicionada'); } }).catch(()=>toast('Não consegui adicionar a foto')); input.value=''; }
+function camDelFotoPonto(i){ if(CAM.cameras[i]){ CAM.cameras[i].foto=''; renderCamPontos(); } }
 async function camBuscarPeca(){
   const q=(document.getElementById('camBuscaPeca').value||'').trim();
   const res=document.getElementById('camBuscaRes'); if(!res)return; if(!q){res.innerHTML='';return;}
@@ -3842,6 +3959,25 @@ async function gerarCameraPDF(baixar){
   y+=2;
   try{ const cv=document.getElementById('camCanvas'); const im=cv.toDataURL('image/jpeg',0.85); const iw=W-2*M, ih=iw*(cv.height/cv.width); doc.addImage(im,'JPEG',M,y,iw,ih); doc.setDrawColor(225,230,238);doc.rect(M,y,iw,ih); y+=ih+12; }catch(e){}
   if(CAM.cameras.length){ doc.autoTable({startY:y,head:[['#','Local','Tipo']],body:CAM.cameras.map((c,i)=>[i+1,c.local||'-',c.tipo||'-']),theme:'grid',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+12; }
+  // fotos dos locais de instalação (por câmera)
+  const comFoto=CAM.cameras.map((c,i)=>({c,i})).filter(o=>o.c.foto);
+  if(comFoto.length){
+    const PH=doc.internal.pageSize.getHeight();
+    if(y>PH-95){ doc.addPage(); y=40; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(10,37,80); doc.text('Fotos dos locais de instalação',M,y); y+=8;
+    const cols=3, gap=8, cw=(W-2*M-gap*(cols-1))/cols, chh=cw*0.72;
+    for(let k=0;k<comFoto.length;k+=cols){
+      if(y+chh+16>PH-25){ doc.addPage(); y=40; }
+      comFoto.slice(k,k+cols).forEach((o,col)=>{ const x=M+col*(cw+gap);
+        try{ doc.addImage(o.c.foto,'JPEG',x,y,cw,chh); }catch(e){}
+        doc.setDrawColor(225,230,238); doc.rect(x,y,cw,chh);
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(60,72,90);
+        doc.text(('#'+(o.i+1)+' '+(o.c.local||o.c.tipo||'')).slice(0,28), x+2, y+chh+9);
+      });
+      y+=chh+16;
+    }
+    doc.setTextColor(0,0,0);
+  }
   const itensF=CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0);
   const fotos={}; for(const it of itensF){ if(it.img&&!(it.img in fotos)) fotos[it.img]=await imgParaDataURL(it.img); }
   const body=[], rowFotos=[];
@@ -3925,16 +4061,44 @@ function cloudSubscribe(){
   if(!cloud.ready) return;
   if(cloud.unsub){cloud.unsub();cloud.unsub=null;}
   cloud.unsub=cloud.db.collection('visitas').onSnapshot(snap=>{
-    const list=[]; snap.forEach(doc=>{const d=doc.data(); if(d&&d.rec)list.push(d.rec);});
+    const localById={}; (load(LIST_KEY)||[]).forEach(r=>{ if(r&&r.id!=null) localById[r.id]=r; });
+    const list=[]; snap.forEach(doc=>{const d=doc.data(); if(d&&d.rec){ let rec=d.rec; if(d.fotosOmitidas) rec=mesclarFotosLocais(rec, localById[rec.id]); list.push(rec); }});
     list.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
     save(LIST_KEY,list);
     if(document.getElementById('modalWrap')){ closeModal(); openVisits(); }
   }, err=>{ cloud.status='err'; refreshCloudStatus(); console.warn('Cloud sync:',err); });
 }
+/* devolve as fotos locais a uma visita cuja versão da nuvem veio sem elas (eram grandes demais p/ subir) */
+function mesclarFotosLocais(rec, local){
+  if(!local||!local.inventory||!rec||!rec.inventory) return rec;
+  for(const k in rec.inventory){ (rec.inventory[k]||[]).forEach((it,i)=>{ const lit=(local.inventory[k]||[])[i];
+    if(lit&&lit._fotos&&lit._fotos.length && (!it._fotos||!it._fotos.length)) it._fotos=lit._fotos; }); }
+  return rec;
+}
+let _cloudWarnAt=0;
+function cloudWarn(msg){ const now=Date.now(); if(now-_cloudWarnAt>4000){ _cloudWarnAt=now; try{ if(typeof toast==='function') toast('⚠️ '+msg); }catch(e){} } }
+/* Escreve no Firestore tratando a rejeição ASSÍNCRONA (try/catch síncrono não pega .set())
+   e protegendo o limite de 1MB por documento — assim a falha aparece em vez de sumir calada. */
+function cloudSet(ref,data,label,opts){
+  try{ const json=JSON.stringify(data); if(json.length>1000000){ cloudWarn((label||'Item')+' grande demais pra nuvem (fotos pesadas). Fica salvo neste aparelho.'); return Promise.resolve(false); } }catch(e){}
+  const p = opts ? ref.set(data,opts) : ref.set(data);
+  return p.then(()=>{ if(cloud.status==='err'){ cloud.status='on'; refreshCloudStatus(); } return true; })
+    .catch(e=>{ console.warn('Cloud '+(label||'')+' save:',e);
+      if(/exceeds the maximum|too large|longer than|invalid-argument/i.test(String((e&&e.message)||e))) cloudWarn((label||'Item')+' grande demais pra nuvem (fotos pesadas).');
+      else { cloud.status='err'; refreshCloudStatus(); }
+      return false; });
+}
 async function cloudUpsert(rec){
   if(!cloud.on) return;
-  try{ await cloud.db.collection('visitas').doc(rec.id).set({rec, savedAt:rec.savedAt||new Date().toISOString()}); }
-  catch(e){ console.warn('Cloud save:',e); }
+  let payload={rec, savedAt:rec.savedAt||new Date().toISOString()};
+  if(JSON.stringify(payload).length>1000000){
+    // fotos pesadas demais p/ 1 documento: sobe os dados sem as fotos (ficam neste aparelho)
+    const slim=JSON.parse(JSON.stringify(rec)); let n=0;
+    if(slim.inventory) for(const k in slim.inventory){ (slim.inventory[k]||[]).forEach(it=>{ if(it._fotos&&it._fotos.length){ n+=it._fotos.length; it._fotos=[]; } }); }
+    payload={rec:slim, savedAt:payload.savedAt, fotosOmitidas:n};
+    cloudWarn('Visita com '+n+' foto(s) pesada(s): dados sincronizados; as fotos ficam neste aparelho.');
+  }
+  await cloudSet(cloud.db.collection('visitas').doc(rec.id), payload, 'Visita');
 }
 async function cloudDelete(id){
   if(!cloud.on) return;
@@ -3943,14 +4107,14 @@ async function cloudDelete(id){
 async function cloudPushLocal(){
   if(!cloud.on) return;
   const list=load(LIST_KEY)||[];
-  for(const rec of list){ try{ await cloud.db.collection('visitas').doc(rec.id).set({rec, savedAt:rec.savedAt||''},{merge:true}); }catch(e){} }
+  for(const rec of list){ await cloudSet(cloud.db.collection('visitas').doc(rec.id), {rec, savedAt:rec.savedAt||''}, 'Visita', {merge:true}); }
 }
 /* sincronização do catálogo de produtos/serviços entre dispositivos */
 let _prodCloudTimer=null;
 function cloudSaveProdutos(arr){
   if(!cloud.on) return;
   clearTimeout(_prodCloudTimer);
-  _prodCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('catalogo').doc('lista').set({itens:arr, ts:Date.now()}); }catch(e){console.warn('Cloud prod save',e);} }, 800);
+  _prodCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('catalogo').doc('lista'), {itens:arr, ts:Date.now()}, 'Catálogo'); }, 800);
 }
 function cloudSubscribeProdutos(){
   if(!cloud.ready) return;
@@ -3975,7 +4139,7 @@ let _histCloudTimer=null;
 function cloudSaveHist(arr){
   if(!cloud.on) return;
   clearTimeout(_histCloudTimer);
-  _histCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('historico').set({itens:arr, ts:Date.now()}); }catch(e){console.warn('Cloud hist save',e);} }, 800);
+  _histCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('historico'), {itens:arr, ts:Date.now()}, 'Histórico'); }, 800);
 }
 function cloudSubscribeHist(){
   if(!cloud.ready) return;
@@ -3995,7 +4159,7 @@ function cloudSubscribeHist(){
 }
 /* sincronização dos custos/lucros (config) e fornecedores */
 let _cfgCloudTimer=null,_fornCloudTimer=null;
-function cloudSaveCfg(o){ if(!cloud.on)return; clearTimeout(_cfgCloudTimer); _cfgCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('config').set({cfg:o,ts:Date.now()}); }catch(e){console.warn('Cloud cfg save',e);} },800); }
+function cloudSaveCfg(o){ if(!cloud.on)return; clearTimeout(_cfgCloudTimer); _cfgCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('config'), {cfg:o,ts:Date.now()}, 'Config'); },800); }
 function cloudSubscribeCfg(){
   if(!cloud.ready) return;
   if(cloud._unsubCfg){cloud._unsubCfg();cloud._unsubCfg=null;}
@@ -4005,7 +4169,7 @@ function cloudSubscribeCfg(){
     else cloudSaveCfg(cfgLoad());
   }, err=>console.warn('Cloud cfg sync',err));
 }
-function cloudSaveForn(a){ if(!cloud.on)return; clearTimeout(_fornCloudTimer); _fornCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('fornecedores').set({itens:a,ts:Date.now()}); }catch(e){console.warn('Cloud forn save',e);} },800); }
+function cloudSaveForn(a){ if(!cloud.on)return; clearTimeout(_fornCloudTimer); _fornCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('fornecedores'), {itens:a,ts:Date.now()}, 'Fornecedores'); },800); }
 function cloudSubscribeForn(){
   if(!cloud.ready) return;
   if(cloud._unsubForn){cloud._unsubForn();cloud._unsubForn=null;}
@@ -4016,7 +4180,7 @@ function cloudSubscribeForn(){
   }, err=>console.warn('Cloud forn sync',err));
 }
 let _catCloudTimer=null;
-function cloudSaveCat(a){ if(!cloud.on)return; clearTimeout(_catCloudTimer); _catCloudTimer=setTimeout(()=>{ try{ cloud.db.collection('cotacoes').doc('catalogo').set({itens:a,ts:Date.now()}); }catch(e){console.warn('Cloud cat save',e);} },800); }
+function cloudSaveCat(a){ if(!cloud.on)return; clearTimeout(_catCloudTimer); _catCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('catalogo'), {itens:a,ts:Date.now()}, 'Catálogo de planilhas'); },800); }
 function cloudSubscribeCat(){
   if(!cloud.ready) return;
   if(cloud._unsubCat){cloud._unsubCat();cloud._unsubCat=null;}
