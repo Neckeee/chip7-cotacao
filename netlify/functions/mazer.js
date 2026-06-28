@@ -63,12 +63,13 @@ function parseBusca(html,q){
     const lk=c.match(/href="(\/produtos\/detalhe\/slug\/[^"]+)"/i);
     const nm=c.match(/nome-produto-3linhas">([\s\S]*?)<\/p>/i);
     const pr=c.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
+    const im=c.match(/<img[^>]+(?:data-src|src)="(https?:\/\/[^"]*(?:mazer-img|imagem\/produto)[^"]*)"/i);
     if(lk&&nm){
       const nome=decode(nm[1].replace(/<[^>]+>/g,' ')).replace(/^C[oó]d:\s*\d+\s*/i,'').trim();
       const low=semAcento(nome);
       if(termos.every(t=>low.includes(t)) && !vistos.has(lk[1])){
         vistos.add(lk[1]);
-        out.push({nome, link:lk[1], preco: pr?precoNum(pr[1]):null});
+        out.push({nome, link:lk[1], preco: pr?precoNum(pr[1]):null, img: im?im[1]:''});
       }
     }
   }

@@ -296,13 +296,26 @@ textarea{min-height:60px;resize:vertical}
 .cam-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .cam-tool{background:#f1f5fb;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
 .cam-tool.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.cam-tool.act{background:#0d9488;color:#fff;border-color:#0d9488}
+.cam-wrap{position:relative}
 .cam-canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:#fff;touch-action:none}
+.cam-esc{width:78px;padding:7px 8px;border:1px solid var(--line);border-radius:9px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin:7px 2px 0}
+.cam-leg b{display:inline-flex;align-items:center;gap:4px;font-weight:600}
+.cam-leg i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.cam-fs-close{display:none}
+.cam-wrap.fs{position:fixed;inset:0;z-index:9998;background:#0b1430;padding:10px;overflow:auto;border-radius:0}
+.cam-wrap.fs .cam-canvas{max-width:1100px;margin:0 auto}
+.cam-wrap.fs .cam-fs-close{display:block;margin:10px auto 0;background:#fff;color:#0b1430}
+.cam-wrap.fs .cam-leg{justify-content:center;color:#cfe0ff}
 .cam-pt{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .cam-pt-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
 .cam-pt input,.cam-pt select{flex:1;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text)}
-.cam-item{display:flex;gap:6px;margin-top:6px}
+.cam-item{display:flex;align-items:center;gap:6px;margin-top:6px}
 .cam-item input{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text);min-width:0}
 .cam-item .ci-del{flex:none}
+.cam-item-img{width:36px;height:36px;flex:none;border-radius:7px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.cam-item-img.ph{background:#eef2f7}
 /* abas Importados/Fornecedores */
 .cot-tabs{display:flex;gap:6px;margin:4px 0 12px;background:#eef2f7;border-radius:12px;padding:4px}
 .cot-tab{flex:1;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px 8px;border-radius:9px;cursor:pointer}
@@ -698,9 +711,12 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cot-sep">croqui do local</div>
           <div class="cam-tools">
             <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
-            <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Muro</button>
+            <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Muro/Parede</button>
             <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
             <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
+            <button class="cam-tool" id="ctPorta" onclick="camTool('porta')">🚪 Porta</button>
+            <button class="cam-tool" id="ctJanela" onclick="camTool('janela')">🪟 Janela</button>
+            <button class="cam-tool" id="ctPortao" onclick="camTool('portao')">🚧 Portão</button>
             <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
             <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
             <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
@@ -725,8 +741,9 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
             <div><label class="cot-lbl">WhatsApp</label><input id="camTel" inputmode="tel" placeholder="(42) 9 9999-9999" oninput="this.value=formatPhoneBR(this.value)"></div>
           </div>
           <label class="cot-lbl">Endereço da instalação</label>
-          <div class="cot-row"><input id="camEndereco" placeholder="Rua, nº, bairro, cidade"><button class="btn ghost" onclick="camLocalizar()" title="Usar minha localização (GPS)">📍</button></div>
+          <div class="cot-row"><input id="camEndereco" placeholder="Rua, nº, bairro, cidade" oninput="camMapaUpdate()"><button class="btn ghost" onclick="camLocalizar()" title="Usar minha localização (GPS)">📍</button></div>
           <div class="cot-row" id="camMapaLink" style="display:none;margin-top:4px"></div>
+          <iframe id="camMapa" title="mapa" loading="lazy" style="display:none;width:100%;height:190px;border:1px solid var(--line);border-radius:10px;margin-top:8px"></iframe>
           <div class="cot-grid">
             <div><label class="cot-lbl">Técnico(s) responsável(is)</label><input id="camTecnico" placeholder="Ex.: Matheus, João"></div>
             <div><label class="cot-lbl">Tipo de parede</label><select id="camParede"><option>Alvenaria</option><option>Madeira</option><option>Drywall</option><option>Misto</option></select></div>
@@ -737,11 +754,19 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           </div>
         </div>
         <div class="cot-card" style="margin-top:14px">
-          <div class="cot-sep">materiais e serviço</div>
+          <div class="cot-sep">cabo das câmeras</div>
+          <div class="cot-row"><input id="camCaboBusca" placeholder="🔌 Buscar cabo no catálogo (ex.: cabo coaxial)" onkeydown="if(event.key==='Enter')camBuscarCabo()"><button class="btn ghost" onclick="camBuscarCabo()">🔎</button></div>
+          <div id="camCaboRes"></div>
+          <div id="camCaboLink" class="cot-hint" style="margin:4px 0 0"></div>
           <div class="cot-grid">
-            <div><label class="cot-lbl">Metros de cabo</label><input id="camCaboM" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
-            <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
+            <div><label class="cot-lbl">Metros por câmera</label><input id="camCaboPorCam" type="number" inputmode="decimal" value="0" oninput="camCaboAuto()"></div>
+            <div><label class="cot-lbl">Metros de cabo (total)</label><input id="camCaboM" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
           </div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
+            <div></div>
+          </div>
+          <div class="cot-sep">serviço e materiais</div>
           <div class="cot-grid">
             <div><label class="cot-lbl">Horas técnicas</label><input id="camHoras" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
             <div><label class="cot-lbl">R$ por hora</label><input id="camHoraV" type="number" inputmode="decimal" value="120" oninput="camCalc()"></div>
@@ -2852,12 +2877,12 @@ async function fornFetch(nome,fn,url){
 async function mazerPesquisa(q){
   const d=await fornFetch('Mazer','mazer','/.netlify/functions/mazer?q='+encodeURIComponent(q));
   if(!d||!d.itens) return [];
-  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Mazer', moeda:'BRL'}));
+  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:i.img||'', fonte:'Mazer', moeda:'BRL'}));
 }
 async function guarapuavaPesquisa(q){
   const d=await fornFetch('Guarapuava','guarapuava','/.netlify/functions/guarapuava?q='+encodeURIComponent(q));
   if(!d||!d.itens) return [];
-  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:'', fonte:'Guarapuava', moeda:'BRL', direto:true}));
+  return d.itens.map(i=>({nome:i.nome, link:i.link, preco:i.preco||0, precoUSD:0, ofertas:1, img:i.img||'', fonte:'Guarapuava', moeda:'BRL', direto:true}));
 }
 async function testarFornecedores(){
   const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
@@ -2900,12 +2925,21 @@ function parseFotoHTML(html){
   m=html.match(/<img[^>]+src="([^"]+(?:media\/catalog|\/produto|\/product|\/fotos)[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i); if(m) return m[1];
   return '';
 }
+/* fornecedores conhecidos (sites/buscas já configurados) */
+const SUPPLIER_SITES={
+  mazer:{nome:'Mazer', url:'https://www.mazer.com.br', busca:'https://www.mazer.com.br/busca/%s', login:true},
+  guarapuava:{nome:'Guarapuava', url:'https://distribuidoraguarapuava.com.br', busca:'https://distribuidoraguarapuava.com.br/catalogsearch/result/?q=%s', login:true},
+  fagundez:{nome:'Fagundez', url:'https://catalogo.fagundez.com', busca:'https://catalogo.fagundez.com/catalogsearch/result/?q=%s', login:false}
+};
+function siteFornecedor(nome){ const k=(nome||'').toLowerCase().replace(/\s+/g,''); for(const key in SUPPLIER_SITES){ if(k.includes(key)) return SUPPLIER_SITES[key]; } return null; }
 async function buscarFotoFornecedor(fornecedor, nome){
   if(!nome) return '';
-  const cfg=freteDoFornecedor(fornecedor);
+  const cfg=freteDoFornecedor(fornecedor), site=siteFornecedor(fornecedor);
+  if(site && site.login) return '';   // sites com login: a foto vem da função (proxy não loga)
   const urls=[];
   if(cfg.busca && cfg.busca.indexOf('%s')>=0) urls.push(cfg.busca.replace('%s',encodeURIComponent(nome)));
-  if(cfg.url){ const base=cfg.url.replace(/^https?:\/\//,'').replace(/\/+$/,''); urls.push('https://'+base+'/catalogsearch/result/?q='+encodeURIComponent(nome)); }
+  else if(site && site.busca) urls.push(site.busca.replace('%s',encodeURIComponent(nome)));
+  else if(cfg.url){ const base=cfg.url.replace(/^https?:\/\//,'').replace(/\/+$/,''); urls.push('https://'+base+'/catalogsearch/result/?q='+encodeURIComponent(nome)); }
   for(const u of urls){ try{ const html=await cpProxy(u); const img=parseFotoHTML(html); if(img) return img; }catch(e){} }
   return '';
 }
@@ -3515,7 +3549,7 @@ function renderClientReport(snap){
 }
 
 /* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
-let CAM={comodos:[],paredes:[],cameras:[],textos:[],dvr:null,itens:[],_calc:null}, camTipoTool='comodo', camCtx=null;
+let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,itens:[],_calc:null}, camTipoTool='comodo', camCtx=null;
 function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
 function camInit(){
   const sel=document.getElementById('camParcelas');
@@ -3525,8 +3559,8 @@ function camInit(){
   if(!CAM.itens.length) CAM.itens.push({desc:'',qtd:1,valor:0});
   renderCamItens(); renderCamPontos(); camRedraw(); camCalc();
 }
-function camTool(t){ camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
-function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.dvr=null; camRedraw(); renderCamPontos(); }
+function camTool(t){ camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['porta','ctPorta'],['janela','ctJanela'],['portao','ctPortao'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
+function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.marcas=[];CAM.dvr=null; camRedraw(); renderCamPontos(); }
 function camModelo(tipo){
   const W=640,H=460;
   if(tipo==='casa'){
@@ -3545,6 +3579,8 @@ function camModelo(tipo){
   camTool('camera'); camRedraw(); renderCamPontos();
   toast('Modelo carregado — ajuste à vontade');
 }
+let _camMapaT=null;
+function camMapaUpdate(){ clearTimeout(_camMapaT); _camMapaT=setTimeout(()=>{ const end=(document.getElementById('camEndereco').value||'').trim(); const mp=document.getElementById('camMapa'); if(!mp)return; if(end.length<6){ mp.style.display='none'; return; } mp.style.display='block'; mp.src='https://maps.google.com/maps?q='+encodeURIComponent(end)+'&output=embed'; }, 700); }
 async function camLocalizar(){
   if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
   toast('📍 Pegando localização...');
@@ -3557,7 +3593,8 @@ async function camLocalizar(){
       document.getElementById('camEndereco').value=end;
     }catch(e){ document.getElementById('camEndereco').value=la.toFixed(5)+', '+lo.toFixed(5); }
     const link=document.getElementById('camMapaLink');
-    if(link){ link.style.display='block'; link.innerHTML=`<a href="https://www.google.com/maps?q=${la},${lo}" target="_blank" rel="noopener" style="color:#bfe3ff;font-size:13px">🗺️ Ver no mapa</a>`; }
+    if(link){ link.style.display='block'; link.innerHTML=`<a href="https://www.google.com/maps?q=${la},${lo}" target="_blank" rel="noopener" style="color:#bfe3ff;font-size:13px">🗺️ Abrir no Google Maps</a>`; }
+    const mp=document.getElementById('camMapa'); if(mp){ mp.style.display='block'; mp.src='https://maps.google.com/maps?q='+la+','+lo+'&output=embed'; }
     toast('✔ Endereço preenchido');
   }, err=>{ toast('Não consegui o GPS (permita a localização)'); }, {enableHighAccuracy:true,timeout:8000});
 }
@@ -3569,6 +3606,7 @@ function camBindCanvas(cv){
     if(camTipoTool==='parede'||camTipoTool==='comodo'){ start=p; }
     else if(camTipoTool==='camera'){ camTapCamera(p); }
     else if(camTipoTool==='dvr'){ CAM.dvr={x:p.x,y:p.y}; camRedraw(); }
+    else if(camTipoTool==='porta'||camTipoTool==='janela'||camTipoTool==='portao'){ CAM.marcas.push({x:p.x,y:p.y,t:camTipoTool}); camRedraw(); }
     else if(camTipoTool==='texto'){ const t=prompt('Texto no croqui (ex.: Garagem, Portão):'); if(t){CAM.textos.push({x:p.x,y:p.y,t});camRedraw();} }
     else if(camTipoTool==='apagar'){ camApagarEm(p); }
   });
@@ -3576,7 +3614,7 @@ function camBindCanvas(cv){
     if(camTipoTool==='parede'){ ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(p.x,p.y);ctx.stroke(); }
     else if(camTipoTool==='comodo'){ ctx.strokeStyle='rgba(10,37,80,.5)';ctx.lineWidth=3;ctx.strokeRect(start.x,start.y,p.x-start.x,p.y-start.y); } });
   cv.addEventListener('pointerup',e=>{ if(!start)return; const p=camPos(cv,e);
-    if(camTipoTool==='parede'){ if(Math.hypot(p.x-start.x,p.y-start.y)>8) CAM.paredes.push({x1:start.x,y1:start.y,x2:p.x,y2:p.y}); }
+    if(camTipoTool==='parede'){ if(Math.hypot(p.x-start.x,p.y-start.y)>8) CAM.paredes.push({x1:start.x,y1:start.y,x2:p.x,y2:p.y,tipo:((document.getElementById('camParede')||{}).value||'Alvenaria')}); }
     else if(camTipoTool==='comodo'){ const x=Math.min(start.x,p.x),y=Math.min(start.y,p.y),w=Math.abs(p.x-start.x),h=Math.abs(p.y-start.y); if(w>20&&h>20) CAM.comodos.push({x,y,w,h}); }
     start=null; camRedraw(); });
 }
@@ -3585,6 +3623,7 @@ function distPtSeg(p,w){ const dx=w.x2-w.x1,dy=w.y2-w.y1,l2=dx*dx+dy*dy; let t=l
 function camApagarEm(p){
   let i=CAM.cameras.findIndex(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(i>=0){CAM.cameras.splice(i,1);camRedraw();renderCamPontos();return;}
   if(CAM.dvr && Math.hypot(CAM.dvr.x-p.x,CAM.dvr.y-p.y)<24){ CAM.dvr=null; camRedraw(); return; }
+  i=CAM.marcas.findIndex(m=>Math.hypot(m.x-p.x,m.y-p.y)<18); if(i>=0){CAM.marcas.splice(i,1);camRedraw();return;}
   i=CAM.textos.findIndex(t=>Math.hypot(t.x-p.x,t.y-p.y)<24); if(i>=0){CAM.textos.splice(i,1);camRedraw();return;}
   let best=-1,bd=14; CAM.paredes.forEach((w,k)=>{const d=distPtSeg(p,w);if(d<bd){bd=d;best=k;}}); if(best>=0){CAM.paredes.splice(best,1);camRedraw();return;}
   i=CAM.comodos.findIndex(c=>p.x>=c.x-6&&p.x<=c.x+c.w+6&&p.y>=c.y-6&&p.y<=c.y+c.h+6 && (Math.abs(p.x-c.x)<10||Math.abs(p.x-(c.x+c.w))<10||Math.abs(p.y-c.y)<10||Math.abs(p.y-(c.y+c.h))<10)); if(i>=0){CAM.comodos.splice(i,1);camRedraw();}
@@ -3594,8 +3633,17 @@ function camRedraw(){
   ctx.clearRect(0,0,W,Hh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,Hh);
   ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   ctx.strokeStyle='#0a2550'; ctx.lineWidth=4; ctx.lineCap='round';
-  CAM.comodos.forEach(c=>{ctx.strokeRect(c.x,c.y,c.w,c.h);});
-  CAM.paredes.forEach(w=>{ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();});
+  CAM.comodos.forEach(c=>{ctx.setLineDash([]);ctx.strokeStyle='#0a2550';ctx.strokeRect(c.x,c.y,c.w,c.h);});
+  CAM.paredes.forEach(w=>{
+    const tp=(w.tipo||'Alvenaria').toLowerCase();
+    if(tp.indexOf('madeira')>=0){ ctx.strokeStyle='#8a5a2b'; ctx.setLineDash([10,6]); }
+    else if(tp.indexOf('drywall')>=0){ ctx.strokeStyle='#9aa6b3'; ctx.setLineDash([3,4]); }
+    else { ctx.strokeStyle='#0a2550'; ctx.setLineDash([]); }
+    ctx.lineWidth=4; ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  CAM.marcas.forEach(m=>{ ctx.font='20px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#1b2430'; ctx.fillText(m.t==='porta'?'🚪':m.t==='janela'?'🪟':'🚧', m.x, m.y); });
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   if(CAM.dvr){ const d=CAM.dvr; ctx.fillStyle='#16407e'; ctx.fillRect(d.x-16,d.y-12,32,24); ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('DVR',d.x,d.y); ctx.textAlign='left'; ctx.textBaseline='alphabetic'; }
   ctx.fillStyle='#1b2430'; ctx.font='bold 14px Arial'; ctx.textBaseline='alphabetic'; CAM.textos.forEach(t=>ctx.fillText(t.t,t.x,t.y));
   CAM.cameras.forEach((c,i)=>{
@@ -3613,7 +3661,7 @@ function renderCamPontos(){
   box.innerHTML=CAM.cameras.map((c,i)=>`<div class="cam-pt"><span class="cam-pt-n">${i+1}</span>
     <input value="${(c.local||'').replace(/"/g,'&quot;')}" placeholder="Local (ex.: Garagem)" oninput="CAM.cameras[${i}].local=this.value">
     <select onchange="CAM.cameras[${i}].tipo=this.value">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>`).join('');
-  camCalc();
+  camCaboAuto();
 }
 async function camBuscarPeca(){
   const q=(document.getElementById('camBuscaPeca').value||'').trim();
@@ -3626,16 +3674,39 @@ async function camBuscarPeca(){
   CAM._busca=achados;
   res.innerHTML=achados.map((a,k)=>`<div class="prod-hit" onclick="camUsarPeca(${k})"><div class="ph-info"><b>${(a.nome||'').replace(/</g,'&lt;')}</b><small><span class="src-tag mazer">${(a.fonte||'Catálogo').replace(/</g,'&lt;')}</span> R$ ${(+a.preco).toFixed(2)}</small></div><span class="ph-go">+</span></div>`).join('');
 }
-function camUsarPeca(k){ const a=(CAM._busca||[])[k]; if(!a)return; CAM.itens.push({desc:a.nome,qtd:1,valor:+a.preco||0}); document.getElementById('camBuscaRes').innerHTML=''; document.getElementById('camBuscaPeca').value=''; renderCamItens(); camCalc(); toast('✔ '+a.nome); }
+function camUsarPeca(k){ const a=(CAM._busca||[])[k]; if(!a)return;
+  const it={desc:a.nome,qtd:1,valor:+a.preco||0,img:a.img||'',fonte:a.fonte||''}; CAM.itens.push(it);
+  document.getElementById('camBuscaRes').innerHTML=''; document.getElementById('camBuscaPeca').value=''; renderCamItens(); camCalc(); toast('✔ '+a.nome);
+  if(!it.img && a.fonte){ buscarFotoFornecedor(a.fonte,a.nome).then(img=>{ if(img){ it.img=img; renderCamItens(); } }).catch(()=>{}); }
+}
 function camAddItem(){ CAM.itens.push({desc:'',qtd:1,valor:0}); renderCamItens(); }
 function renderCamItens(){
   const box=document.getElementById('camItens'); if(!box)return;
   box.innerHTML=CAM.itens.map((it,i)=>`<div class="cam-item">
-    <input style="flex:2" value="${(it.desc||'').replace(/"/g,'&quot;')}" placeholder="Descrição (ex.: Câmera Bullet 1080p)" oninput="CAM.itens[${i}].desc=this.value">
-    <input style="width:46px" type="number" inputmode="numeric" value="${it.qtd}" oninput="CAM.itens[${i}].qtd=+this.value||0;camCalc()">
-    <input style="width:78px" type="number" inputmode="decimal" value="${it.valor}" placeholder="R$" oninput="CAM.itens[${i}].valor=+this.value||0;camCalc()">
+    ${it.img?`<img class="cam-item-img" src="${imgThumb(it.img)}" alt="" onerror="this.style.display='none'">`:'<div class="cam-item-img ph"></div>'}
+    <input style="flex:2;min-width:0" value="${(it.desc||'').replace(/"/g,'&quot;')}" placeholder="Descrição (ex.: Câmera Bullet 1080p)" oninput="CAM.itens[${i}].desc=this.value">
+    <input style="width:42px" type="number" inputmode="numeric" value="${it.qtd}" oninput="CAM.itens[${i}].qtd=+this.value||0;camCalc()">
+    <input style="width:72px" type="number" inputmode="decimal" value="${it.valor}" placeholder="R$" oninput="CAM.itens[${i}].valor=+this.value||0;camCalc()">
     <button class="ci-del" onclick="CAM.itens.splice(${i},1);renderCamItens();camCalc()">✕</button></div>`).join('');
   camCalc();
+}
+function camCaboAuto(){ const por=parseFloat((document.getElementById('camCaboPorCam')||{}).value)||0; const m=document.getElementById('camCaboM'); if(por>0 && m){ m.value=(CAM.cameras.length*por).toFixed(0); } camCalc(); }
+async function camBuscarCabo(){
+  const q=(document.getElementById('camCaboBusca').value||'').trim(); const res=document.getElementById('camCaboRes'); if(!res)return; if(!q){res.innerHTML='';return;}
+  res.innerHTML='<p class="cot-hint" style="margin:6px 0">🔄 Buscando cabo...</p>';
+  let achados=[]; try{ achados=await fornecedorPesquisa(q); }catch(e){ achados=catBuscaLocal(q); }
+  achados=achados.filter(x=>x.preco>0).slice(0,8);
+  if(!achados.length){ res.innerHTML='<p class="cot-hint" style="margin:6px 0">Nada encontrado. Cadastre no 📒 Catálogo ou digite o R$/metro abaixo.</p>'; return; }
+  CAM._cabos=achados;
+  res.innerHTML=achados.map((a,k)=>`<div class="prod-hit" onclick="camUsarCabo(${k})"><div class="ph-info"><b>${(a.nome||'').replace(/</g,'&lt;')}</b><small><span class="src-tag mazer">${(a.fonte||'Catálogo').replace(/</g,'&lt;')}</span> R$ ${(+a.preco).toFixed(2)}</small></div><span class="ph-go">+</span></div>`).join('');
+}
+function camUsarCabo(k){ const a=(CAM._cabos||[])[k]; if(!a)return;
+  const m=(a.nome||'').match(/(\d{2,4})\s*m\b/i); const rolo=m?parseInt(m[1],10):0;   // rolo (ex.: "100m") -> R$/metro
+  const rsM = rolo>5 ? (a.preco/rolo) : a.preco;
+  document.getElementById('camCaboV').value=rsM.toFixed(2);
+  const link=document.getElementById('camCaboLink'); if(link) link.innerHTML=`🔌 <b>${a.nome.replace(/</g,'&lt;')}</b> — ${rolo>5?('rolo '+rolo+'m → '):''}R$ ${rsM.toFixed(2)}/metro`;
+  document.getElementById('camCaboRes').innerHTML=''; document.getElementById('camCaboBusca').value='';
+  camCalc(); toast('✔ Cabo linkado (R$ '+rsM.toFixed(2)+'/m)');
 }
 function camCalc(){
   const num=id=>parseFloat((document.getElementById(id)||{}).value)||0;
@@ -3675,10 +3746,15 @@ async function gerarCameraPDF(baixar){
   y+=2;
   try{ const cv=document.getElementById('camCanvas'); const im=cv.toDataURL('image/jpeg',0.85); const iw=W-2*M, ih=iw*(cv.height/cv.width); doc.addImage(im,'JPEG',M,y,iw,ih); doc.setDrawColor(225,230,238);doc.rect(M,y,iw,ih); y+=ih+12; }catch(e){}
   if(CAM.cameras.length){ doc.autoTable({startY:y,head:[['#','Local','Tipo']],body:CAM.cameras.map((c,i)=>[i+1,c.local||'-',c.tipo||'-']),theme:'grid',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+12; }
-  const body=[]; CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0).forEach(it=>body.push([it.desc,String(it.qtd),fmtMoney(it.valor),fmtMoney(it.qtd*it.valor)]));
-  if(c.cabo>0)body.push(['Cabeamento ('+g('camCaboM')+' m)','','',fmtMoney(c.cabo)]);
-  if(c.mao>0)body.push(['Mão de obra ('+g('camHoras')+' h)','','',fmtMoney(c.mao)]);
-  if(body.length){ doc.autoTable({startY:y,head:[['Item','Qtd','Unit.','Total']],body,theme:'striped',styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:[10,37,80]},columnStyles:{1:{halign:'center'},2:{halign:'right'},3:{halign:'right'}},margin:{left:M,right:M}}); y=doc.lastAutoTable.finalY+10; }
+  const itensF=CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0);
+  const fotos={}; for(const it of itensF){ if(it.img&&!(it.img in fotos)) fotos[it.img]=await imgParaDataURL(it.img); }
+  const body=[], rowFotos=[];
+  itensF.forEach(it=>{ rowFotos.push(it.img?fotos[it.img]:null); body.push(['',it.desc,String(it.qtd),fmtMoney(it.valor),fmtMoney(it.qtd*it.valor)]); });
+  if(c.cabo>0){ rowFotos.push(null); body.push(['','Cabeamento ('+g('camCaboM')+' m)','','',fmtMoney(c.cabo)]); }
+  if(c.mao>0){ rowFotos.push(null); body.push(['','Mão de obra ('+g('camHoras')+' h)','','',fmtMoney(c.mao)]); }
+  if(body.length){ doc.autoTable({startY:y,head:[['','Item','Qtd','Unit.','Total']],body,theme:'striped',styles:{fontSize:9,cellPadding:4,minCellHeight:28,valign:'middle'},headStyles:{fillColor:[10,37,80]},columnStyles:{0:{cellWidth:32},2:{halign:'center'},3:{halign:'right'},4:{halign:'right'}},margin:{left:M,right:M},
+    didDrawCell:d=>{ if(d.section==='body'&&d.column.index===0){ const f=rowFotos[d.row.index]; if(f){ try{ const s=Math.min(d.cell.width,d.cell.height)-4; doc.addImage(f,'JPEG',d.cell.x+(d.cell.width-s)/2,d.cell.y+(d.cell.height-s)/2,s,s); }catch(e){} } } }
+  }); y=doc.lastAutoTable.finalY+10; }
   if(y>Hp-150){ doc.addPage(); y=60; }
   doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
   doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(20,28,40);doc.text('Total',M+14,y+23);

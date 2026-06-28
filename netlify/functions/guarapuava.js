@@ -49,11 +49,12 @@ function parseBusca(html,q){
     const lk=c.match(/href="([^"]+)"/i);
     const nm=c.match(/descr-produto">\s*<p>([^<]+)<\/p>/i) || c.match(/title="([^"]+)"/i);
     const pr=c.match(/box-preco">\s*<p>\s*R\$\s?([\d.]+,\d{2})/i) || c.match(/R\$\s?([\d.]+,\d{2})/);
+    const im=c.match(/<img[^>]+(?:data-src|src)="(https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
     if(lk&&nm){
       const nome=decode(nm[1]); const low=semAcento(nome);
       if(termos.every(t=>low.includes(t)) && !vistos.has(lk[1])){
         vistos.add(lk[1]);
-        out.push({nome, link:lk[1], preco: pr?precoNum(pr[1]):null});
+        out.push({nome, link:lk[1], preco: pr?precoNum(pr[1]):null, img: im?im[1]:''});
       }
     }
   }
