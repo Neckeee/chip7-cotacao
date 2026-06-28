@@ -709,11 +709,16 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div class="cot-col-l">
         <div class="cot-card">
           <div class="cot-sep">croqui do local</div>
+          <div class="cam-wrap" id="camWrap">
           <div class="cam-tools">
             <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
             <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Muro/Parede</button>
             <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
             <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
+            <button class="cam-tool" id="ctCabo" onclick="camTool('cabo')">🔌 Cabo</button>
+            <button class="cam-tool" id="ctRot" onclick="camTool('roteador')">📶 Roteador</button>
+            <button class="cam-tool" id="ctAp" onclick="camTool('ap')">📡 Access Point</button>
+            <button class="cam-tool" id="ctPoste" onclick="camTool('poste')">🗼 Poste</button>
             <button class="cam-tool" id="ctPorta" onclick="camTool('porta')">🚪 Porta</button>
             <button class="cam-tool" id="ctJanela" onclick="camTool('janela')">🪟 Janela</button>
             <button class="cam-tool" id="ctPortao" onclick="camTool('portao')">🚧 Portão</button>
@@ -724,9 +729,22 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cam-tools" style="margin-top:-2px">
             <button class="cam-tool" onclick="camModelo('casa')">🏠 Casa pronta</button>
             <button class="cam-tool" onclick="camModelo('loja')">🏪 Loja pronta</button>
+            <button class="cam-tool" id="ctCaboFim" onclick="camCaboUndo()">↶ Desfazer ponto</button>
+            <button class="cam-tool" onclick="camFull()">⛶ Tela cheia</button>
+            <input id="camEscala" class="cam-esc" inputmode="decimal" placeholder="m/quadr." title="Metros que cada quadradinho do croqui representa (pra medir cabo)" oninput="camCalcCabo()">
+            <button class="cam-tool" onclick="camSomarCabos()">📏 Somar cabos</button>
           </div>
-          <canvas id="camCanvas" class="cam-canvas" width="640" height="460"></canvas>
-          <p class="cot-hint">Cômodo/Muro: arraste. Câmera/DVR: toque pra colocar (toque de novo na câmera pra girar). Use um modelo pronto pra começar rápido. Apagar: toque no item.</p>
+          <canvas id="camCanvas" class="cam-canvas" width="900" height="620"></canvas>
+          <div class="cam-leg">
+            <b><i style="background:#16a34a"></i>sinal bom</b>
+            <b><i style="background:#d97706"></i>médio</b>
+            <b><i style="background:#dc2626"></i>fraco</b>
+            <b>⛔ bloqueio por parede</b>
+            <b><i style="background:#0d9488"></i>cabo</b>
+          </div>
+          <button class="btn ghost cam-fs-close" onclick="camFull()">✕ Fechar tela cheia</button>
+          </div>
+          <p class="cot-hint" id="camHint">Cômodo/Muro: arraste. Câmera/DVR/Roteador/Poste: toque pra colocar (toque de novo p/ girar a câmera ou trocar o alcance do Wi-Fi). 🔌 Cabo: toque na câmera, depois nos cantos do caminho e termine no DVR. Apagar: toque no item.</p>
         </div>
         <div class="cot-card" style="margin-top:14px">
           <div class="cot-sep">pontos de câmera</div>
@@ -762,6 +780,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
             <div><label class="cot-lbl">Metros por câmera</label><input id="camCaboPorCam" type="number" inputmode="decimal" value="0" oninput="camCaboAuto()"></div>
             <div><label class="cot-lbl">Metros de cabo (total)</label><input id="camCaboM" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
           </div>
+          <div id="camCaboCroqui" class="cot-hint" style="margin:2px 2px 0;color:#0d9488;font-weight:600"></div>
           <div class="cot-grid">
             <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
             <div></div>
@@ -3549,32 +3568,67 @@ function renderClientReport(snap){
 }
 
 /* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
-let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,itens:[],_calc:null}, camTipoTool='comodo', camCtx=null;
+let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[],_calc:null}, camTipoTool='comodo', camCtx=null, camCaboAtual=null;
 function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
 function camInit(){
   const sel=document.getElementById('camParcelas');
   if(sel && !sel.options.length){ sel.innerHTML=Object.keys(TAXAS_CARTAO).map(n=>`<option value="${n}"${n=='10'?' selected':''}>${n}x · ${String(TAXAS_CARTAO[n]).replace('.',',')}%</option>`).join(''); }
   const dt=document.getElementById('camData'); if(dt && !dt.value) dt.value=new Date().toISOString().slice(0,10);
   const cv=document.getElementById('camCanvas'); if(cv){ camCtx=cv.getContext('2d'); camBindCanvas(cv); }
+  CAM.cabos=CAM.cabos||[]; CAM.wifi=CAM.wifi||[]; CAM.postes=CAM.postes||[]; camCaboAtual=null;
   if(!CAM.itens.length) CAM.itens.push({desc:'',qtd:1,valor:0});
-  renderCamItens(); renderCamPontos(); camRedraw(); camCalc();
+  renderCamItens(); renderCamPontos(); camRedraw(); camCalc(); camCalcCabo(); camCaboHint();
 }
-function camTool(t){ camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['porta','ctPorta'],['janela','ctJanela'],['portao','ctPortao'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); }
-function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.marcas=[];CAM.dvr=null; camRedraw(); renderCamPontos(); }
+function camTool(t){ if(camCaboAtual && t!=='cabo') camCaboFim(); camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['cabo','ctCabo'],['roteador','ctRot'],['ap','ctAp'],['poste','ctPoste'],['porta','ctPorta'],['janela','ctJanela'],['portao','ctPortao'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); camCaboHint(); }
+function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.marcas=[];CAM.dvr=null;CAM.cabos=[];CAM.wifi=[];CAM.postes=[];camCaboAtual=null; camRedraw(); renderCamPontos(); }
+function camFull(){ const w=document.getElementById('camWrap'); if(!w)return; const fs=w.classList.toggle('fs'); document.body.style.overflow=fs?'hidden':''; camRedraw(); }
+/* ---- Cabos (caminhos câmera→DVR) ---- */
+function camCaboAncora(p){ const c=CAM.cameras.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<26); if(c)return{x:c.x,y:c.y}; if(CAM.dvr&&Math.hypot(CAM.dvr.x-p.x,CAM.dvr.y-p.y)<28)return{x:CAM.dvr.x,y:CAM.dvr.y}; const w=CAM.wifi.find(w=>Math.hypot(w.x-p.x,w.y-p.y)<24); if(w)return{x:w.x,y:w.y}; return null; }
+function camCaboTap(p){
+  if(!camCaboAtual){ const a=camCaboAncora(p); camCaboAtual=[a||{x:p.x,y:p.y}]; camRedraw(); camCaboHint(); return; }
+  const last=camCaboAtual[camCaboAtual.length-1], a=camCaboAncora(p);
+  if(a && Math.hypot(a.x-last.x,a.y-last.y)>6){ camCaboAtual.push({x:a.x,y:a.y}); camCaboFim(); return; }
+  if(Math.hypot(p.x-last.x,p.y-last.y)<12){ camCaboFim(); return; }
+  camCaboAtual.push({x:p.x,y:p.y}); camRedraw(); camCaboHint();
+}
+function camCaboFim(){ if(camCaboAtual && camCaboAtual.length>=2){ CAM.cabos.push({pts:camCaboAtual.slice()}); } camCaboAtual=null; camRedraw(); camCaboHint(); camCalcCabo(); }
+function camCaboUndo(){ if(camCaboAtual && camCaboAtual.length){ camCaboAtual.pop(); if(!camCaboAtual.length)camCaboAtual=null; } else if(CAM.cabos.length){ CAM.cabos.pop(); } camRedraw(); camCaboHint(); camCalcCabo(); }
+function camCaboHint(){ const h=document.getElementById('camHint'); const b=document.getElementById('ctCaboFim'); if(b)b.classList.toggle('act',!!(camCaboAtual&&camCaboAtual.length)); if(!h)return;
+  if(camTipoTool==='cabo'){ h.innerHTML = camCaboAtual&&camCaboAtual.length ? '🔌 <b>Desenhando cabo</b> — toque nos cantos do caminho e termine <b>no DVR</b> (ou toque 2× pra fechar). “↶ Desfazer ponto” volta um passo.' : '🔌 Toque na <b>câmera</b> pra começar o cabo, passe pelos cantos das paredes e termine <b>no DVR</b>. Defina “m/quadr.” e use “📏 Somar cabos” pra puxar a metragem.'; }
+  else h.innerHTML='Cômodo/Muro: arraste. Câmera/DVR/Roteador/Poste: toque (toque de novo p/ girar a câmera ou trocar o alcance do Wi-Fi). 🔌 Cabo: câmera → cantos → DVR. Apagar: toque no item.';
+}
+function camEscalaPxM(){ const v=parseFloat(((document.getElementById('camEscala')||{}).value||'').replace(',','.')); return (v>0)? v/20 : 0; }
+function caboPx(pts){ let d=0; for(let i=1;i<pts.length;i++)d+=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y); return d; }
+function camCabosTotalM(){ const mpp=camEscalaPxM(); if(!mpp)return 0; let px=0; CAM.cabos.forEach(c=>px+=caboPx(c.pts)); return px*mpp; }
+function camCalcCabo(){ const m=camCabosTotalM(); const inf=document.getElementById('camCaboCroqui'); if(inf){ inf.textContent = (CAM.cabos.length&&m)?('Croqui: '+CAM.cabos.length+' lance(s) ≈ '+Math.ceil(m)+' m'):''; } }
+function camSomarCabos(){ if(!CAM.cabos.length){ toast('Desenhe os cabos no croqui primeiro 🔌'); return; } const mpp=camEscalaPxM(); if(!mpp){ toast('Preencha “m/quadr.” (quantos metros cada quadradinho vale)'); return; } const m=Math.ceil(camCabosTotalM()); const el=document.getElementById('camCaboM'); if(el){ el.value=m; } camCalc(); toast('📏 '+m+' m de cabo somados do croqui'); }
+/* ---- Sinal Wi-Fi / Access Point ---- */
+const CAM_ALC={0:150,1:225,2:310}, CAM_ALCNOME={0:'Curto',1:'Médio',2:'Longo'};
+function paredeSegs(){ const a=CAM.paredes.map(w=>({x1:w.x1,y1:w.y1,x2:w.x2,y2:w.y2,tipo:w.tipo||'Alvenaria'})); CAM.comodos.forEach(c=>{a.push({x1:c.x,y1:c.y,x2:c.x+c.w,y2:c.y,tipo:'Alvenaria'},{x1:c.x+c.w,y1:c.y,x2:c.x+c.w,y2:c.y+c.h,tipo:'Alvenaria'},{x1:c.x+c.w,y1:c.y+c.h,x2:c.x,y2:c.y+c.h,tipo:'Alvenaria'},{x1:c.x,y1:c.y+c.h,x2:c.x,y2:c.y,tipo:'Alvenaria'});}); return a; }
+function paredePen(w){ const t=(w.tipo||'alvenaria').toLowerCase(); if(t.indexOf('madeira')>=0)return 12; if(t.indexOf('drywall')>=0)return 9; if(t.indexOf('misto')>=0)return 17; return 24; }
+function segCruz(a,b,c,d){ const r={x:b.x-a.x,y:b.y-a.y},s={x:d.x-c.x,y:d.y-c.y},den=r.x*s.y-r.y*s.x; if(!den)return null; const t=((c.x-a.x)*s.y-(c.y-a.y)*s.x)/den,u=((c.x-a.x)*r.y-(c.y-a.y)*r.x)/den; return (t>=0&&t<=1&&u>=0&&u<=1)?{x:a.x+t*r.x,y:a.y+t*r.y}:null; }
+function camSinal(cam){ let best=null; const segs=paredeSegs();
+  CAM.wifi.forEach(w=>{ const rng=CAM_ALC[w.alc||0]*(w.tipo==='ap'?1.25:1); const d=Math.hypot(cam.x-w.x,cam.y-w.y); let pct=100-(d/rng)*60; const hits=[];
+    segs.forEach(p=>{ const ip=segCruz({x:cam.x,y:cam.y},{x:w.x,y:w.y},{x:p.x1,y:p.y1},{x:p.x2,y:p.y2}); if(ip){ pct-=paredePen(p); hits.push(ip); } });
+    pct=Math.max(0,Math.min(100,Math.round(pct))); if(!best||pct>best.pct) best={pct,w,hits}; });
+  return best;
+}
+function sinalCor(p){ return p>=60?'#16a34a':p>=30?'#d97706':'#dc2626'; }
+function ehIP(c){ return /ip|wi-?fi|wifi/i.test(c.tipo||''); }
 function camModelo(tipo){
-  const W=640,H=460;
+  CAM.cabos=[]; CAM.postes=[]; CAM.marcas=[]; camCaboAtual=null;
   if(tipo==='casa'){
-    CAM.comodos=[{x:60,y:60,w:520,h:340}]; // contorno
-    CAM.paredes=[{x1:320,y1:60,x2:320,y2:240},{x1:320,y1:240,x2:580,y2:240},{x1:60,y1:240,x2:200,y2:240}];
-    CAM.textos=[{x:150,y:160,t:'Sala'},{x:430,y:150,t:'Quartos'},{x:130,y:330,t:'Garagem'}];
-    CAM.cameras=[{x:90,y:90,ang:45,local:'Frente',tipo:'Bullet'},{x:550,y:90,ang:135,local:'Lateral',tipo:'Bullet'},{x:120,y:300,ang:0,local:'Garagem',tipo:'Dome'}];
-    CAM.dvr={x:430,y:330};
+    CAM.comodos=[{x:80,y:80,w:740,h:460}];
+    CAM.paredes=[{x1:450,y1:80,x2:450,y2:330,tipo:'Alvenaria'},{x1:450,y1:330,x2:820,y2:330,tipo:'Alvenaria'},{x1:80,y1:330,x2:280,y2:330,tipo:'Alvenaria'}];
+    CAM.textos=[{x:210,y:220,t:'Sala'},{x:600,y:200,t:'Quartos'},{x:170,y:450,t:'Garagem'}];
+    CAM.cameras=[{x:120,y:120,ang:45,local:'Frente',tipo:'Bullet'},{x:780,y:120,ang:135,local:'Lateral',tipo:'Bullet'},{x:160,y:430,ang:0,local:'Garagem',tipo:'Dome'}];
+    CAM.dvr={x:600,y:460}; CAM.wifi=[{x:430,y:300,tipo:'roteador',alc:1}];
   } else {
-    CAM.comodos=[{x:60,y:80,w:520,h:300}];
-    CAM.paredes=[{x1:60,y1:200,x2:380,y2:200},{x1:380,y1:80,x2:380,y2:380}];
-    CAM.textos=[{x:160,y:140,t:'Loja'},{x:200,y:300,t:'Caixa'},{x:460,y:230,t:'Estoque'}];
-    CAM.cameras=[{x:90,y:110,ang:45,local:'Entrada',tipo:'Dome'},{x:550,y:110,ang:135,local:'Estoque',tipo:'Bullet'},{x:200,y:350,ang:270,local:'Caixa',tipo:'Dome'}];
-    CAM.dvr={x:520,y:350};
+    CAM.comodos=[{x:80,y:110,w:740,h:400}];
+    CAM.paredes=[{x1:80,y1:300,x2:540,y2:300,tipo:'Alvenaria'},{x1:540,y1:110,x2:540,y2:510,tipo:'Alvenaria'}];
+    CAM.textos=[{x:240,y:200,t:'Loja'},{x:300,y:430,t:'Caixa'},{x:660,y:330,t:'Estoque'}];
+    CAM.cameras=[{x:120,y:150,ang:45,local:'Entrada',tipo:'Dome'},{x:780,y:150,ang:135,local:'Estoque',tipo:'Bullet'},{x:300,y:480,ang:270,local:'Caixa',tipo:'Dome'}];
+    CAM.dvr={x:740,y:480}; CAM.wifi=[{x:430,y:270,tipo:'ap',alc:1}];
   }
   camTool('camera'); camRedraw(); renderCamPontos();
   toast('Modelo carregado — ajuste à vontade');
@@ -3606,6 +3660,9 @@ function camBindCanvas(cv){
     if(camTipoTool==='parede'||camTipoTool==='comodo'){ start=p; }
     else if(camTipoTool==='camera'){ camTapCamera(p); }
     else if(camTipoTool==='dvr'){ CAM.dvr={x:p.x,y:p.y}; camRedraw(); }
+    else if(camTipoTool==='cabo'){ camCaboTap(p); }
+    else if(camTipoTool==='roteador'||camTipoTool==='ap'){ const hit=CAM.wifi.find(w=>Math.hypot(w.x-p.x,w.y-p.y)<20); if(hit){ hit.alc=(hit.alc+1)%3; toast('Alcance '+CAM_ALCNOME[hit.alc]); } else { CAM.wifi.push({x:p.x,y:p.y,tipo:camTipoTool,alc:1}); } camRedraw(); }
+    else if(camTipoTool==='poste'){ CAM.postes.push({x:p.x,y:p.y}); camRedraw(); }
     else if(camTipoTool==='porta'||camTipoTool==='janela'||camTipoTool==='portao'){ CAM.marcas.push({x:p.x,y:p.y,t:camTipoTool}); camRedraw(); }
     else if(camTipoTool==='texto'){ const t=prompt('Texto no croqui (ex.: Garagem, Portão):'); if(t){CAM.textos.push({x:p.x,y:p.y,t});camRedraw();} }
     else if(camTipoTool==='apagar'){ camApagarEm(p); }
@@ -3623,6 +3680,9 @@ function distPtSeg(p,w){ const dx=w.x2-w.x1,dy=w.y2-w.y1,l2=dx*dx+dy*dy; let t=l
 function camApagarEm(p){
   let i=CAM.cameras.findIndex(c=>Math.hypot(c.x-p.x,c.y-p.y)<22); if(i>=0){CAM.cameras.splice(i,1);camRedraw();renderCamPontos();return;}
   if(CAM.dvr && Math.hypot(CAM.dvr.x-p.x,CAM.dvr.y-p.y)<24){ CAM.dvr=null; camRedraw(); return; }
+  i=CAM.wifi.findIndex(w=>Math.hypot(w.x-p.x,w.y-p.y)<20); if(i>=0){CAM.wifi.splice(i,1);camRedraw();return;}
+  i=CAM.postes.findIndex(w=>Math.hypot(w.x-p.x,w.y-p.y)<20); if(i>=0){CAM.postes.splice(i,1);camRedraw();return;}
+  let cb=-1,cbd=12; CAM.cabos.forEach((c,k)=>{ for(let j=1;j<c.pts.length;j++){ const d=distPtSeg(p,{x1:c.pts[j-1].x,y1:c.pts[j-1].y,x2:c.pts[j].x,y2:c.pts[j].y}); if(d<cbd){cbd=d;cb=k;} } }); if(cb>=0){ CAM.cabos.splice(cb,1); camRedraw(); camCalcCabo(); return; }
   i=CAM.marcas.findIndex(m=>Math.hypot(m.x-p.x,m.y-p.y)<18); if(i>=0){CAM.marcas.splice(i,1);camRedraw();return;}
   i=CAM.textos.findIndex(t=>Math.hypot(t.x-p.x,t.y-p.y)<24); if(i>=0){CAM.textos.splice(i,1);camRedraw();return;}
   let best=-1,bd=14; CAM.paredes.forEach((w,k)=>{const d=distPtSeg(p,w);if(d<bd){bd=d;best=k;}}); if(best>=0){CAM.paredes.splice(best,1);camRedraw();return;}
@@ -3632,8 +3692,20 @@ function camRedraw(){
   const cv=document.getElementById('camCanvas'); if(!cv||!camCtx)return; const ctx=camCtx,W=cv.width,Hh=cv.height;
   ctx.clearRect(0,0,W,Hh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,Hh);
   ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; for(let x=0;x<=W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Hh);ctx.stroke();} for(let y=0;y<=Hh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.strokeStyle='#0a2550'; ctx.lineWidth=4; ctx.lineCap='round';
-  CAM.comodos.forEach(c=>{ctx.setLineDash([]);ctx.strokeStyle='#0a2550';ctx.strokeRect(c.x,c.y,c.w,c.h);});
+  // 1) Cobertura Wi-Fi (ondas verde→amarelo→vermelho, enfraquecendo p/ fora)
+  CAM.wifi.forEach(w=>{ const rng=CAM_ALC[w.alc||0]*(w.tipo==='ap'?1.25:1);
+    const grd=ctx.createRadialGradient(w.x,w.y,4,w.x,w.y,rng*1.12);
+    grd.addColorStop(0,'rgba(22,163,74,.30)'); grd.addColorStop(.42,'rgba(22,163,74,.20)');
+    grd.addColorStop(.6,'rgba(217,119,6,.20)'); grd.addColorStop(.82,'rgba(220,38,38,.16)'); grd.addColorStop(1,'rgba(220,38,38,0)');
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(w.x,w.y,rng*1.12,0,6.3); ctx.fill();
+    // anéis tracejados ("ondas")
+    ctx.setLineDash([4,6]); ctx.lineWidth=1.4;
+    [[rng*0.5,'#16a34a'],[rng*0.8,'#d97706'],[rng*1.12,'#dc2626']].forEach(z=>{ ctx.globalAlpha=.5; ctx.strokeStyle=z[1]; ctx.beginPath(); ctx.arc(w.x,w.y,z[0],0,6.3); ctx.stroke(); });
+    ctx.globalAlpha=1; ctx.setLineDash([]);
+  });
+  // 2) Cômodos e paredes
+  ctx.lineCap='round';
+  CAM.comodos.forEach(c=>{ctx.setLineDash([]);ctx.strokeStyle='#0a2550';ctx.lineWidth=4;ctx.strokeRect(c.x,c.y,c.w,c.h);});
   CAM.paredes.forEach(w=>{
     const tp=(w.tipo||'Alvenaria').toLowerCase();
     if(tp.indexOf('madeira')>=0){ ctx.strokeStyle='#8a5a2b'; ctx.setLineDash([10,6]); }
@@ -3642,17 +3714,41 @@ function camRedraw(){
     ctx.lineWidth=4; ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke();
   });
   ctx.setLineDash([]);
+  // 3) Cabos (caminhos)
+  const desCabo=(pts,prog)=>{ if(pts.length<1)return; ctx.strokeStyle=prog?'#f59e0b':'#0d9488'; ctx.lineWidth=3.5; ctx.lineJoin='round'; ctx.setLineDash(prog?[7,5]:[]); ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=prog?'#f59e0b':'#0d9488'; pts.forEach((pt,i)=>{ if(i>0&&i<pts.length-1){ ctx.beginPath(); ctx.arc(pt.x,pt.y,3.2,0,6.3); ctx.fill(); } }); };
+  CAM.cabos.forEach(cb=>desCabo(cb.pts,false));
+  if(camCaboAtual&&camCaboAtual.length)desCabo(camCaboAtual,true);
+  // 4) Marcas (porta/janela/portão)
   CAM.marcas.forEach(m=>{ ctx.font='20px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#1b2430'; ctx.fillText(m.t==='porta'?'🚪':m.t==='janela'?'🪟':'🚧', m.x, m.y); });
   ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  // 5) DVR
   if(CAM.dvr){ const d=CAM.dvr; ctx.fillStyle='#16407e'; ctx.fillRect(d.x-16,d.y-12,32,24); ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('DVR',d.x,d.y); ctx.textAlign='left'; ctx.textBaseline='alphabetic'; }
+  // 6) Textos
   ctx.fillStyle='#1b2430'; ctx.font='bold 14px Arial'; ctx.textBaseline='alphabetic'; CAM.textos.forEach(t=>ctx.fillText(t.t,t.x,t.y));
+  // 7) Postes
+  CAM.postes.forEach(p=>{ ctx.font='22px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🗼',p.x,p.y); });
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  // 8) Roteador / Access Point (ícone + alcance)
+  CAM.wifi.forEach(w=>{ ctx.font='22px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(w.tipo==='ap'?'📡':'📶', w.x, w.y);
+    ctx.font='bold 9px Arial'; ctx.fillStyle='#0b3b6f'; ctx.fillText(CAM_ALCNOME[w.alc||0], w.x, w.y+18); });
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  // 9) Câmeras (cone + número)
   CAM.cameras.forEach((c,i)=>{
-    const a=c.ang*Math.PI/180, R=58, sp=Math.PI/4.5;
+    const a=c.ang*Math.PI/180, R=70, sp=Math.PI/4.5;
     ctx.fillStyle='rgba(43,108,176,.18)'; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.arc(c.x,c.y,R,a-sp,a+sp); ctx.closePath(); ctx.fill();
     ctx.fillStyle='#1f4fa3'; ctx.beginPath(); ctx.arc(c.x,c.y,12,0,6.3); ctx.fill();
     ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(i+1),c.x,c.y);
     ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   });
+  // 10) Sinal das câmeras IP/Wi-Fi (linha colorida + % + ⛔ bloqueio na parede)
+  if(CAM.wifi.length){ CAM.cameras.forEach(c=>{ if(!ehIP(c))return; const s=camSinal(c); if(!s)return; const col=sinalCor(s.pct);
+    ctx.strokeStyle=col; ctx.lineWidth=2.4; ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(s.w.x,s.w.y); ctx.stroke(); ctx.setLineDash([]);
+    s.hits.forEach(h=>{ ctx.font='14px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('⛔',h.x,h.y); });
+    const txt=s.pct+'%'; ctx.font='bold 11px Arial'; const wpx=ctx.measureText(txt).width+10, lx=c.x, ly=c.y-22;
+    ctx.fillStyle=col; ctx.beginPath(); ctx.rect(lx-wpx/2,ly-9,wpx,17); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(txt,lx,ly);
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  }); }
 }
 function renderCamPontos(){
   const box=document.getElementById('camPontos'); if(!box)return;
