@@ -196,7 +196,8 @@ textarea{min-height:60px;resize:vertical}
 
 /* ---------- Tela de Cotação ---------- */
 .cot-screen{align-items:flex-start;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0}
-.cot-wrap{width:100%;max-width:560px;margin:0 auto;padding:18px 16px calc(40px + env(safe-area-inset-bottom))}
+.cot-wrap{width:100%;max-width:560px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+.cot-head .btn{min-height:42px}
 .cot-cols{display:flex;flex-direction:column;gap:14px}
 .cot-hint{font-size:11.5px;color:var(--muted);margin:6px 2px 0}
 @media(min-width:860px){
@@ -282,6 +283,28 @@ body.dark .hist-tabs .ht.on{background:var(--accent2);border-color:var(--accent2
 /* rótulo minimizável (lojas/fornecedores) */
 .lbl-tgl{cursor:pointer;display:flex!important;align-items:center;justify-content:space-between;user-select:none;-webkit-tap-highlight-color:transparent}
 .lbl-tgl span{font-size:11px;color:var(--muted)}
+/* módulo reparo de celular */
+.rep-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.rep-sel{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.rep-foto{width:84px;height:84px;flex:none;border:1px solid var(--line);border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;overflow:hidden}
+.rep-foto img{width:100%;height:100%;object-fit:contain}
+.rep-sel b{font-size:15px;display:block}
+.rep-sel small{color:var(--muted)}
+.rep-extras{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 2px}
+.rep-extras label{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--text)}
+.rep-extras input[type=checkbox]{width:18px;height:18px;accent-color:var(--brand)}
+.rep-extras input[type=number]{width:74px!important;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--text)}
+.rep-prev{background:#f0f7ff;border:1px solid #bcd6f7;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:8px;color:var(--text)}
+.rep-prev>div{margin:2px 0}
+.rep-aviso{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:8px;padding:6px 9px;font-size:12.5px;margin-top:5px}
+.repcfg-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-top:6px;background:#fff}
+.repcfg-row>b{min-width:64px;font-size:12.5px;color:var(--brand)}
+.repcfg-row label{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);font-weight:700}
+.repcfg-row input,.repcfg-row select{width:64px;padding:6px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;background:#fbfcfe;color:var(--text)}
+.repcfg-row select{width:auto}
+body.dark .rep-foto,body.dark .repcfg-row{background:var(--card);border-color:var(--line)}
+body.dark .rep-prev{background:#12233f;border-color:#2b4a80}
+body.dark .rep-aviso{background:#3a2e10;border-color:#8a6d1f;color:#fcd34d}
 /* chips de modelos (módulo celular) */
 .cel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .cel-chip{background:#eef4ff;border:1px solid #c8dcff;color:#0b3b6f;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
@@ -687,7 +710,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
       <button class="wel-btn func" onclick="irModulo('montar')"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
       <button class="wel-btn cli" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
-      <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca em todos os fornecedores</small></button>
+      <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca nos importados</small></button>
+      <button class="wel-btn func" onclick="irModulo('reparo')"><span>🔧</span><b>Reparos</b><small>Peça + serviço de celular</small></button>
       <button class="wel-btn func" onclick="escolherTaxas()"><span>🧮</span><b>Calcular Taxas</b><small>Parcelas da maquininha</small></button>
     </div>
     <button class="wel-wa dark-btn" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo escuro: desligado</button>
@@ -995,6 +1019,99 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <button class="btn primary" onclick="txPDF()">📄 PDF pro cliente</button>
         <button class="btn ghost" onclick="txZap()">📲 WhatsApp</button>
         <button class="btn ghost" onclick="txCopiar()">📋 Copiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE REPARO DE CELULAR (peça + serviço) -->
+<div class="welcome cot-screen" id="reparoScreen">
+  <div class="cot-wrap" style="max-width:980px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🔧 Reparo de Celular</h2>
+      <span style="flex:1"></span>
+      <button class="btn ghost" onclick="abrirHistorico()">🕘 Orçamentos</button>
+    </div>
+    <div class="cot-cols">
+      <div class="cot-col-l">
+        <div class="cot-card">
+          <div class="cot-sep">escolher a peça</div>
+          <div class="cot-row">
+            <input id="repBusca" placeholder="Ex.: bateria moto g7, tela iphone 11" onkeydown="if(event.key==='Enter')repFiltrar()" oninput="repFiltrar()">
+            <button class="btn primary" onclick="repFiltrar()">🔎</button>
+          </div>
+          <div class="rep-chips" id="repMarcas"></div>
+          <div class="rep-chips" id="repTipos"></div>
+          <div id="repResultados"></div>
+        </div>
+        <div class="cot-card" style="margin-top:14px">
+          <div class="cot-sep lbl-tgl" onclick="toggleLojas('repCatBox',this)">📒 catálogo de peças <span>▾ minimizar</span></div>
+          <div id="repCatBox">
+            <div class="cot-row">
+              <select id="repImpForn" style="flex:1"></select>
+              <label class="btn ghost" style="flex:none;cursor:pointer">📥 Planilha<input type="file" accept=".xlsx,.xls,.csv,.txt" style="display:none" onchange="repImportar(this)"></label>
+            </div>
+            <p class="cot-hint" style="margin:4px 0 8px">Importa Marca/Modelo/Tipo do nome do produto (ex.: "TELA MOTO G7 POWER"). Escolha o fornecedor acima antes de importar.</p>
+            <div class="cot-grid">
+              <div><label class="cot-lbl">Marca</label><select id="repAddMarca"></select></div>
+              <div><label class="cot-lbl">Tipo</label><select id="repAddTipo"></select></div>
+            </div>
+            <div class="cot-grid">
+              <div><label class="cot-lbl">Modelo</label><input id="repAddModelo" placeholder="ex.: Moto G7 Power"></div>
+              <div><label class="cot-lbl">Custo (R$)</label><input id="repAddCusto" type="number" inputmode="decimal"></div>
+            </div>
+            <button class="btn ghost" style="width:100%;margin-top:8px" onclick="repAddManual()">➕ Adicionar peça manual</button>
+            <div class="cot-row" style="margin-top:8px">
+              <button class="btn ghost" style="flex:1" onclick="repAbrirCfg()">⚙️ Custos & margens</button>
+              <button class="btn ghost" style="flex:1" onclick="repAbrirForn()">🚚 Fornecedores</button>
+              <button class="btn ghost" style="flex:none" onclick="repLimparCat()" title="Apagar o catálogo">🗑️</button>
+            </div>
+            <div id="repCfgBox"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cot-col-r">
+        <div class="cot-card">
+          <div class="cot-sep">peça selecionada</div>
+          <div id="repSelBox"><p class="cot-hint" style="margin:0">Busque e toque numa peça — a foto do aparelho aparece aqui.</p></div>
+          <div id="repCampos" style="display:none">
+            <div class="cot-grid">
+              <div><label class="cot-lbl">Custo da peça (R$)</label><input id="repCusto" type="number" inputmode="decimal" oninput="repCalc()"></div>
+              <div><label class="cot-lbl">Frete (R$)</label><input id="repFrete" type="number" inputmode="decimal" value="0" oninput="repCalc()"></div>
+            </div>
+            <div class="cot-grid">
+              <div><label class="cot-lbl">Margem (%)</label><input id="repMargem" type="number" inputmode="decimal" oninput="repCalc()"></div>
+              <div><label class="cot-lbl">Mão de obra (R$)</label><input id="repMao" type="number" inputmode="decimal" oninput="repCalc()"></div>
+            </div>
+            <div class="rep-extras">
+              <label><input type="checkbox" id="repPelicula" onchange="repCalc()"> Película <input id="repPeliculaV" type="number" inputmode="decimal" oninput="repCalc()"></label>
+              <label><input type="checkbox" id="repCapinha" onchange="repCalc()"> Capinha <input id="repCapinhaV" type="number" inputmode="decimal" oninput="repCalc()"></label>
+            </div>
+            <label class="cot-lbl">Fornecedor da peça</label>
+            <select id="repForn" onchange="repCalc()"></select>
+            <div class="rep-prazo" id="repPrazo"></div>
+            <label class="cot-lbl">Maquininha / bandeira</label>
+            <div id="repMaqSwitch"></div>
+            <label class="cot-lbl">Parcelar no cartão em</label>
+            <select id="repParcelas" onchange="repCalc()"></select>
+          </div>
+        </div>
+        <div class="cot-result" id="repResult"><p class="cot-result-empty">Escolha uma peça pra ver o preço do serviço.</p></div>
+        <div class="cot-card" style="margin-top:14px">
+          <div class="cot-sep">dados do cliente (opcional)</div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Cliente</label><input id="repCliente" placeholder="Nome"></div>
+            <div><label class="cot-lbl">WhatsApp</label><input id="repTel" inputmode="tel" placeholder="(42) 9 9999-9999" oninput="this.value=formatPhoneBR(this.value)"></div>
+          </div>
+          <label class="cot-lbl">Observações (vai no orçamento)</label>
+          <textarea id="repObs" rows="2" placeholder="Garantia de 90 dias na peça e serviço..."></textarea>
+        </div>
+        <div class="ab-actions" style="margin-top:12px">
+          <button class="btn primary" onclick="enviarReparoWhatsApp()">📲 WhatsApp</button>
+          <button class="btn ghost" onclick="gerarReparoPDF(true)">📄 PDF</button>
+          <button class="btn ghost" onclick="anexarAoDiagnostico('rep')">📎 Anexar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2197,6 +2314,14 @@ function anexarAoDiagnostico(tipo){
           .concat(c.cabo>0?[{desc:'Cabeamento',qtd:1,valor:c.cabo*f}]:[])
           .concat(c.mao>0?[{desc:'Mão de obra',qtd:1,valor:c.mao}]:[]),
         total:c.total, parcelado:c.parcelas+'x de '+fmtMoney(c.parcela), quando:new Date().toISOString()};
+  } else if(tipo==='rep'){
+    repCalc(); const c=REP_CALC;
+    if(!c||!REP_SEL){ toast('Escolha uma peça primeiro'); return; }
+    ax={tipo:'🔧 Reparo', cliente:((document.getElementById('repCliente')||{}).value||'').trim(),
+        linhas:[{desc:REP_SEL.tipo+' '+REP_SEL.modelo+' (peça + mão de obra)',qtd:1,valor:c.total-(c.pel||0)-(c.cap||0)}]
+          .concat(c.pel?[{desc:'Película',qtd:1,valor:c.pel}]:[])
+          .concat(c.cap?[{desc:'Capinha',qtd:1,valor:c.cap}]:[]),
+        total:c.total, parcelado:c.parcelas+'x de '+fmtMoney(c.parcela), quando:new Date().toISOString()};
   } else {
     const itens=cotItens();
     if(!itens.length){ toast('Adicione produtos ao orçamento primeiro'); return; }
@@ -2831,20 +2956,21 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   const tag=document.querySelector('#chooser .wel-tag'); if(tag)tag.textContent='👤 '+usuarioAtual()+' — o que você quer fazer?';
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
-  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   if(m==='cotacao'){ COT_BUILD=false; COT_CEL=false; escolherCotacao(); }
   else if(m==='montar'){ COT_CEL=false; escolherMontarPC(); }
   else if(m==='celular'){ escolherCelular(); }
   else if(m==='camera'){ escolherCamera(); }
   else if(m==='taxas'){ escolherTaxas(); }
+  else if(m==='reparo'){ escolherReparo(); }
   else if(m==='diagnostico'){ escolherDiagnostico(); }
   else showChooser();
 }
@@ -2860,7 +2986,10 @@ function escolherCotacao(){
   cotCalc();
   setBuildUI();
 }
-function voltarChooser(){ if(history.state && history.state.chip7){ history.back(); return; } showChooser(); }
+function voltarChooser(){
+  showChooser();   // resposta IMEDIATA (não depende do history — no celular o back() às vezes não dispara)
+  if(history.state && history.state.chip7){ try{ history.back(); }catch(e){} }   // consome o estado por baixo
+}
 /* ---- botão físico/gesto de VOLTAR do celular navega dentro do app ---- */
 function marcarTela(){ try{ history.pushState({chip7:1},''); }catch(e){} }
 window.addEventListener('popstate',()=>{
@@ -2868,7 +2997,7 @@ window.addEventListener('popstate',()=>{
   if(w && w.classList.contains('fs')){ camFull(); marcarTela(); return; }   // 1º: fecha a tela cheia do croqui
   const hs=document.getElementById('histScreen');
   if(hs && hs.classList.contains('show')){ fecharHistorico(); marcarTela(); return; }   // voltar fecha os orçamentos primeiro
-  const overlay=['cotacaoScreen','cameraScreen','taxasScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
+  const overlay=['cotacaoScreen','cameraScreen','taxasScreen','reparoScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
   const chooserOn=document.getElementById('chooser').classList.contains('show');
   const welcomeOn=document.getElementById('welcome').classList.contains('show');
   const loginOn=document.getElementById('loginScreen').classList.contains('show');
@@ -2966,8 +3095,340 @@ function trocarMaq(maq,band,cb){ const cur=maqPref(); maqSet(maq, band||((maq===
 function parcelasOptionsHTML(selVal){ const max=maqMax(); let h=''; for(let n=1;n<=max;n++){ h+=`<option value="${n}"${n==Math.min(selVal,max)?' selected':''}>${n}x · ${String(maqTaxa(n)).replace('.',',')}%</option>`; } return h; }
 function refreshParcelasSelect(id){ const s=document.getElementById(id); if(!s)return; const cur=parseInt(s.value,10)||10; s.innerHTML=parcelasOptionsHTML(cur); }
 function refreshMaqUI(){
-  [['cotMaqSwitch','cotCalc'],['camMaqSwitch','camCalc'],['txMaqSwitch','txRender']].forEach(([id,cb])=>{ const el=document.getElementById(id); if(el)el.innerHTML=maqSwitchHTML(cb); });
-  refreshParcelasSelect('cotParcelas'); refreshParcelasSelect('camParcelas');
+  [['cotMaqSwitch','cotCalc'],['camMaqSwitch','camCalc'],['txMaqSwitch','txRender'],['repMaqSwitch','repCalc']].forEach(([id,cb])=>{ const el=document.getElementById(id); if(el)el.innerHTML=maqSwitchHTML(cb); });
+  refreshParcelasSelect('cotParcelas'); refreshParcelasSelect('camParcelas'); refreshParcelasSelect('repParcelas');
+}
+/* ================= 🔧 REPARO DE CELULAR (peça + serviço) ================= */
+const REP_MARCAS=['Apple','Samsung','Motorola','Xiaomi','LG','Outra'];
+const REP_TIPOS=['Tela','Bateria','Flex','Traseira','Conector','Placa','Outro'];
+const REP_CFG_PADRAO={
+  'Tela|iphone':{margem:80,mao:120},'Tela|android':{margem:60,mao:80},
+  'Bateria|iphone':{margem:80,mao:80},'Bateria|android':{margem:70,mao:60},
+  'Flex|iphone':{margem:80,mao:80},'Flex|android':{margem:70,mao:60},
+  'Traseira|iphone':{margem:80,mao:100},'Traseira|android':{margem:70,mao:80},
+  'Conector|iphone':{margem:80,mao:120},'Conector|android':{margem:70,mao:90},
+  'Placa|iphone':{margem:60,mao:150},'Placa|android':{margem:60,mao:120},
+  'Outro|iphone':{margem:70,mao:80},'Outro|android':{margem:60,mao:60},
+  extras:{pelicula:25,capinha:40}
+};
+const REP_FORN_PADRAO=[
+  {id:'itb',nome:'Is The Best',frete:0,prazo:0,regra:'itb'},
+  {id:'dc',nome:'Display Center',frete:0,prazo:0,regra:'dc'}
+];
+let REP_SEL=null, REP_MARCA='', REP_TIPO='', REP_CALC=null;
+function repCatLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_rep_cat')||'[]'); }catch(e){ return []; } }
+function repCatSave(a){ if(typeof marcaLocal==='function')marcaLocal('repcat'); try{ localStorage.setItem('chip7_rep_cat',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveRepCat==='function')cloudSaveRepCat(a); }
+function repCfgAll(){ try{ return Object.assign({},REP_CFG_PADRAO,JSON.parse(localStorage.getItem('chip7_rep_cfg')||'{}')); }catch(e){ return Object.assign({},REP_CFG_PADRAO); } }
+function repCfgSave(o){ if(typeof marcaLocal==='function')marcaLocal('repcfg'); try{ localStorage.setItem('chip7_rep_cfg',JSON.stringify(o)); }catch(e){} if(typeof cloudSaveRepCfg==='function')cloudSaveRepCfg(o); }
+function repFornList(){ try{ const a=JSON.parse(localStorage.getItem('chip7_rep_forn')||'null'); return Array.isArray(a)&&a.length?a:REP_FORN_PADRAO.slice(); }catch(e){ return REP_FORN_PADRAO.slice(); } }
+function repFornSave(a){ if(typeof marcaLocal==='function')marcaLocal('repforn'); try{ localStorage.setItem('chip7_rep_forn',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveRepForn==='function')cloudSaveRepForn(a); }
+function plataformaDe(marca){ return (marca||'').toLowerCase()==='apple'?'iphone':'android'; }
+function escolherReparo(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('reparoScreen').classList.add('show');
+  marcarTela(); refreshMaqUI();
+  const am=document.getElementById('repAddMarca'); if(am&&!am.options.length)am.innerHTML=REP_MARCAS.map(m=>`<option>${m}</option>`).join('');
+  const at=document.getElementById('repAddTipo'); if(at&&!at.options.length)at.innerHTML=REP_TIPOS.map(t=>`<option>${t}</option>`).join('');
+  repRenderFornSelects(); repRenderChips(); repFiltrar(); repCalc();
+  window.scrollTo(0,0);
+}
+function repRenderFornSelects(){
+  const fs=repFornList();
+  const sel=document.getElementById('repForn'), imp=document.getElementById('repImpForn');
+  const opts=fs.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
+  if(sel){ const v=sel.value; sel.innerHTML=opts; if(v&&fs.some(f=>f.id===v))sel.value=v; }
+  if(imp){ const v=imp.value; imp.innerHTML=opts; if(v&&fs.some(f=>f.id===v))imp.value=v; }
+}
+function repRenderChips(){
+  const m=document.getElementById('repMarcas'), t=document.getElementById('repTipos');
+  if(m)m.innerHTML=['',...REP_MARCAS].map(x=>`<button type="button" class="cel-chip${REP_MARCA===x?' on':''}" onclick="REP_MARCA='${x}';repRenderChips();repFiltrar()">${x||'Todas as marcas'}</button>`).join('');
+  if(t)t.innerHTML=['',...REP_TIPOS].map(x=>`<button type="button" class="cel-chip${REP_TIPO===x?' on':''}" onclick="REP_TIPO='${x}';repRenderChips();repFiltrar()">${x||'Todos os tipos'}</button>`).join('');
+}
+function repFiltrar(){
+  const box=document.getElementById('repResultados'); if(!box)return;
+  const q=semAcento((document.getElementById('repBusca')||{}).value||'');
+  const termos=q.split(/\s+/).filter(Boolean);
+  let itens=repCatLoad();
+  if(REP_MARCA) itens=itens.filter(i=>i.marca===REP_MARCA);
+  if(REP_TIPO) itens=itens.filter(i=>i.tipo===REP_TIPO);
+  if(termos.length) itens=itens.filter(i=>{ const t=semAcento([i.tipo,i.marca,i.modelo,i.desc].join(' ')); return termos.every(x=>t.includes(x)); });
+  if(!repCatLoad().length){ box.innerHTML='<p class="cot-hint" style="margin:8px 0">Catálogo vazio — importe a planilha do fornecedor ali embaixo. 👇</p>'; return; }
+  if(!itens.length){ box.innerHTML='<p class="cot-hint" style="margin:8px 0">Nada com esse filtro. Tente outro termo ou limpe os chips.</p>'; return; }
+  const fs=repFornList();
+  box.innerHTML=itens.slice(0,30).map(i=>{ const f=fs.find(x=>x.id===i.forn);
+    return `<div class="prod-hit" onclick="repSelecionar('${i.id}')"><div class="ph-info"><b>${(i.tipo+' · '+(i.marca?i.marca+' ':'')+i.modelo).replace(/</g,'&lt;')}</b><small><span class="src-tag mazer">${((f&&f.nome)||'—').replace(/</g,'&lt;')}</span> custo R$ ${(+i.custo).toFixed(2)}</small></div><span class="ph-go">›</span></div>`; }).join('');
+}
+/* deteta Marca/Modelo/Tipo do nome da planilha (ex.: "TELA MOTO G7 POWER") */
+function parsePecaNome(nome){
+  const n=semAcento(nome);
+  let tipo='Outro';
+  if(/\btela\b|display|frontal|touch|lcd/.test(n))tipo='Tela';
+  else if(/bateria/.test(n))tipo='Bateria';
+  else if(/\bflex\b/.test(n))tipo='Flex';
+  else if(/tampa|traseira|vidro tras/.test(n))tipo='Traseira';
+  else if(/conector|dock|carga/.test(n))tipo='Conector';
+  else if(/placa/.test(n))tipo='Placa';
+  let marca='Outra';
+  if(/iphone|apple|\bipad\b/.test(n))marca='Apple';
+  else if(/samsung|galaxy|\bsm-|\ba\d{2}\b|\bj\d\b/.test(n))marca='Samsung';
+  else if(/motorola|\bmoto\b|\bg\d{1,2}\b|\be\d{1,2}\b/.test(n))marca='Motorola';
+  else if(/xiaomi|redmi|poco|\bmi \d/.test(n))marca='Xiaomi';
+  else if(/\blg\b|k\d{2}\b/.test(n))marca='LG';
+  let modelo=nome
+    .replace(/flex de carga|conector de carga|tampa traseira|de carga|tela|display|frontal|touch|lcd|bateria|flex|tampa|traseira|conector|dock|placa|vidro|original|nacional|premium|incell|oled|c\/ ?aro|s\/ ?aro/gi,'')
+    .replace(/\b(apple|samsung|motorola|xiaomi|celular|smartphone)\b/gi,'')
+    .replace(/\s+/g,' ').trim();
+  return {tipo,marca,modelo:modelo||nome};
+}
+async function repImportar(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return; inp.value='';
+  const fornId=(document.getElementById('repImpForn')||{}).value||'itb';
+  toast('📥 Lendo a planilha...');
+  try{
+    let rows=[];
+    if(/\.xlsx?$/i.test(f.name)){
+      const XLSX=await loadXLSX(); const buf=await f.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'}); rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
+    } else {
+      const txt=await new Promise(res=>{const rd=new FileReader();rd.onload=()=>res(String(rd.result));rd.readAsText(f,'utf-8');});
+      rows=txt.split(/\r?\n/).filter(l=>l.trim()).map(parseCsvLine);
+    }
+    const base=mapearPlanilha(rows,'');
+    if(!base.length){ toast('Não achei colunas de Produto/Preço na planilha.'); return; }
+    const a=repCatLoad();
+    base.forEach(x=>{ const p=parsePecaNome(x.nome); a.push({id:'r'+Date.now()+Math.random().toString(36).slice(2,6), marca:p.marca, modelo:p.modelo, tipo:p.tipo, desc:x.nome, custo:+x.preco||0, forn:fornId}); });
+    repCatSave(a); repFiltrar();
+    toast('✔ '+base.length+' peça(s) importadas');
+  }catch(e){ toast('⚠ Não consegui ler a planilha'); }
+}
+function repAddManual(){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const modelo=g('repAddModelo'), custo=parseFloat(g('repAddCusto'))||0;
+  if(!modelo||!custo){ toast('Preencha modelo e custo'); return; }
+  const a=repCatLoad();
+  a.push({id:'r'+Date.now(), marca:g('repAddMarca'), modelo, tipo:g('repAddTipo'), desc:g('repAddTipo')+' '+modelo, custo, forn:(document.getElementById('repImpForn')||{}).value||'itb'});
+  repCatSave(a); repFiltrar(); document.getElementById('repAddModelo').value=''; document.getElementById('repAddCusto').value='';
+  toast('✔ Peça adicionada');
+}
+function repLimparCat(){ if(!confirm('Apagar TODO o catálogo de peças?'))return; repCatSave([]); repFiltrar(); }
+/* foto do aparelho: busca nos importados e guarda no cache */
+async function repFotoModelo(marca,modelo){
+  let cache={}; try{ cache=JSON.parse(localStorage.getItem('chip7_rep_fotos')||'{}'); }catch(e){}
+  const key=semAcento(marca+' '+modelo);
+  if(cache[key]!==undefined) return cache[key];
+  let img='';
+  try{ const hits=await cpPesquisa((marca==='Outra'?'':marca+' ')+modelo); img=(hits.find(h=>h.img)||{}).img||''; }catch(e){}
+  cache[key]=img; try{ localStorage.setItem('chip7_rep_fotos',JSON.stringify(cache)); }catch(e){}
+  return img;
+}
+function repSelecionar(id){
+  const i=repCatLoad().find(x=>x.id===id); if(!i)return;
+  REP_SEL=Object.assign({},i);
+  const plat=plataformaDe(i.marca), cfg=repCfgAll(), c=cfg[i.tipo+'|'+plat]||cfg['Outro|'+plat]||{margem:60,mao:60};
+  const set=(id2,v)=>{const e=document.getElementById(id2);if(e)e.value=v;};
+  set('repCusto',i.custo); set('repMargem',c.margem); set('repMao',c.mao);
+  const f=repFornList().find(x=>x.id===i.forn); set('repFrete',(f&&f.frete)||0);
+  const sel=document.getElementById('repForn'); if(sel&&f)sel.value=f.id;
+  set('repPeliculaV',cfg.extras.pelicula); set('repCapinhaV',cfg.extras.capinha);
+  document.getElementById('repCampos').style.display='block';
+  const box=document.getElementById('repSelBox');
+  box.innerHTML=`<div class="rep-sel"><div class="rep-foto" id="repFoto">📱</div>
+    <div><b>${(i.tipo+' — '+(i.marca!=='Outra'?i.marca+' ':'')+i.modelo).replace(/</g,'&lt;')}</b>
+    <small>${plat==='iphone'?'🍎 iPhone':'🤖 Android'} · margens do tipo "${i.tipo}" aplicadas</small></div></div>`;
+  repFotoModelo(i.marca,i.modelo).then(img=>{ const el=document.getElementById('repFoto'); if(el&&img) el.innerHTML=`<img src="${imgThumb(img)}" alt="" onerror="this.parentElement.textContent='📱'">`; });
+  repCalc();
+}
+/* previsão de entrega/pronto conforme a regra do fornecedor e o horário AGORA */
+function repPrevisao(fornId){
+  const f=repFornList().find(x=>x.id===fornId)||{};
+  const agora=new Date(), h=agora.getHours(), dow=agora.getDay();   // 0=dom 6=sáb
+  const out={avisos:[]};
+  if(f.regra==='itb'){
+    if(dow===0){ out.chega='segunda à tarde'; out.pronto='segunda, até o fim do dia'; out.avisos.push('Domingo: o pedido entra como segunda de manhã.'); }
+    else if(dow===6){ out.chega='hoje (SÓ se houver rota) — senão segunda'; out.pronto='hoje com rota · senão segunda no fim do dia'; out.avisos.push('⚠️ Sábado: Is The Best só entrega se houver ROTA — confirme antes de prometer.'); }
+    else if(h<12){ out.chega='hoje à tarde'; out.pronto='hoje, até o fim do dia'; }
+    else if(dow===5){ out.chega='sábado de manhã (se houver rota) ou segunda de manhã'; out.pronto='sábado à tarde (com rota) · senão segunda à tarde'; out.avisos.push('⚠️ Pedido de sexta à tarde: amanhã é sábado — entrega só com rota.'); }
+    else { out.chega='amanhã de manhã'; out.pronto='amanhã à tarde'; }
+  } else if(f.regra==='dc'){
+    out.chega='hoje (entregam a qualquer horário)';
+    out.pronto=h<16?'hoje, poucas horas após a peça chegar':'hoje à noite ou amanhã cedo';
+    out.avisos.push('⚠️ Display Center: CONFIRMAR a disponibilidade da peça antes de fechar com o cliente.');
+  } else {
+    const dias=Math.max(0,parseInt(f.prazo,10)||0);
+    if(!dias){ out.chega='a combinar com o fornecedor'; out.pronto='a combinar'; }
+    else { const d=new Date(agora); let n=0; while(n<dias){ d.setDate(d.getDate()+1); if(d.getDay()!==0&&d.getDay()!==6)n++; }
+      out.chega=d.toLocaleDateString('pt-BR')+' ('+dias+' dia'+(dias>1?'s':'')+' útil'+(dias>1?'eis':'')+')'; out.pronto='no dia da chegada, até o fim do dia'; }
+  }
+  return out;
+}
+function repCalc(){
+  const num=id=>parseFloat((document.getElementById(id)||{}).value)||0;
+  const el=document.getElementById('repResult'); if(!el)return;
+  if(!REP_SEL){ el.innerHTML='<p class="cot-result-empty">Escolha uma peça pra ver o preço do serviço.</p>'; return; }
+  const custo=num('repCusto'), frete=num('repFrete'), margem=num('repMargem'), mao=num('repMao');
+  const pel=document.getElementById('repPelicula').checked?num('repPeliculaV'):0;
+  const cap=document.getElementById('repCapinha').checked?num('repCapinhaV'):0;
+  const base=custo+frete, lucroPeca=base*margem/100;
+  let total=base+lucroPeca+mao+pel+cap;
+  if(COT_ARRED&&total>0) total=arredNice(total);
+  const N=Math.min(parseInt((document.getElementById('repParcelas')||{}).value,10)||10, maqMax());
+  const taxaPct=maqTaxa(N), totalCartao=precoComTaxa(total,taxaPct);
+  const parcela=COT_ARRED?arredCima5(totalCartao/N):Math.round(totalCartao/N*100)/100;
+  const prev=repPrevisao((document.getElementById('repForn')||{}).value);
+  REP_CALC={total,custo,frete,margem,mao,pel,cap,lucro:lucroPeca+mao,parcela,parcelas:N,taxa:taxaPct,maq:maqNome(),prev,totalParc:parcela*N};
+  const pz=document.getElementById('repPrazo');
+  if(pz) pz.innerHTML=`<div class="rep-prev"><div>📦 <b>Peça chega:</b> ${prev.chega}</div><div>🔧 <b>Pronto:</b> ${prev.pronto}</div>${prev.avisos.map(a=>`<div class="rep-aviso">${a}</div>`).join('')}</div>`;
+  el.innerHTML=`
+    <details class="cr-calc"><summary>🔎 Como cheguei no preço · só você vê</summary>
+      <div class="cr-line"><span>Custo da peça</span><b>${fmtMoney(custo)}</b></div>
+      ${frete?`<div class="cr-line"><span>+ Frete</span><b>+ ${fmtMoney(frete)}</b></div>`:''}
+      <div class="cr-line"><span>+ Margem (${margem}%)</span><b>+ ${fmtMoney(lucroPeca)}</b></div>
+      <div class="cr-line"><span>+ Mão de obra</span><b>+ ${fmtMoney(mao)}</b></div>
+      ${pel?`<div class="cr-line"><span>+ Película</span><b>+ ${fmtMoney(pel)}</b></div>`:''}
+      ${cap?`<div class="cr-line"><span>+ Capinha</span><b>+ ${fmtMoney(cap)}</b></div>`:''}
+      <div class="cr-line"><span>= Total${COT_ARRED?' (arredondado)':''}</span><b>${fmtMoney(total)}</b></div>
+      <div class="cr-line"><span>💵 Seu lucro (margem + mão de obra)</span><b>${fmtMoney(lucroPeca+mao)}</b></div>
+      <div class="cr-line"><span>+ Taxa ${maqNome()} (${N}x · ${String(taxaPct).replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-total)}</b></div>
+    </details>
+    <div class="cr-venda big"><b>${(REP_SEL.tipo+' '+REP_SEL.modelo).replace(/</g,'&lt;')}</b><span>${fmtMoney(total)}</span></div>
+    <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
+    <div class="cr-sub">Total no cartão ${fmtMoney(parcela*N)} · ${maqNome()}</div>
+    <button type="button" class="cr-arred${COT_ARRED?' on':''}" onclick="cotToggleArred();repCalc()">${COT_ARRED?'✓ Arredondamento ligado':'○ Sem arredondamento'}</button>`;
+}
+function repAbrirCfg(){
+  const box=document.getElementById('repCfgBox'); if(!box)return;
+  const cfg=repCfgAll();
+  const linhas=REP_TIPOS.map(t=>{
+    const i=cfg[t+'|iphone']||{margem:0,mao:0}, a=cfg[t+'|android']||{margem:0,mao:0};
+    return `<div class="repcfg-row"><b>${t}</b>
+      <label>🍎 %<input data-k="${t}|iphone" data-f="margem" type="number" value="${i.margem}"></label>
+      <label>🍎 MO<input data-k="${t}|iphone" data-f="mao" type="number" value="${i.mao}"></label>
+      <label>🤖 %<input data-k="${t}|android" data-f="margem" type="number" value="${a.margem}"></label>
+      <label>🤖 MO<input data-k="${t}|android" data-f="mao" type="number" value="${a.mao}"></label></div>`;
+  }).join('');
+  box.innerHTML=`<div class="cot-sep" style="margin-top:14px">margens e mão de obra (🍎 iPhone · 🤖 Android)</div>${linhas}
+    <div class="repcfg-row"><b>Extras</b>
+      <label>Película<input id="repCfgPel" type="number" value="${cfg.extras.pelicula}"></label>
+      <label>Capinha<input id="repCfgCap" type="number" value="${cfg.extras.capinha}"></label></div>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="repSalvarCfg()">💾 Salvar custos & margens</button>`;
+}
+function repSalvarCfg(){
+  const o={};
+  document.querySelectorAll('#repCfgBox .repcfg-row input[data-k]').forEach(inp=>{ const k=inp.dataset.k,f=inp.dataset.f,v=parseFloat(inp.value); if(!isNaN(v)){ if(!o[k])o[k]={}; o[k][f]=v; } });
+  Object.keys(o).forEach(k=>{ o[k]=Object.assign({},REP_CFG_PADRAO[k]||{},o[k]); });
+  o.extras={pelicula:parseFloat((document.getElementById('repCfgPel')||{}).value)||0, capinha:parseFloat((document.getElementById('repCfgCap')||{}).value)||0};
+  repCfgSave(o); toast('💾 Margens salvas'); document.getElementById('repCfgBox').innerHTML=''; repCalc();
+}
+function repAbrirForn(){
+  const box=document.getElementById('repCfgBox'); if(!box)return;
+  const fs=repFornList();
+  box.innerHTML=`<div class="cot-sep" style="margin-top:14px">fornecedores de peças</div>`+
+    fs.map((f,i)=>`<div class="repcfg-row"><b contenteditable onblur="repFornEdit(${i},'nome',this.textContent)">${f.nome}</b>
+      <label>Frete<input type="number" value="${f.frete||0}" onchange="repFornEdit(${i},'frete',this.value)"></label>
+      <label>Dias<input type="number" value="${f.prazo||0}" onchange="repFornEdit(${i},'prazo',this.value)" ${f.regra!=='padrao'?'disabled title="Regra própria de horário"':''}></label>
+      <label>Regra<select onchange="repFornEdit(${i},'regra',this.value)"><option value="itb"${f.regra==='itb'?' selected':''}>Manhã→tarde</option><option value="dc"${f.regra==='dc'?' selected':''}>Qualquer hora*</option><option value="padrao"${f.regra==='padrao'?' selected':''}>Dias úteis</option></select></label>
+      <button class="ci-del" onclick="repFornDel(${i})">✕</button></div>`).join('')+
+    `<button class="btn ghost" style="width:100%;margin-top:8px" onclick="repFornAdd()">➕ Novo fornecedor</button>`;
+}
+function repFornEdit(i,k,v){ const fs=repFornList(); if(!fs[i])return; fs[i][k]=(k==='frete'||k==='prazo')?(parseFloat(v)||0):String(v).trim(); repFornSave(fs); repRenderFornSelects(); repCalc(); }
+function repFornDel(i){ const fs=repFornList(); if(fs.length<=1){ toast('Deixe pelo menos um fornecedor'); return; } fs.splice(i,1); repFornSave(fs); repAbrirForn(); repRenderFornSelects(); }
+function repFornAdd(){ const nome=prompt('Nome do fornecedor:'); if(!nome)return; const fs=repFornList(); fs.push({id:'f'+Date.now(),nome,frete:0,prazo:1,regra:'padrao'}); repFornSave(fs); repAbrirForn(); repRenderFornSelects(); }
+function repTextoOrcamento(){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const c=REP_CALC, s=REP_SEL;
+  let t=`*Orçamento de Reparo — ${CHIP7.nome}*\n`;
+  if(g('repCliente'))t+=`Para: ${g('repCliente')}\n`;
+  t+=`\n🔧 ${s.tipo} — ${(s.marca!=='Outra'?s.marca+' ':'')}${s.modelo}\n💵 À vista: *${fmtMoney(c.total)}*\n💳 ${c.parcelas}x de ${fmtMoney(c.parcela)}`;
+  if(c.pel)t+=`\n➕ Película incluída`;
+  if(c.cap)t+=`\n➕ Capinha incluída`;
+  t+=`\n\n📦 Peça chega: ${c.prev.chega}\n🔧 Pronto: ${c.prev.pronto}`;
+  if(g('repObs'))t+=`\n\n${g('repObs')}`;
+  t+=`\n\n_Orçamento válido por 7 dias._\n${CHIP7.tel} · ${CHIP7.site}`;
+  return t;
+}
+function salvarNoHistoricoRep(){
+  if(!REP_CALC||!REP_SEL)return;
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const arr=histLoad();
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente:g('repCliente'),status:'enviado',vendedor:usuarioAtual(),modulo:'reparo',
+    totalVista:REP_CALC.total, resumo:REP_SEL.tipo+' '+(REP_SEL.marca!=='Outra'?REP_SEL.marca+' ':'')+REP_SEL.modelo+' · '+REP_CALC.parcelas+'x de '+fmtMoney(REP_CALC.parcela),
+    rep:{sel:REP_SEL, campos:{custo:g('repCusto'),frete:g('repFrete'),margem:g('repMargem'),mao:g('repMao'),pel:document.getElementById('repPelicula').checked,cap:document.getElementById('repCapinha').checked,pelV:g('repPeliculaV'),capV:g('repCapinhaV'),forn:g('repForn'),cliente:g('repCliente'),tel:g('repTel'),obs:g('repObs')}}});
+  histSave(arr);
+}
+function reabrirHistRep(id){
+  const h=histLoad().find(x=>x.id===id); if(!h||!h.rep)return;
+  fecharHistorico(); irModulo('reparo');
+  REP_SEL=Object.assign({},h.rep.sel);
+  const f=h.rep.campos||{}; const set=(i,v)=>{const e=document.getElementById(i);if(e&&v!=null&&v!=='')e.value=v;};
+  document.getElementById('repCampos').style.display='block';
+  set('repCusto',f.custo); set('repFrete',f.frete); set('repMargem',f.margem); set('repMao',f.mao);
+  set('repPeliculaV',f.pelV); set('repCapinhaV',f.capV); set('repForn',f.forn); set('repCliente',f.cliente); set('repTel',f.tel); set('repObs',f.obs);
+  document.getElementById('repPelicula').checked=!!f.pel; document.getElementById('repCapinha').checked=!!f.cap;
+  const box=document.getElementById('repSelBox');
+  box.innerHTML=`<div class="rep-sel"><div class="rep-foto" id="repFoto">📱</div><div><b>${(REP_SEL.tipo+' — '+REP_SEL.modelo).replace(/</g,'&lt;')}</b><small>reaberto do histórico</small></div></div>`;
+  repFotoModelo(REP_SEL.marca,REP_SEL.modelo).then(img=>{ const el=document.getElementById('repFoto'); if(el&&img) el.innerHTML=`<img src="${imgThumb(img)}" alt="">`; });
+  repCalc(); toast('🔧 Orçamento de reparo reaberto');
+}
+async function gerarReparoPDF(baixar){
+  if(!REP_CALC||!REP_SEL){ toast('Escolha uma peça primeiro'); return null; }
+  if(!window.jspdf){ toast('PDF indisponível'); return null; }
+  repCalc(); const c=REP_CALC, s=REP_SEL;
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=48, hoje=new Date();
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  doc.setFillColor(10,37,80); doc.rect(0,0,W,84,'F');
+  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,18,48,48);}catch(e){}}
+  const hx=M+(logo?60:0);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);doc.text('Orçamento de reparo de celular',hx,52);doc.text(CHIP7.endereco,hx,65);
+  doc.setFontSize(10);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
+  let y=112;
+  doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(13);
+  doc.text((g('repCliente')?('Orçamento para '+g('repCliente')):'Orçamento de reparo'),M,y); y+=22;
+  // foto do aparelho
+  const foto=await repFotoModelo(s.marca,s.modelo);
+  const fD=foto?await imgParaDataURL(foto):null;
+  if(fD){ try{ doc.addImage(fD,'JPEG',W-M-110,y-8,110,110); }catch(e){} }
+  doc.setFontSize(12); doc.text(s.tipo+' — '+(s.marca!=='Outra'?s.marca+' ':'')+s.modelo, M, y); y+=20;
+  doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(60,72,90);
+  const linhas=[['Serviço: troca de '+s.tipo.toLowerCase()+' (peça + mão de obra)', fmtMoney(c.total-(c.pel||0)-(c.cap||0))]];
+  if(c.pel)linhas.push(['Película',fmtMoney(c.pel)]);
+  if(c.cap)linhas.push(['Capinha',fmtMoney(c.cap)]);
+  linhas.forEach(l=>{ doc.text('• '+l[0],M,y); doc.text(l[1],W-M-130,y,{align:'right'}); y+=16; });
+  y+=8;
+  doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M-125,58,8,8,'FD');
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(20,28,40);doc.text('À vista (dinheiro/PIX)',M+12,y+22);
+  doc.setFontSize(17);doc.setTextColor(10,37,80);doc.text(fmtMoney(c.total),M+12,y+45);
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(95,105,120);
+  doc.text('ou '+c.parcelas+'x de '+fmtMoney(c.parcela)+' no cartão', W-M-140, y+34, {align:'right'});
+  y+=78;
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(20,28,40);doc.text('Prazo',M,y); y+=15;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(60,72,90);
+  doc.text('Peça chega: '+c.prev.chega,M,y); y+=14;
+  doc.text('Aparelho pronto: '+c.prev.pronto,M,y); y+=14;
+  c.prev.avisos.forEach(a=>{ doc.setTextColor(180,83,9); const tl=doc.splitTextToSize(a.replace(/⚠️ /,''),W-2*M); doc.text(tl,M,y); y+=tl.length*13; doc.setTextColor(60,72,90); });
+  const obs=g('repObs');
+  if(obs){ y+=8; doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(20,28,40);doc.text('Observações',M,y); y+=14; doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(80,90,105); const ol=doc.splitTextToSize(obs,W-2*M); doc.text(ol,M,y); y+=ol.length*13; }
+  y+=18; doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);doc.text('Este orçamento é válido por 7 dias.',M,y);
+  const fy=H-64; doc.setDrawColor(225,230,238); doc.line(M,fy-14,W-M,fy-14);
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text(CHIP7.nome+'  ·  CNPJ '+CHIP7.cnpj,M,fy);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text(CHIP7.endereco,M,fy+13);doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site,M,fy+26);
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const fname='Reparo '+s.tipo+' '+s.modelo.replace(/[\\/:*?"<>|]+/g,' ').trim().slice(0,40)+' - '+hoje.getDate()+' de '+meses[hoje.getMonth()]+'.pdf';
+  const blob=doc.output('blob');
+  if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); salvarNoHistoricoRep(); }
+  return {blob,fname};
+}
+async function enviarReparoWhatsApp(){
+  const r=await gerarReparoPDF(false); if(!r)return;
+  salvarNoHistoricoRep();
+  const text=repTextoOrcamento();
+  const tel=((document.getElementById('repTel')||{}).value||'').replace(/\D/g,'');
+  const num=tel?(tel.length<=11?'55'+tel:tel):'';
+  const file=new File([r.blob],r.fname,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],text,title:'Orçamento Reparo - Chip7'}); return; }catch(e){ if(e&&e.name==='AbortError')return; } }
+  downloadBlob(file); toast('📄 PDF baixado — anexe no WhatsApp');
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(text),'_blank');
 }
 /* ====== módulo Calculadora de Taxas ====== */
 let TX_ARRED=false;
@@ -3922,14 +4383,15 @@ function renderHistScreen(){
   lista.innerHTML=ordenado.map(h=>{
     const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     const mod=h.modulo||'cotacao';
-    const modTag={cotacao:'💰',pc:'🖥️ PC',celular:'📱 Celular',camera:'📹 Câmeras'}[mod]||'💰';
-    const titulo = mod==='camera' ? (h.resumo||'Orçamento de câmeras') : (h.itens?h.itens.length:0)+' item(ns)';
-    const nomes = mod==='camera' ? '' : (h.itens||[]).map(i=>((i.qtd||1)>1?(i.qtd+'× '):'')+(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
+    const modTag={cotacao:'💰',pc:'🖥️ PC',celular:'📱 Celular',camera:'📹 Câmeras',reparo:'🔧 Reparo'}[mod]||'💰';
+    const semItens = mod==='camera'||mod==='reparo';
+    const titulo = semItens ? (h.resumo||'Orçamento') : (h.itens?h.itens.length:0)+' item(ns)';
+    const nomes = semItens ? '' : (h.itens||[]).map(i=>((i.qtd||1)>1?(i.qtd+'× '):'')+(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
     const st=h.status||'enviado';
     const chips=['enviado','fechado','perdido'].map(s=>`<span class="st-chip s-${s}${st===s?' on':''}" onclick="histSetStatus(${h.id},'${s}')">${HIST_ST[s]}</span>`).join('');
     const cli=h.cliente?(' · '+h.cliente.replace(/</g,'&lt;')):'';
     const quem=HIST_PESSOA==='__todos__'?` · 👤 ${h.vendedor}`:'';
-    const reabrir = mod==='camera' ? `reabrirHistCam(${h.id})` : `reabrirHist(${h.id})`;
+    const reabrir = mod==='camera' ? `reabrirHistCam(${h.id})` : mod==='reparo' ? `reabrirHistRep(${h.id})` : `reabrirHist(${h.id})`;
     return `<div class="hist-item"><div class="hi-info"><b>${modTag} · ${titulo} · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}${quem}</small>${nomes?`<small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small>`:''}<div class="st-chips">${chips}</div></div>
       <div class="hi-acts"><button class="btn ghost" onclick="${reabrir}">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
   }).join('');
@@ -4675,7 +5137,7 @@ async function cloudSignIn(){
   try{
     await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
     cloud.on=true; cloud.status='on'; refreshCloudStatus();
-    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); cloudSubscribeCat(); cloudSubscribeFav(); cloudSubscribePrefs(); cloudSubscribeCart(); await cloudPushLocal();
+    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); cloudSubscribeCat(); cloudSubscribeFav(); cloudSubscribePrefs(); cloudSubscribeCart(); cloudSubscribeRep(); await cloudPushLocal();
     return true;
   }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
 }
@@ -4878,6 +5340,28 @@ function cloudSubscribeCart(){
         if(document.getElementById('cotacaoScreen').classList.contains('show')) renderCart(); }
     }
   }, err=>console.warn('Cloud cart sync',err));
+}
+/* reparo de celular: catálogo de peças, margens e fornecedores na nuvem */
+let _repCatT=null,_repCfgT=null,_repFornT=null;
+function cloudSaveRepCat(a){ if(!cloud.on)return; clearTimeout(_repCatT); _repCatT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_catalogo'), {itens:a,ts:Date.now()}, 'Catálogo de peças'); },800); }
+function cloudSaveRepCfg(o){ if(!cloud.on)return; clearTimeout(_repCfgT); _repCfgT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_config'), {cfg:o,ts:Date.now()}, 'Margens de reparo'); },800); }
+function cloudSaveRepForn(a){ if(!cloud.on)return; clearTimeout(_repFornT); _repFornT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_fornecedores'), {itens:a,ts:Date.now()}, 'Fornecedores de peças'); },800); }
+function cloudSubscribeRep(){
+  if(!cloud.ready) return;
+  [['rep_catalogo','chip7_rep_cat','repcat',()=>{ if(document.getElementById('reparoScreen').classList.contains('show')) repFiltrar(); }],
+   ['rep_config','chip7_rep_cfg','repcfg',null],
+   ['rep_fornecedores','chip7_rep_forn','repforn',()=>{ if(document.getElementById('reparoScreen').classList.contains('show')) repRenderFornSelects(); }]
+  ].forEach(([docId,lsKey,eco,onchg])=>{
+    const un='_unsub_'+docId;
+    if(cloud[un]){cloud[un]();cloud[un]=null;}
+    cloud[un]=cloud.db.collection('cotacoes').doc(docId).onSnapshot(doc=>{
+      if(snapLocal(doc) || ecoRecente(eco)) return;
+      const d=doc.data(); if(!d) return;
+      const val=d.itens!==undefined?d.itens:d.cfg;
+      const inc=JSON.stringify(val);
+      if(inc!==localStorage.getItem(lsKey)){ try{localStorage.setItem(lsKey,inc);}catch(e){} if(onchg)onchg(); }
+    }, err=>console.warn('Cloud '+docId+' sync',err));
+  });
 }
 let _catCloudTimer=null;
 function cloudSaveCat(a){ if(!cloud.on)return; clearTimeout(_catCloudTimer); _catCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('catalogo'), {itens:a,ts:Date.now()}, 'Catálogo de planilhas'); },800); }
