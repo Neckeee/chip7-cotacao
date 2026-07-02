@@ -75,20 +75,30 @@ function parseBusca(html,q){
   }
   return out.slice(0,20);
 }
+// cache em memória (por instância, 10 min) — busca repetida volta na hora, sem bater no site de novo
+const _cache=new Map(), CACHE_MS=10*60*1000;
+function cacheGet(k){ const h=_cache.get(k); return (h && Date.now()-h.t<CACHE_MS) ? h.body : null; }
+function cachePut(k,body){ if(_cache.size>60) _cache.delete(_cache.keys().next().value); _cache.set(k,{t:Date.now(),body}); }
 exports.handler=async(event)=>{
   const headers={'Access-Control-Allow-Origin':'*','Content-Type':'application/json; charset=utf-8'};
   const p=event.queryStringParameters||{};
+  const ck=(p.detalhe?'d:'+p.detalhe:'q:'+(p.q||'').trim().toLowerCase());
+  const hit=cacheGet(ck); if(hit) return {statusCode:200,headers,body:hit};
   try{
+    let body;
     if(p.detalhe){
       let path=p.detalhe.replace(/^https?:\/\/[^/]+/,''); if(!path.startsWith('/')) path='/'+path;
       const html=await get(path);
       const nm=(html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
       const img=(html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)||[])[1]||'';
-      return {statusCode:200,headers,body:JSON.stringify({precoST:parseST(html), nome:decode(nm), img})};
+      body=JSON.stringify({precoST:parseST(html), nome:decode(nm), img});
+    } else {
+      const q=(p.q||'').trim();
+      if(!q) return {statusCode:400,headers,body:JSON.stringify({erro:'Informe o que pesquisar (q).'})};
+      const html=await get('/busca/'+encodeURIComponent(q));
+      body=JSON.stringify({itens:parseBusca(html,q)});
     }
-    const q=(p.q||'').trim();
-    if(!q) return {statusCode:400,headers,body:JSON.stringify({erro:'Informe o que pesquisar (q).'})};
-    const html=await get('/busca/'+encodeURIComponent(q));
-    return {statusCode:200,headers,body:JSON.stringify({itens:parseBusca(html,q)})};
+    cachePut(ck,body);
+    return {statusCode:200,headers,body};
   }catch(e){ return {statusCode:500,headers,body:JSON.stringify({erro:String(e.message||e)})}; }
 };

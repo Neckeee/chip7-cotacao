@@ -100,12 +100,18 @@ function parseDetalhe(html) {
   return Object.values(map);
 }
 
+// cache em memória (por instância, 10 min) — busca repetida volta na hora
+const _cache = new Map(), CACHE_MS = 10 * 60 * 1000;
+function cacheGet(k){ const h = _cache.get(k); return (h && Date.now() - h.t < CACHE_MS) ? h.body : null; }
+function cachePut(k, body){ if (_cache.size > 60) _cache.delete(_cache.keys().next().value); _cache.set(k, { t: Date.now(), body }); }
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json; charset=utf-8'
   };
   const p = event.queryStringParameters || {};
+  const ck = (p.detalhe ? 'd:' + p.detalhe : 'q:' + (p.q || '').trim().toLowerCase());
+  const hit = cacheGet(ck); if (hit) return { statusCode: 200, headers, body: hit };
 
   try {
     // ---- MODO DETALHE: ofertas por loja ----
@@ -119,7 +125,9 @@ exports.handler = async (event) => {
       const ofertas = parseDetalhe(html).sort((a, b) => a.precoUSD - b.precoUSD);  // todas; filtro de loja é no cliente
       const nome = (html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) || [])[1] || '';
       const img = (html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) || [])[1] || '';
-      return { statusCode: 200, headers, body: JSON.stringify({ ofertas, total: ofertas.length, nome: decode(nome), img, link: path }) };
+      const body = JSON.stringify({ ofertas, total: ofertas.length, nome: decode(nome), img, link: path });
+      cachePut(ck, body);
+      return { statusCode: 200, headers, body };
     }
 
     // ---- MODO BUSCA: lista de produtos ----
@@ -128,7 +136,9 @@ exports.handler = async (event) => {
     const urlBusca = 'https://www.comprasparaguai.com.br/busca/?q=' + encodeURIComponent(q);
     const html = await baixar(urlBusca);
     const itens = parseBusca(html).slice(0, 30);   // ordem de relevância do site
-    return { statusCode: 200, headers, body: JSON.stringify({ itens, urlBusca }) };
+    const body = JSON.stringify({ itens, urlBusca });
+    cachePut(ck, body);
+    return { statusCode: 200, headers, body };
 
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ erro: String(e) }) };

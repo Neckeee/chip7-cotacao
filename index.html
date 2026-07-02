@@ -10,6 +10,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
 
+<!-- conexões antecipadas (fotos, proxies e nuvem carregam mais rápido) -->
+<link rel="preconnect" href="https://images.weserv.nl" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://corsproxy.io">
+<link rel="dns-prefetch" href="https://api.allorigins.win">
+<link rel="dns-prefetch" href="https://economia.awesomeapi.com.br">
+
 <!-- iPhone / iPad: ícone na tela de início + app em tela cheia -->
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -62,6 +69,10 @@ input,textarea{font-family:inherit;font-size:15px}
 .card.collapsed .card-body{display:none}
 .card.collapsed .chev{transform:rotate(-90deg)}
 .card-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+#form .card[data-sec]{content-visibility:auto;contain-intrinsic-size:auto 340px} /* só renderiza a seção quando ela entra na tela */
+.sec-toolbar{display:flex;gap:8px;justify-content:flex-end;margin:2px 0 10px}
+.sec-toolbar button{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--brand);cursor:pointer;box-shadow:0 1px 3px rgba(16,42,90,.08)}
+.sec-toolbar button:hover{background:#eef3fc}
 
 .field{padding:12px 0;border-bottom:1px dashed var(--line)}
 .field:last-child{border-bottom:0}
@@ -208,13 +219,80 @@ textarea{min-height:60px;resize:vertical}
 .cot-sep:first-child{margin-top:2px}
 .cot-sep::before{content:'';width:4px;height:14px;background:var(--accent2);border-radius:3px;flex:none}
 .cot-sep::after{content:'';flex:1;height:1px;background:var(--line)}
-.mod-switch{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
-.mod-switch button{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
-.mod-switch button.on{background:#fff;color:var(--brand);border-color:#fff}
-.mod-switch.dark button{background:#eef2f7;color:var(--brand);border-color:var(--line)}
-.mod-switch.dark button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .topbar-mods{background:#eef2f7;color:var(--brand);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:800;cursor:pointer;margin-right:10px;white-space:nowrap}
 .topbar-mods:hover{background:#e2e8f4}
+/* seletor de maquininha / bandeira */
+.maq-switch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.maq-switch .mq{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
+.maq-switch .mq.mp.on{border-color:#00a3e0;background:#e8f7fe;color:#01364e}
+.maq-switch .mq.ip.on{border-color:#84cc16;background:#f3fbe4;color:#2a3b06}
+.maq-switch .mq.band{padding:5px 8px}
+.maq-switch .mq.band.on{border-color:var(--brand);background:#eef3fc}
+.maq-switch .mq-div{width:1px;height:22px;background:var(--line)}
+.lg-mp{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#00a3e0;align-items:center;justify-content:center;font-size:11px}
+.lg-ip{display:inline-flex;width:20px;height:20px;border-radius:6px;background:#1a1a1a;color:#a3e635;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+.lg-mc{display:inline-flex;width:26px;height:16px;position:relative;flex:none}
+.lg-mc u{position:absolute;top:0;width:16px;height:16px;border-radius:50%}
+.lg-mc u:first-child{left:0;background:#eb001b}
+.lg-mc u:last-child{right:0;background:#f79e1b;opacity:.9}
+.lg-visa{color:#1a1f71;font-style:italic;font-weight:900;font-size:12px;letter-spacing:.4px}
+.lg-elo{background:#000;color:#ffcb05;border-radius:8px;padding:1px 6px;font-size:11px;font-weight:900;text-transform:lowercase}
+.lg-amex{background:#2e77bc;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:900}
+/* análise do PC (gargalo + FPS) */
+.pc-an{margin:10px 0 4px}
+.pc-garg{border:1.5px solid;border-radius:10px;padding:8px 11px;font-size:13px;margin-bottom:8px;background:#fff}
+.pc-sug{font-size:12.5px;color:var(--text);margin-bottom:8px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.pc-sug span{background:#eef4ff;border:1px solid #c8dcff;color:#0b3b6f;border-radius:999px;padding:3px 9px;font-weight:700;font-size:12px}
+.pc-fps{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+@media(max-width:480px){.pc-fps{grid-template-columns:repeat(2,1fr)}}
+.pc-fps-i{background:linear-gradient(150deg,#0a2550,#123a72);color:#fff;border-radius:11px;padding:9px 6px;text-align:center}
+.pc-fps-i b{font-size:21px;display:inline-block}
+.pc-fps-i small{font-size:9px;opacity:.75;margin-left:2px}
+.pc-fps-i span{display:block;font-size:10.5px;opacity:.92;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-somar{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);margin:10px 0 4px;cursor:pointer}
+.cart-somar input{width:18px;height:18px;accent-color:var(--brand)}
+.cart-total.parc{font-size:13px;color:var(--muted);padding-top:0}
+.cr-arred{margin-top:10px;width:100%;border:1.5px dashed var(--line);background:#f8fafc;color:var(--muted);border-radius:9px;padding:7px;font-size:12.5px;font-weight:700;cursor:pointer}
+.cr-arred.on{border-color:#16a34a;color:#166534;background:#f0fdf4;border-style:solid}
+/* calculadora de taxas */
+.tx-head,.tx-row{display:grid;grid-template-columns:56px 1fr 110px 54px;gap:8px;align-items:center;padding:8px 10px}
+.tx-head{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:800;padding-bottom:4px}
+.tx-row{border:1px solid var(--line);border-radius:10px;margin-bottom:5px;background:#fff;font-size:13.5px}
+.tx-row>b{color:var(--brand);font-size:14px}
+.tx-row.deb{background:#f0fdf4;border-color:#bbe7c8}
+.tx-parc b{color:var(--brand)}
+.tx-row .tx-fee,.tx-head .tx-fee{text-align:right;font-size:11.5px;color:var(--muted)}
+.tx-liq{margin-top:8px;background:#f0fdf4;border:1px solid #bbe7c8;color:#14532d;border-radius:10px;padding:9px 12px;font-size:13px}
+/* chips de modelos (módulo celular) */
+.cel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cel-chip{background:#eef4ff;border:1px solid #c8dcff;color:#0b3b6f;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.cel-chip:hover{background:#dbe9ff}
+/* ---------- 🌙 MODO ESCURO ---------- */
+body.dark{--bg:#0e1524;--card:#161f36;--line:#2b3a5c;--text:#e8eef9;--muted:#9db0cf;background:var(--bg)}
+body.dark .card,body.dark .cot-card,body.dark .cot-result,body.dark .doc-card,body.dark .login-card,body.dark .cot-cart,body.dark .insights{background:var(--card);color:var(--text)}
+body.dark input[type=text],body.dark input[type=number],body.dark input[type=date],body.dark input[type=tel],body.dark input[type=email],body.dark input[type=password],body.dark textarea,body.dark select,
+body.dark .cot-card input,body.dark .cot-card select,body.dark .cot-card textarea,body.dark .forn-add input,body.dark .cfg-f input,body.dark .cam-pt input,body.dark .cam-pt select,body.dark .cam-item input,body.dark .cam-tools .cam-esc,body.dark .cam-estcabo input,body.dark .sell-row input{background:#0f1930;color:var(--text);border-color:var(--line)}
+body.dark .btn{background:#1d2a47;color:#dbe7ff;border-color:var(--line)}
+body.dark .btn.primary{background:linear-gradient(120deg,#2a5cb0,#173a72);color:#fff}
+body.dark .prod-hit,body.dark .cart-item,body.dark .forn-item,body.dark .forn-add,body.dark .hist-item,body.dark .tx-row,body.dark .cam-pt,body.dark .vendas-box,body.dark .pc-garg,body.dark .inv-item,body.dark .opp-item{background:var(--card);border-color:var(--line);color:var(--text)}
+body.dark .cam-g,body.dark .cam-leg,body.dark .cr-arred,body.dark .tabbar{background:#101a30;border-color:var(--line);color:var(--text)}
+body.dark .cam-g .cam-tool,body.dark .cam-tool,body.dark .maq-switch .mq,body.dark .sec-toolbar button,body.dark .topbar-mods{background:#1d2a47;color:#dbe7ff;border-color:var(--line)}
+body.dark .cam-tool.on{background:var(--accent2);border-color:var(--accent2);color:#fff}
+body.dark .maq-switch .mq.mp.on{background:#0b2a3d;color:#9fdcfb;border-color:#00a3e0}
+body.dark .maq-switch .mq.ip.on{background:#1d2b0d;color:#c8f284;border-color:#84cc16}
+body.dark .maq-switch .mq.band.on{background:#152647;border-color:#5c8fe0}
+body.dark .cel-chip,body.dark .pc-sug span{background:#152647;border-color:#2b4a80;color:#bcd6ff}
+body.dark .tx-liq,body.dark .tx-row.deb{background:#0f2b1c;border-color:#1f5c38;color:#a7e6c0}
+body.dark .cr-arred.on{background:#0f2b1c;border-color:#1f5c38;color:#7fd6a0}
+body.dark .cam-pt-addfoto{background:#152647;border-color:#2b4a80;color:#bcd6ff}
+body.dark .tab-btn{color:var(--muted)}
+body.dark .tab-btn.active{color:#fff}
+body.dark .cfg-row{background:var(--card);border-color:var(--line)}
+body.dark .cart-total{color:var(--text)}
+body.dark .loja-chip{background:#1d2a47;border-color:var(--line);color:#dbe7ff}
+body.dark .cr-calc{background:#101a30}
+body.dark .cot-sep{color:#bcd6ff}
+body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua branco (vai pro PDF) */
 .cot-result{background:#fff;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
 .cot-result-empty{margin:0;color:var(--muted);font-size:13.5px;text-align:center}
 .cr-calc{background:#f4f6fb;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:13px}
@@ -270,11 +348,20 @@ textarea{min-height:60px;resize:vertical}
 .ph-info small+small{margin-top:1px}
 .cot-addbar{margin-top:14px}
 .ab-actions{display:flex;gap:8px;margin-top:12px}
-.ab-actions .btn{flex:1;white-space:nowrap}
+.ab-actions .btn{flex:1;white-space:nowrap;justify-content:center}
+/* botões de ação sobre o fundo navy das telas — garantir contraste */
+.cot-screen .ab-actions .btn.primary{border:1px solid rgba(255,255,255,.3);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.cot-screen .ab-actions .btn.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.45)}
+.cot-screen .ab-actions .btn.ghost:hover{background:rgba(255,255,255,.26)}
+/* ...mas dentro do cartão branco eles voltam ao estilo claro (senão fica branco no branco) */
+.cot-card .ab-actions .btn.primary{border:0;box-shadow:none}
+.cot-card .ab-actions .btn.ghost{background:#f1f5fb;color:var(--brand);border:1px solid var(--line)}
+.cot-card .ab-actions .btn.ghost:hover{background:#e4ebf5}
+/* botões soltos na área de resultados (fundo navy): backup, testar conexão... */
+#cotResultados > .btn.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.45);justify-content:center}
+#cotResultados > .btn.ghost:hover{background:rgba(255,255,255,.24)}
+#cotResultados > .cot-hint{color:#c9d6ec}
 .cot-card textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fbfcfe;color:var(--text);font-family:inherit;resize:vertical}
-.reversa-out{font-size:13px;margin:6px 2px 0;min-height:0;color:var(--text)}
-.reversa-out b{color:var(--brand)}
-.reversa-out.neg b{color:#c0392b}
 .var-row{display:flex;align-items:flex-start;gap:8px;margin:8px 0 2px}
 .var-lbl{flex:none;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);padding-top:7px;min-width:42px}
 .cot-cart{background:#fff;border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
@@ -304,20 +391,30 @@ textarea{min-height:60px;resize:vertical}
 .frete-tag span{color:#c0392b;cursor:pointer;font-weight:700;text-decoration:underline;font-size:12px}
 /* módulo câmera (croqui) */
 .cam-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.cam-groups{flex-direction:column;gap:7px}
+.cam-g{display:flex;flex-wrap:wrap;gap:5px;align-items:center;background:#f6f8fc;border:1px solid var(--line);border-radius:11px;padding:7px 9px 8px}
+.cam-g-l{width:100%;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 1px 3px}
+.cam-g .cam-tool{background:#fff;padding:6px 9px;font-size:12.5px;border-radius:8px}
 .cam-tool{background:#f1f5fb;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
 .cam-tool.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .cam-tool.act{background:#0d9488;color:#fff;border-color:#0d9488}
 .cam-wrap{position:relative}
 .cam-canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:#fff;touch-action:none}
-.cam-esc{width:78px;padding:7px 8px;border:1px solid var(--line);border-radius:9px;font-size:13px;background:#fbfcfe;color:var(--text)}
-.cam-leg{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--text);margin:8px 0 0;background:#f6f8fc;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.cam-tools .cam-esc{width:90px;flex:none;padding:7px 8px;border:1px solid var(--line);border-radius:9px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-estcabo{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.cam-estcabo span{font-size:12.5px;color:var(--muted);font-weight:600}
+.cam-estcabo input{width:104px!important;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fbfcfe;color:var(--text)}
+.cam-estcabo .btn{flex:none;padding:8px 10px;font-size:12.5px}
+.cam-leg{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11.5px;color:var(--text);margin:8px 0 0;background:#f6f8fc;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
 .cam-leg b{display:inline-flex;align-items:center;gap:5px;font-weight:600}
-.cam-leg i{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.12)}
+.cam-leg i{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.18)}
 .cam-fs-close{display:none}
-.cam-wrap.fs{position:fixed;inset:0;z-index:9998;background:#0b1430;padding:10px;overflow:auto;border-radius:0}
-.cam-wrap.fs .cam-canvas{max-width:1100px;margin:0 auto}
+.cam-wrap.fs{position:fixed;inset:0;z-index:9998;background:#0b1430;padding:10px 10px 24px;overflow:auto;border-radius:0}
+.cam-wrap.fs .cam-tools,.cam-wrap.fs .cam-canvas,.cam-wrap.fs .cam-leg{max-width:1100px;margin-left:auto;margin-right:auto}
+.cam-wrap.fs .cam-tools{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:7px;justify-content:center}
+.cam-wrap.fs .cam-canvas{margin-top:8px;margin-bottom:8px}
 .cam-wrap.fs .cam-fs-close{display:block;margin:10px auto 0;background:#fff;color:#0b1430}
-.cam-wrap.fs .cam-leg{justify-content:center;color:#cfe0ff}
+.cam-wrap.fs .cam-leg{justify-content:center}
 .cam-pt{display:block;padding:9px;margin-bottom:8px;border:1px solid var(--line);border-radius:11px;background:#fff;box-shadow:0 1px 2px rgba(16,42,90,.05)}
 .cam-pt-top{display:flex;align-items:center;gap:8px}
 .cam-pt-bot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -552,11 +649,14 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <h1 class="wel-title">Chip7 Informática</h1>
     <p class="wel-tag">O que você quer fazer?</p>
     <div class="wel-choice">
-      <button class="wel-btn func" onclick="escolherCotacao()"><span>💰</span><b>Cotar valores</b><small>Importados e fornecedores</small></button>
+      <button class="wel-btn func" onclick="irModulo('cotacao')"><span>💰</span><b>Cotar valores</b><small>Importados e fornecedores</small></button>
       <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
-      <button class="wel-btn func" onclick="escolherMontarPC()"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
+      <button class="wel-btn func" onclick="irModulo('montar')"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
       <button class="wel-btn cli" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
+      <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca em todos os fornecedores</small></button>
+      <button class="wel-btn func" onclick="escolherTaxas()"><span>🧮</span><b>Calcular Taxas</b><small>Parcelas da maquininha</small></button>
     </div>
+    <button class="wel-wa" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo claro / escuro</button>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
   </div>
 </div>
@@ -568,13 +668,6 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
       <h2 style="margin:0;color:#fff" id="cotTitulo">💰 Cotar Valores</h2>
       <span style="flex:1"></span>
-      <button class="btn ghost" id="cotModoBtn" onclick="toggleBuild()">🖥️ Montar PC</button>
-    </div>
-    <div class="mod-switch">
-      <button onclick="irModulo('diagnostico')">🩺 Diagnóstico</button>
-      <button class="on" onclick="irModulo('cotacao')">💰 Cotações</button>
-      <button onclick="irModulo('montar')">🖥️ Montar PC</button>
-      <button onclick="irModulo('camera')">📹 Câmeras</button>
     </div>
     <div class="cot-tools">
       <button class="btn ghost" onclick="abrirHistorico()">🕘 Histórico / Vendas</button>
@@ -598,9 +691,13 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <option value="memoria" data-lucro="20" data-trazer="20">Memória RAM</option>
         <option value="outro" data-lucro="20" data-trazer="20">Outro</option>
       </select>
-      <div class="cot-tabs">
+      <div class="cot-tabs" id="cotTabs">
         <button id="tabImp" class="cot-tab on" onclick="setModo('importados')">🌎 Importados</button>
         <button id="tabForn" class="cot-tab" onclick="setModo('fornecedores')">🏪 Fornecedores (BR)</button>
+      </div>
+      <div id="celInfo" style="display:none">
+        <p class="cot-hint" style="margin:0 0 8px">📱 A busca procura em <b>tudo de uma vez</b>: importados + Mazer + Guarapuava + catálogo. Toque num modelo:</p>
+        <div class="cel-chips" id="celChips"></div>
       </div>
       <div id="lojasWrap">
         <label class="cot-lbl">Lojas (importados)</label>
@@ -673,30 +770,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div><label class="cot-lbl">Grade (condição)</label><input id="cotGrade" placeholder="ex.: Grade A+ (deixe vazio se novo)"></div>
         <div><label class="cot-lbl">Cor</label><input id="cotCor" placeholder="ex.: Titânio Natural"></div>
       </div>
+      <label class="cot-lbl">Maquininha / bandeira</label>
+      <div id="cotMaqSwitch"></div>
       <label class="cot-lbl">Parcelar no cartão em</label>
-      <select id="cotParcelas" onchange="cotCalc()">
-        <option value="1">1x (à vista no cartão) · 2,99%</option>
-        <option value="2">2x · 5,39%</option>
-        <option value="3">3x · 6,49%</option>
-        <option value="4">4x · 7,26%</option>
-        <option value="5">5x · 8,04%</option>
-        <option value="6">6x · 8,79%</option>
-        <option value="7">7x · 9,63%</option>
-        <option value="8">8x · 10,43%</option>
-        <option value="9">9x · 10,88%</option>
-        <option value="10" selected>10x · 11,09%</option>
-        <option value="11">11x · 11,84%</option>
-        <option value="12">12x · 12,49%</option>
-        <option value="13">13x · 13,39%</option>
-        <option value="14">14x · 14,24%</option>
-        <option value="15">15x · 15,09%</option>
-        <option value="16">16x · 15,94%</option>
-        <option value="17">17x · 16,79%</option>
-        <option value="18">18x · 17,64%</option>
-      </select>
-      <label class="cot-lbl">💡 Quero vender à vista por (R$) — opcional</label>
-      <input id="cotVenderPor" type="number" inputmode="decimal" placeholder="veja o lucro desse preço" oninput="calcReversa()">
-      <div class="reversa-out" id="cotReversaOut"></div>
+      <select id="cotParcelas" onchange="cotCalc()"></select>
       <div class="ab-actions">
         <button class="btn primary" onclick="adicionarAoCart()">➕ Adicionar ao orçamento</button>
         <button class="btn ghost" onclick="gerarCotacaoImagem()" title="Compartilhar como imagem">🖼️ Imagem</button>
@@ -728,41 +805,45 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
       <h2 style="margin:0;color:#fff">📹 Orçamento de Câmera</h2>
     </div>
-    <div class="mod-switch">
-      <button onclick="irModulo('diagnostico')">🩺 Diagnóstico</button>
-      <button onclick="irModulo('cotacao')">💰 Cotações</button>
-      <button onclick="irModulo('montar')">🖥️ Montar PC</button>
-      <button class="on" onclick="irModulo('camera')">📹 Câmeras</button>
-    </div>
     <div class="cot-cols">
       <div class="cot-col-l">
         <div class="cot-card">
           <div class="cot-sep">croqui do local</div>
           <div class="cam-wrap" id="camWrap">
-          <div class="cam-tools">
-            <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
-            <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Muro/Parede</button>
-            <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
-            <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
-            <button class="cam-tool" id="ctCabo" onclick="camTool('cabo')">🔌 Cabo</button>
-            <button class="cam-tool" id="ctRot" onclick="camTool('roteador')">📶 Roteador</button>
-            <button class="cam-tool" id="ctAp" onclick="camTool('ap')">📡 Access Point</button>
-            <button class="cam-tool" id="ctPoste" onclick="camTool('poste')">🗼 Poste</button>
-            <button class="cam-tool" id="ctPorta" onclick="camTool('porta')">🚪 Porta</button>
-            <button class="cam-tool" id="ctJanela" onclick="camTool('janela')">🪟 Janela</button>
-            <button class="cam-tool" id="ctPortao" onclick="camTool('portao')">🚧 Portão</button>
-            <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
-            <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
-            <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
-          </div>
-          <div class="cam-tools" style="margin-top:-2px">
-            <button class="cam-tool" onclick="camModelo('casa')">🏠 Casa pronta</button>
-            <button class="cam-tool" onclick="camModelo('loja')">🏪 Loja pronta</button>
-            <button class="cam-tool" id="ctCaboFim" onclick="camCaboUndo()">↶ Desfazer ponto</button>
-            <button class="cam-tool" onclick="camFull()">⛶ Tela cheia</button>
-            <input id="camEscala" class="cam-esc" inputmode="decimal" placeholder="m/quadr." title="Metros que cada quadradinho do croqui representa (pra medir cabo)" oninput="camCalcCabo()">
-            <button class="cam-tool" onclick="camSomarCabos()">📏 Somar cabos</button>
-            <button class="cam-tool" id="ctSat" onclick="camSatelite()" title="Puxar a vista de cima (satélite) do endereço como fundo do croqui — opcional">🛰️ Satélite</button>
+          <div class="cam-tools cam-groups">
+            <div class="cam-g">
+              <span class="cam-g-l">✏️ Desenhar</span>
+              <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
+              <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Parede</button>
+              <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
+              <button class="cam-tool" id="ctPorta" onclick="camTool('porta')">🚪 Porta</button>
+              <button class="cam-tool" id="ctJanela" onclick="camTool('janela')">🪟 Janela</button>
+              <button class="cam-tool" id="ctPortao" onclick="camTool('portao')">🚧 Portão</button>
+            </div>
+            <div class="cam-g">
+              <span class="cam-g-l">📷 Equipamentos</span>
+              <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
+              <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
+              <button class="cam-tool" id="ctCabo" onclick="camTool('cabo')">🔌 Cabo</button>
+              <button class="cam-tool" id="ctRot" onclick="camTool('roteador')">📶 Roteador</button>
+              <button class="cam-tool" id="ctAp" onclick="camTool('ap')">📡 Access Point</button>
+              <button class="cam-tool" id="ctPoste" onclick="camTool('poste')">🗼 Poste</button>
+            </div>
+            <div class="cam-g">
+              <span class="cam-g-l">🧰 Ações e medida</span>
+              <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
+              <button class="cam-tool" id="ctCaboFim" onclick="camCaboUndo()">↶ Desfazer</button>
+              <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
+              <button class="cam-tool" onclick="camFull()">⛶ Tela cheia</button>
+              <input id="camEscala" class="cam-esc" inputmode="decimal" placeholder="m/quadr." title="Metros que cada quadradinho do croqui representa (pra medir cabo)" oninput="camCalcCabo()">
+              <button class="cam-tool" onclick="camSomarCabos()">📏 Somar cabos</button>
+            </div>
+            <div class="cam-g">
+              <span class="cam-g-l">🏠 Começar rápido</span>
+              <button class="cam-tool" onclick="camModelo('casa')">🏠 Casa pronta</button>
+              <button class="cam-tool" onclick="camModelo('loja')">🏪 Loja pronta</button>
+              <button class="cam-tool" id="ctSat" onclick="camSatelite()" title="Puxar a vista de cima (satélite) do endereço como fundo do croqui — opcional">🛰️ Satélite</button>
+            </div>
           </div>
           <canvas id="camCanvas" class="cam-canvas" width="900" height="620"></canvas>
           <div class="cam-leg">
@@ -807,14 +888,16 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div id="camCaboRes"></div>
           <div id="camCaboLink" class="cot-hint" style="margin:4px 0 0"></div>
           <div class="cot-grid">
-            <div><label class="cot-lbl">Metros por câmera</label><input id="camCaboPorCam" type="number" inputmode="decimal" value="0" oninput="camCaboAuto()"></div>
             <div><label class="cot-lbl">Metros de cabo (total)</label><input id="camCaboM" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
+            <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
           </div>
           <div id="camCaboCroqui" class="cot-hint" style="margin:2px 2px 0;color:#0d9488;font-weight:600"></div>
-          <div class="cot-grid">
-            <div><label class="cot-lbl">R$ por metro</label><input id="camCaboV" type="number" inputmode="decimal" value="3" oninput="camCalc()"></div>
-            <div></div>
+          <div class="cam-estcabo">
+            <span>Estimar rápido:</span>
+            <input id="camCaboPorCam" type="number" inputmode="decimal" placeholder="m/câmera">
+            <button class="btn ghost" onclick="camEstimarCabo()">↳ preencher total</button>
           </div>
+          <p class="cot-hint" style="margin:4px 2px 0">Dica: desenhe os cabos no croqui (🔌) e toque <b>“📏 Somar cabos”</b> pra puxar a metragem real de cada câmera somada.</p>
           <div class="cot-sep">serviço e materiais</div>
           <div class="cot-grid">
             <div><label class="cot-lbl">Horas técnicas</label><input id="camHoras" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
@@ -825,6 +908,13 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div id="camBuscaRes"></div>
           <div id="camItens"></div>
           <button class="btn ghost" style="width:100%;margin-top:8px" onclick="camAddItem()">➕ Adicionar item manual</button>
+          <div class="cot-sep">lucro e cartão</div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Lucro sobre materiais (%)</label><input id="camLucroPct" type="number" inputmode="decimal" value="0" oninput="camCalc()"></div>
+            <div><label class="cot-lbl">Lucro (R$)</label><input id="camLucroRs" type="number" inputmode="decimal" placeholder="0" oninput="camLucroRsInput()"></div>
+          </div>
+          <label class="cot-lbl">Maquininha / bandeira</label>
+          <div id="camMaqSwitch"></div>
           <label class="cot-lbl">Parcelar no cartão em</label>
           <select id="camParcelas" onchange="camCalc()"></select>
           <label class="cot-lbl">Observações</label>
@@ -834,7 +924,34 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div class="ab-actions" style="margin-top:12px">
           <button class="btn primary" onclick="enviarCameraWhatsApp()">📲 Enviar no WhatsApp</button>
           <button class="btn ghost" onclick="gerarCameraPDF(true)">📄 PDF</button>
+          <button class="btn ghost" onclick="anexarAoDiagnostico('cam')">📎 Anexar</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE CALCULADORA DE TAXAS -->
+<div class="welcome cot-screen" id="taxasScreen">
+  <div class="cot-wrap" style="max-width:760px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🧮 Calculadora de Taxas</h2>
+    </div>
+    <div class="cot-card">
+      <div class="cot-sep">maquininha e bandeira</div>
+      <div id="txMaqSwitch"></div>
+      <div class="cot-sep">quanto você quer receber</div>
+      <div class="cot-row">
+        <input id="txValor" type="number" inputmode="decimal" placeholder="Valor à vista que você quer receber (R$)" oninput="txRender()">
+        <button class="btn ghost" id="txArredBtn" onclick="txToggleArred()" title="Arredondar as parcelas pra cima (múltiplo de R$ 5)">○ Arredondar</button>
+      </div>
+      <p class="cot-hint">O cliente paga o parcelado; a maquininha desconta a taxa e <b>você recebe o valor cheio</b>.</p>
+      <div id="txTabela"></div>
+      <div class="ab-actions" style="margin-top:12px">
+        <button class="btn primary" onclick="txPDF()">📄 PDF pro cliente</button>
+        <button class="btn ghost" onclick="txZap()">📲 WhatsApp</button>
+        <button class="btn ghost" onclick="txCopiar()">📋 Copiar</button>
       </div>
     </div>
   </div>
@@ -870,6 +987,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <span>Diagnóstico Tecnológico<small>Levantamento em campo</small></span>
       </div>
       <div class="spacer"></div>
+      <button class="topbar-mods" onclick="toggleDark()" title="Modo claro/escuro">🌙</button>
       <button class="topbar-mods" onclick="showChooser()" title="Trocar de módulo (Cotações, Câmeras...)">⧉ Módulos</button>
       <div class="score-pill" title="Pontuação geral da infraestrutura">
         <span class="score-dot" id="scoreDot"></span>
@@ -918,8 +1036,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
 <div id="report"></div>
 <div class="toast" id="toast"></div>
 
-<script src="jspdf.umd.min.js"></script>
-<script src="jspdf.autotable.min.js"></script>
+<script src="jspdf.umd.min.js" defer></script>
+<script src="jspdf.autotable.min.js" defer></script>
 <script>
 /* =========================================================
    MODELO DE DADOS — baseado no formulário Chip7
@@ -1193,6 +1311,7 @@ const CUR_KEY="chip7_current", LIST_KEY="chip7_visits";
 const form = document.getElementById('form');
 function render(){
   let html='<div id="insights" class="insights" style="display:none"></div>';
+  html+='<div class="sec-toolbar"><button type="button" onclick="recolherTudo(true)">➖ Recolher tudo</button><button type="button" onclick="recolherTudo(false)">➕ Abrir tudo</button></div>';
   SECTIONS.forEach(sec=>{
     html+=`<section class="card" data-sec="${sec.id}">
       <div class="card-head" onclick="toggle('${sec.id}')">
@@ -1312,6 +1431,7 @@ function renderField(f){
 
 /* ---------- interações ---------- */
 function toggle(id){document.querySelector(`[data-sec="${id}"]`).classList.toggle('collapsed');}
+function recolherTudo(rec){ document.querySelectorAll('#form .card[data-sec]').forEach(c=>c.classList.toggle('collapsed',rec)); if(rec)window.scrollTo({top:0,behavior:'smooth'}); }
 function setYN(id,v){
   if(state.answers[id]===v) v=""; // clicar de novo limpa
   state.answers[id]=v;
@@ -1947,8 +2067,23 @@ function renderDocArea(){
       <div id="trocaList"></div>
       <div class="doc-total">Total da recompra <span id="trocaTotal">R$ 0</span></div>
       <div class="btn-row"><button class="btn" onclick="addTroca()">➕ Adicionar equipamento</button></div>
+    </div>
+    <div class="doc-card">
+      <h2>📎 Orçamentos anexados</h2>
+      <p class="section-note">Orçamentos feitos nos módulos de Câmeras, Cotações ou Montar PC (botão "Anexar"). Entram no documento do cliente.</p>
+      <div id="anexosList"></div>
     </div>`;
-  renderVenda(); renderTroca();
+  renderVenda(); renderTroca(); renderAnexosCard();
+}
+function renderAnexosCard(){
+  const el=document.getElementById('anexosList'); if(!el)return;
+  const ax=(state.anexos||[]);
+  el.innerHTML=ax.length?ax.map((a,i)=>`
+    <div class="sell-row" style="grid-template-columns:1fr 130px 34px">
+      <div><b>${esc(a.tipo)}</b>${a.cliente?(' — '+esc(a.cliente)):''}<br><small style="color:var(--muted)">${(a.linhas||[]).length} item(ns)${a.parcelado?(' · '+esc(a.parcelado)):''}</small></div>
+      <div style="text-align:right;font-weight:800;color:var(--brand)">${fmtMoney(a.total)}</div>
+      <button class="del" onclick="removerAnexo(${i})">✕</button>
+    </div>`).join(''):`<p class="inv-empty">Nenhum orçamento anexado. Nos outros módulos, toque em "📎 Anexar ao diagnóstico".</p>`;
 }
 function toggleHidden(secId,checked){ if(!state.doc.hidden)state.doc.hidden={}; if(checked)delete state.doc.hidden[secId]; else state.doc.hidden[secId]=true; save(CUR_KEY,state); }
 function toggleDocOpt(key,checked){ state.doc[key]=checked; save(CUR_KEY,state); }
@@ -1988,6 +2123,40 @@ function trocaTotal(){let s=0;((state.doc&&state.doc.troca)||[]).forEach(t=>{con
 function addTroca(){if(!state.doc.troca)state.doc.troca=[];state.doc.troca.push({item:'',valor:''});renderTroca();save(CUR_KEY,state);}
 function updTroca(i,k,v){state.doc.troca[i][k]=v;if(k==='valor')trocaTotal();save(CUR_KEY,state);}
 function delTroca(i){state.doc.troca.splice(i,1);renderTroca();save(CUR_KEY,state);}
+/* ====== anexos de orçamentos dos outros módulos (câmeras / cotação / PC) ====== */
+function anexarAoDiagnostico(tipo){
+  if(typeof state==='undefined'||!state){ toast('Abra o diagnóstico primeiro'); return; }
+  let ax=null;
+  if(tipo==='cam'){
+    camCalc(); const c=CAM._calc;
+    if(!c||!c.total){ toast('Preencha o orçamento de câmeras primeiro'); return; }
+    const f=c.fator||1;
+    ax={tipo:'📹 Câmeras (CFTV)', cliente:((document.getElementById('camCliente')||{}).value||'').trim(),
+        linhas:CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0).map(it=>({desc:it.desc,qtd:it.qtd,valor:it.valor*f}))
+          .concat(c.cabo>0?[{desc:'Cabeamento',qtd:1,valor:c.cabo*f}]:[])
+          .concat(c.mao>0?[{desc:'Mão de obra',qtd:1,valor:c.mao}]:[]),
+        total:c.total, parcelado:c.parcelas+'x de '+fmtMoney(c.parcela), quando:new Date().toISOString()};
+  } else {
+    const itens=cotItens();
+    if(!itens.length){ toast('Adicione produtos ao orçamento primeiro'); return; }
+    ax={tipo:COT_BUILD?'🖥️ Computador':'💰 Cotação', cliente:((document.getElementById('cotCliente')||{}).value||'').trim(),
+        linhas:itens.map(i=>({desc:(i.tipo?('['+i.tipo+'] '):'')+i.nome,qtd:1,valor:i.aVista,parc:(i.parcelas||10)+'x de '+fmtMoney(i.parcela)})),
+        total:itens.reduce((s,i)=>s+i.aVista,0), somar:COT_SOMAR, quando:new Date().toISOString()};
+  }
+  state.anexos=state.anexos||[];
+  state.anexos.push(ax);
+  save(CUR_KEY,state);
+  toast('📎 Anexado à visita atual — vai aparecer no documento do diagnóstico');
+}
+function removerAnexo(i){ if(state.anexos){ state.anexos.splice(i,1); save(CUR_KEY,state); if(typeof renderAnexosCard==='function')renderAnexosCard(); } }
+function anexosReportHTML(st){
+  const ax=st.anexos||[]; if(!ax.length) return '';
+  return ax.map(a=>{
+    const rows=(a.linhas||[]).map(l=>`<tr><td>${esc(l.desc)}</td><td style="text-align:center">${l.qtd||1}</td><td style="text-align:right">${fmtMoney(l.valor)}</td></tr>`).join('');
+    const tot = a.somar===false ? '' : `<tfoot><tr><th colspan="2" style="text-align:right">Total</th><th style="text-align:right">${fmtMoney(a.total)}${a.parcelado?(' · '+a.parcelado):''}</th></tr></tfoot>`;
+    return `<h2>${a.tipo} — orçamento anexado</h2><table><thead><tr><th>Item</th><th>Qtd</th><th>Valor</th></tr></thead><tbody>${rows}</tbody>${tot}</table>`;
+  }).join('');
+}
 /* blocos de venda/recompra no relatório (HTML) */
 function vendaTrocaReportHTML(st){
   const d=st.doc||{}; let h='';
@@ -2037,6 +2206,7 @@ function buildWordOriginal(st){
   else b+=`<tr><td colspan="4" style="text-align:center">—</td></tr>`;
   b+=`</table>`;
   b+=vendaTrocaReportHTML(st);
+  b+=anexosReportHTML(st);
   const stt=(p,r)=>catStatus(p,r).txt;
   b+=`<h2>Resumo Executivo</h2>
     <p>Nota da infraestrutura: <b>${c.nota.toFixed(1)} / 10</b></p>
@@ -2284,6 +2454,7 @@ function buildReport(st){
     <tfoot><tr><th colspan="2" style="text-align:right">Investimento estimado total</th><th colspan="2">${fmtMoney(total)}</th></tr></tfoot></table>
 
     ${vendaTrocaReportHTML(st)}
+    ${anexosReportHTML(st)}
 
     ${secHtml}
 
@@ -2599,27 +2770,26 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen','cameraScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ document.getElementById('cotacaoScreen').classList.remove('show'); document.getElementById('cameraScreen').classList.remove('show'); document.getElementById('chooser').classList.remove('show'); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
-  ['cotacaoScreen','cameraScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
-  if(m==='cotacao'){ COT_BUILD=false; escolherCotacao(); }
-  else if(m==='montar'){ escolherMontarPC(); }
+  ['cotacaoScreen','cameraScreen','taxasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  if(m==='cotacao'){ COT_BUILD=false; COT_CEL=false; escolherCotacao(); }
+  else if(m==='montar'){ COT_CEL=false; escolherMontarPC(); }
+  else if(m==='celular'){ escolherCelular(); }
   else if(m==='camera'){ escolherCamera(); }
+  else if(m==='taxas'){ escolherTaxas(); }
   else if(m==='diagnostico'){ escolherDiagnostico(); }
   else showChooser();
-}
-function modSwitchHTML(ativo){
-  const mods=[['diagnostico','🩺','Diagnóstico'],['cotacao','💰','Cotações'],['montar','🖥️','Montar PC'],['camera','📹','Câmeras']];
-  return '<div class="mod-switch">'+mods.map(([k,ic,nm])=>`<button class="${k===ativo?'on':''}" onclick="irModulo('${k}')">${ic} ${nm}</button>`).join('')+'</div>';
 }
 function escolherCotacao(){
   document.getElementById('chooser').classList.remove('show');
   document.getElementById('cotacaoScreen').classList.add('show');
+  refreshMaqUI();
   renderLojas();
   onCategoria();
   if(!document.getElementById('cotDolar').value) buscarDolar();
@@ -2684,7 +2854,133 @@ function arredNice(v){                                // sobe de 50 em 50; últi
 }
 // taxas reais da maquininha (% que a loja repassa por nº de parcelas)
 const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
+/* ====== maquininhas e bandeiras ======
+   MP = Mercado Pago (mesma taxa p/ todas as bandeiras, até 18x)
+   IP = InfinitePay plano "1 Dia Útil" (Master/Visa ≠ Elo/Amex, débito + até 12x) */
+const MAQS={
+  mp:{nome:'Mercado Pago', logo:'<span class="lg-mp">🤝</span>', max:18, bandeiras:{
+    todas:{nome:'Todas as bandeiras', logo:'<i class="lg-mc"><u></u><u></u></i><b class="lg-visa">VISA</b><b class="lg-elo">elo</b>', deb:null, tx:TAXAS_CARTAO}}},
+  ip:{nome:'InfinitePay', logo:'<b class="lg-ip">∞</b>', max:12, bandeiras:{
+    mv:{nome:'Master / Visa', logo:'<i class="lg-mc"><u></u><u></u></i><b class="lg-visa">VISA</b>', deb:0.75,
+        tx:{1:2.69,2:3.94,3:4.46,4:4.98,5:5.49,6:5.99,7:6.51,8:6.99,9:7.51,10:7.99,11:8.49,12:8.99}},
+    ea:{nome:'Elo / Amex', logo:'<b class="lg-elo">elo</b><b class="lg-amex">AMEX</b>', deb:1.88,
+        tx:{1:4.46,2:5.81,3:6.32,4:6.83,5:7.33,6:7.83,7:8.34,8:8.83,9:9.32,10:9.81,11:10.29,12:10.77}}}}
+};
+function maqPref(){ try{ const m=JSON.parse(localStorage.getItem('chip7_maq')||'{}'); if(MAQS[m.maq] && MAQS[m.maq].bandeiras[m.band]) return m; }catch(e){} return {maq:'mp',band:'todas'}; }
+function maqSet(maq,band){ const M=MAQS[maq]||MAQS.mp; if(!band||!M.bandeiras[band]) band=Object.keys(M.bandeiras)[0]; try{localStorage.setItem('chip7_maq',JSON.stringify({maq,band}));}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); }
+function maqBand(){ const p=maqPref(); return MAQS[p.maq].bandeiras[p.band]; }
+function maqTaxa(n){ return maqBand().tx[n]||0; }
+function maqMax(){ return MAQS[maqPref().maq].max; }
+function maqNome(){ const p=maqPref(); const M=MAQS[p.maq]; const B=M.bandeiras[p.band]; return M.nome+(Object.keys(M.bandeiras).length>1?(' · '+B.nome):''); }
+/* preço a cobrar p/ VOCÊ receber v líquido: a taxa incide sobre o total cobrado */
+function precoComTaxa(v,txPct){ return txPct>=100?0:v/(1-txPct/100); }
+function maqSwitchHTML(cb){
+  const p=maqPref();
+  let h='<div class="maq-switch">';
+  h+=Object.entries(MAQS).map(([k,m])=>`<button type="button" class="mq ${k}${p.maq===k?' on':''}" onclick="trocarMaq('${k}',null,'${cb}')">${m.logo} ${m.nome}</button>`).join('');
+  const M=MAQS[p.maq];
+  if(Object.keys(M.bandeiras).length>1){
+    h+='<span class="mq-div"></span>';
+    h+=Object.entries(M.bandeiras).map(([k,b])=>`<button type="button" class="mq band${p.band===k?' on':''}" onclick="trocarMaq('${p.maq}','${k}','${cb}')">${b.logo}</button>`).join('');
+  }
+  return h+'</div>';
+}
+function trocarMaq(maq,band,cb){ const cur=maqPref(); maqSet(maq, band||((maq===cur.maq)?cur.band:null)); refreshMaqUI(); if(cb&&typeof window[cb]==='function')window[cb](); }
+function parcelasOptionsHTML(selVal){ const max=maqMax(); let h=''; for(let n=1;n<=max;n++){ h+=`<option value="${n}"${n==Math.min(selVal,max)?' selected':''}>${n}x · ${String(maqTaxa(n)).replace('.',',')}%</option>`; } return h; }
+function refreshParcelasSelect(id){ const s=document.getElementById(id); if(!s)return; const cur=parseInt(s.value,10)||10; s.innerHTML=parcelasOptionsHTML(cur); }
+function refreshMaqUI(){
+  [['cotMaqSwitch','cotCalc'],['camMaqSwitch','camCalc'],['txMaqSwitch','txRender']].forEach(([id,cb])=>{ const el=document.getElementById(id); if(el)el.innerHTML=maqSwitchHTML(cb); });
+  refreshParcelasSelect('cotParcelas'); refreshParcelasSelect('camParcelas');
+}
+/* ====== módulo Calculadora de Taxas ====== */
+let TX_ARRED=false;
+function escolherTaxas(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('taxasScreen').classList.add('show');
+  refreshMaqUI(); txRender(); window.scrollTo(0,0);
+  const v=document.getElementById('txValor'); if(v&&!v.value)v.focus();
+}
+function txToggleArred(){ TX_ARRED=!TX_ARRED; const b=document.getElementById('txArredBtn'); if(b){ b.textContent=TX_ARRED?'✓ Arredondado':'○ Arredondar'; b.classList.toggle('primary',false); } txRender(); }
+function txLinhas(){
+  const v=parseFloat((document.getElementById('txValor')||{}).value)||0;
+  if(!v) return null;
+  const B=maqBand(), max=maqMax(), rows=[];
+  if(B.deb!=null){ let t=precoComTaxa(v,B.deb); if(TX_ARRED)t=arredCima5(t); rows.push({lbl:'Débito',n:0,taxa:B.deb,parcela:t,total:t}); }
+  for(let n=1;n<=max;n++){
+    const tx=B.tx[n]||0; let total=precoComTaxa(v,tx), parcela=total/n;
+    if(TX_ARRED){ parcela=arredCima5(parcela); total=parcela*n; }
+    rows.push({lbl:n+'x',n,taxa:tx,parcela,total});
+  }
+  return {v,rows};
+}
+function txRender(){
+  const el=document.getElementById('txTabela'); if(!el)return;
+  const d=txLinhas();
+  if(!d){ el.innerHTML='<p class="cot-result-empty" style="margin:10px 0 4px">Digite o valor que você quer receber pra ver as parcelas.</p>'; return; }
+  el.innerHTML=`<div class="tx-head"><span></span><span>Parcela</span><span>Total</span><span class="tx-fee">taxa</span></div>`+
+    d.rows.map(r=>`<div class="tx-row${r.n===0?' deb':''}">
+      <b>${r.lbl}</b>
+      <span class="tx-parc">${r.n>1?(r.n+'x de '):''}<b>${fmtMoney(r.parcela)}</b></span>
+      <span>${fmtMoney(r.total)}</span>
+      <span class="tx-fee">${String(r.taxa).replace('.',',')}%</span>
+    </div>`).join('')+
+    `<div class="tx-liq">💵 Em todas as opções <b>você recebe ${fmtMoney(d.v)}</b> (a taxa fica com a maquininha)</div>`;
+}
+function txTexto(){
+  const d=txLinhas(); if(!d)return '';
+  let t=`*Simulação de parcelamento — ${CHIP7.nome}*\n💵 À vista: *${fmtMoney(d.v)}*\n\n`;
+  t+=d.rows.filter(r=>r.n>0).map(r=>`💳 ${r.n}x de *${fmtMoney(r.parcela)}* (total ${fmtMoney(r.total)})`).join('\n');
+  t+=`\n\n${CHIP7.tel} · ${CHIP7.site}`;
+  return t;
+}
+async function txZap(){ const t=txTexto(); if(!t){toast('Digite o valor primeiro');return;} window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+async function txCopiar(){ const t=txTexto(); if(!t){toast('Digite o valor primeiro');return;} try{ await navigator.clipboard.writeText(t); toast('📋 Copiado'); }catch(e){ toast('Não consegui copiar'); } }
+async function txPDF(){
+  const d=txLinhas(); if(!d){toast('Digite o valor primeiro');return;}
+  if(!window.jspdf){toast('PDF indisponível');return;}
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=48, hoje=new Date();
+  doc.setFillColor(10,37,80); doc.rect(0,0,W,92,'F');
+  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,20,52,52);}catch(e){}}
+  const hx=M+(logo?64:0);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text(CHIP7.nome,hx,40);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(200,214,235);
+  doc.text('Simulação de parcelamento no cartão',hx,57);doc.text(CHIP7.endereco,hx,70);
+  doc.setFontSize(10);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,40,{align:'right'});
+  let y=126;
+  doc.setFillColor(240,245,252); doc.setDrawColor(10,37,80); doc.roundedRect(M,y-22,W-2*M,46,9,9,'FD');
+  doc.setTextColor(20,28,40); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Valor à vista (dinheiro / PIX)',M+16,y+5);
+  doc.setFontSize(19); doc.setTextColor(10,37,80); doc.text(fmtMoney(d.v),W-M-16,y+6,{align:'right'});
+  y+=48;
+  doc.autoTable({startY:y,
+    head:[['Forma de pagamento','Valor da parcela','Total no cartão']],
+    body:d.rows.filter(r=>r.n>0).map(r=>[r.n+'x no cartão', (r.n>1?(r.n+'x de '):'')+fmtMoney(r.parcela), fmtMoney(r.total)]),
+    theme:'striped', styles:{fontSize:10.5,cellPadding:7,valign:'middle'},
+    headStyles:{fillColor:[10,37,80],fontSize:10.5},
+    columnStyles:{1:{halign:'right',fontStyle:'bold',textColor:[10,37,80]},2:{halign:'right'}},
+    margin:{left:M,right:M}});
+  y=doc.lastAutoTable.finalY+24;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(95,105,120);
+  doc.text('Parcelamento sujeito à aprovação da operadora do cartão. Valores válidos na data desta simulação.',M,y);
+  const fy=H-64; doc.setDrawColor(225,230,238); doc.line(M,fy-14,W-M,fy-14);
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text(CHIP7.nome+'  ·  CNPJ '+CHIP7.cnpj,M,fy);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);
+  doc.text(CHIP7.endereco,M,fy+13);
+  doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site+'   ·   '+CHIP7.email,M,fy+26);
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  downloadBlob(new File([doc.output('blob')],`Parcelamento ${fmtMoney(d.v)} - ${hoje.getDate()} de ${meses[hoje.getMonth()]}.pdf`,{type:'application/pdf'}));
+  toast('📄 PDF gerado');
+}
 let COT_PROD=null, COT_SEL=null, COT_CALC=null, COT_CART=[], COT_VIS=[], COT_GRADEFILTER='', COT_CORFILTER='', COT_SHOWALL=false, COT_BUILD=false, COT_MODO='importados';
+let COT_SOMAR = localStorage.getItem('chip7_cot_somar')!=='0';   // mostrar/tirar o "Valor total" do orçamento
+function toggleSomar(on){ COT_SOMAR=!!on; try{localStorage.setItem('chip7_cot_somar',on?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); renderCart(); }
+let COT_ARRED = localStorage.getItem('chip7_cot_arred')!=='0';   // arredondar bonito (à vista de 50 em 50, parcela múltipla de 5)
+function cotToggleArred(){ COT_ARRED=!COT_ARRED; try{localStorage.setItem('chip7_cot_arred',COT_ARRED?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); cotCalc(); }
+/* 🌙 modo escuro (persistido e sincronizado) */
+function toggleDark(){ const on=!document.body.classList.contains('dark'); document.body.classList.toggle('dark',on); try{localStorage.setItem('chip7_dark',on?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); toast(on?'🌙 Modo escuro ligado':'☀️ Modo claro'); }
+if(localStorage.getItem('chip7_dark')==='1') document.body.classList.add('dark');
+// restaura o carrinho da última sessão (e sincroniza com a nuvem quando logado)
+try{ const _cc=JSON.parse(localStorage.getItem('chip7_cot_cart')||'[]'); if(Array.isArray(_cc)) _cc.forEach(i=>COT_CART.push(i)); }catch(e){}
 function setModo(m){
   COT_MODO=m;
   const ti=document.getElementById('tabImp'), tf=document.getElementById('tabForn');
@@ -2697,13 +2993,72 @@ function setModo(m){
   const msg=document.getElementById('cotBuscaMsg'); if(msg)msg.textContent = m==='fornecedores'?'Pesquise uma peça nos seus fornecedores (preços em R$, sem dólar/trazer).':'';
 }
 const PECAS_PC=['Processador','Placa-mãe','Memória RAM','SSD / HD','Placa de vídeo','Fonte','Gabinete','Cooler / Water'];
+/* ====== análise do PC: gargalo CPU×GPU + FPS estimado (heurística, escala 0–200) ====== */
+const PC_CPUS=[
+  [/i9|ryzen ?9/i,135],[/i7[- ]?1[234]\d{3}|ryzen ?7 ?7[78]00/i,115],[/ryzen ?7 ?5[78]00/i,110],[/i7/i,85],[/ryzen ?7/i,95],
+  [/i5[- ]?1[234]\d{3}/i,90],[/ryzen ?5 ?(5[56]00|7[56]00)/i,92],[/i5[- ]?(10|11)\d{3}/i,70],[/i5/i,55],[/ryzen ?5/i,70],
+  [/i3[- ]?1[234]\d{3}/i,62],[/i3/i,38],[/ryzen ?3 ?[45]\d{3}/i,52],[/ryzen ?3/i,38],
+  [/athlon|celeron|pentium/i,20]
+];
+const PC_GPUS=[
+  [/rtx ?4090/i,200],[/rtx ?4080/i,180],[/rx ?7900/i,170],[/rtx ?4070|rtx ?3080/i,150],[/rx ?7800/i,160],
+  [/rtx ?4060 ?ti/i,120],[/rtx ?4060|rtx ?3060 ?ti/i,110],[/rx ?7600|rx ?66\d0 ?xt/i,105],[/rtx ?3060/i,95],[/rx ?6600/i,100],
+  [/rtx ?3050|rtx ?2060/i,75],[/gtx ?16[65]0 ?(ti|super)/i,55],[/gtx ?1660/i,52],[/gtx ?1650/i,45],[/rx ?6500/i,55],
+  [/gtx ?10[65]0 ?ti/i,40],[/gtx ?1050|rx ?580/i,33],[/rx ?550|gt ?10?30/i,22],
+  [/vega|iris|uhd|integrad|igpu|onboard/i,12]
+];
+const PC_GPU_SUG=[['GTX 1650',45],['RX 6500 XT',55],['RTX 3050',75],['RTX 3060',95],['RX 6600',100],['RTX 4060',110],['RTX 4060 Ti',120],['RTX 4070',150],['RX 7800 XT',160],['RTX 4080',180]];
+const PC_CPU_SUG=[['i3-12100F',62],['i5-12400F',90],['Ryzen 5 5600',92],['Ryzen 5 7600',105],['i5-13400F',95],['i7-12700F',115],['Ryzen 7 7700',120],['i9 / Ryzen 9',135]];
+const PC_JOGOS=[['CS2 (Counter-Strike 2)',3.2],['Valorant',4.0],['GTA V',1.6],['Fortnite',1.7]];
+function pcScore(nome,tab){ for(const [re,s] of tab){ if(re.test(nome||'')) return s; } return 0; }
+function pcAnaliseData(){
+  const cpuIt=COT_CART.find(i=>i.tipo==='Processador'), gpuIt=COT_CART.find(i=>i.tipo==='Placa de vídeo');
+  const cpu=cpuIt?pcScore(cpuIt.nome,PC_CPUS):0, gpu=gpuIt?pcScore(gpuIt.nome,PC_GPUS):0;
+  if(!cpu&&!gpu) return null;
+  const out={cpu,gpu,cpuNome:cpuIt&&cpuIt.nome,gpuNome:gpuIt&&gpuIt.nome};
+  if(cpu&&gpu){
+    const eff=Math.min(gpu,cpu*1.15);
+    out.eff=eff;
+    out.jogos=PC_JOGOS.map(([nome,m])=>({nome,fps:Math.max(15,Math.round(eff*m))}));
+    out.res = gpu>=140?'1440p / 4K':gpu>=90?'1080p no alto (dá 1440p)':gpu>=50?'1080p':'720p / 1080p leve';
+    const r=cpu/gpu;
+    if(r<0.6){ out.gargalo={lado:'cpu',pct:Math.round((1-r)*100),msg:'O processador segura a placa de vídeo'}; out.sug=PC_CPU_SUG.filter(s=>s[1]>=gpu*0.75&&s[1]<=gpu*1.35).map(s=>s[0]); }
+    else if(r>1.7){ out.gargalo={lado:'gpu',pct:Math.round((1-1/r)*100),msg:'A placa de vídeo segura o processador'}; out.sug=PC_GPU_SUG.filter(s=>s[1]>=cpu*0.8&&s[1]<=cpu*1.3).map(s=>s[0]); }
+    else out.gargalo={lado:'ok',pct:0,msg:'Conjunto equilibrado — sem gargalo relevante'};
+  } else if(cpu){ out.faltando='Placa de vídeo'; out.sug=PC_GPU_SUG.filter(s=>s[1]>=cpu*0.8&&s[1]<=cpu*1.3).map(s=>s[0]); }
+  else { out.faltando='Processador'; out.sug=PC_CPU_SUG.filter(s=>s[1]>=gpu*0.75&&s[1]<=gpu*1.35).map(s=>s[0]); }
+  return out;
+}
+function pcAnaliseHTML(){
+  const an=pcAnaliseData();
+  if(!an) return '<p class="cot-hint">💡 Adicione o <b>Processador</b> e a <b>Placa de vídeo</b> pra ver o gargalo e o FPS estimado nos jogos.</p>';
+  let h='<div class="pc-an">';
+  if(an.gargalo){
+    const cor=an.gargalo.lado==='ok'?'#16a34a':an.gargalo.pct>25?'#dc2626':'#d97706';
+    h+=`<div class="pc-garg" style="border-color:${cor}"><b style="color:${cor}">${an.gargalo.lado==='ok'?'✅':'⚠️'} ${an.gargalo.msg}${an.gargalo.pct?(' (~'+an.gargalo.pct+'% de gargalo)'):''}</b></div>`;
+  }
+  if(an.faltando) h+=`<div class="pc-garg" style="border-color:#d97706"><b style="color:#d97706">Falta cotar: ${an.faltando}</b></div>`;
+  if(an.sug&&an.sug.length) h+=`<div class="pc-sug">👍 Combina bem: ${an.sug.map(s=>`<span>${s}</span>`).join('')}</div>`;
+  if(an.jogos){
+    h+='<div class="pc-fps">'+an.jogos.map(j=>`<div class="pc-fps-i"><b>${j.fps}</b><small>FPS</small><span>${j.nome.split(' (')[0]}</span></div>`).join('')+'</div>';
+    h+=`<p class="cot-hint" style="margin:4px 0 0">🎮 Estimativa em 1080p (ajustes altos/competitivos) · 📺 Recomendado: <b>${an.res}</b></p>`;
+  }
+  return h+'</div>';
+}
+let COT_CEL=false;
+const CEL_CHIPS=['iPhone 13 128GB','iPhone 14 128GB','iPhone 15 128GB','iPhone 16 128GB','iPhone 15 Pro','Samsung S24','Redmi Note 13','Motorola Moto G84'];
 function setBuildUI(){
-  const t=document.getElementById('cotTitulo'); if(t)t.textContent=COT_BUILD?'🖥️ Montar PC':'💰 Cotar Valores';
-  const b=document.getElementById('cotModoBtn'); if(b)b.textContent=COT_BUILD?'💰 Avulso':'🖥️ Montar PC';
+  const t=document.getElementById('cotTitulo'); if(t)t.textContent=COT_CEL?'📱 Cotar Celular':COT_BUILD?'🖥️ Montar PC':'💰 Cotar Valores';
   const w=document.getElementById('cotTipoWrap'); if(w)w.style.display=COT_BUILD?'block':'none';
+  const tabs=document.getElementById('cotTabs'); if(tabs)tabs.style.display=COT_CEL?'none':'';
+  const ci=document.getElementById('celInfo'); if(ci)ci.style.display=COT_CEL?'block':'none';
+  const chips=document.getElementById('celChips');
+  if(chips && COT_CEL && !chips.children.length) chips.innerHTML=CEL_CHIPS.map(m=>`<button type="button" class="cel-chip" onclick="celBuscar('${m}')">${m}</button>`).join('');
+  const b=document.getElementById('cotBusca'); if(b)b.placeholder=COT_CEL?'Ex.: iPhone 15 128GB':'Ex.: placa mãe B550';
   renderCart();
 }
-function toggleBuild(){ COT_BUILD=!COT_BUILD; setBuildUI(); toast(COT_BUILD?'Modo Montar PC ligado':'Modo avulso'); }
+function escolherCelular(){ COT_BUILD=false; COT_CEL=true; escolherCotacao(); const c=document.getElementById('cotCategoria'); if(c){c.value='iphone-novo'; onCategoria();} }
+function celBuscar(m){ const b=document.getElementById('cotBusca'); if(b)b.value=m; pesquisarProdutos(); }
 function escolherPeca(tp){ COT_BUILD=true; setBuildUI(); const s=document.getElementById('cotTipo'); if(s)s.value=tp; const i=document.getElementById('cotBusca'); if(i){i.focus();i.scrollIntoView({behavior:'smooth',block:'center'});} }
 function escolherMontarPC(){ escolherCotacao(); COT_BUILD=true; setBuildUI(); }
 function cotCalc(){
@@ -2712,8 +3067,8 @@ function cotCalc(){
   const pct=parseFloat(document.getElementById('cotLucroPct').value)||0;
   const trazerPct=parseFloat((document.getElementById('cotTrazer')||{}).value)||0;
   const selP=document.getElementById('cotParcelas');
-  const N=parseInt(selP?selP.value:'10',10)||10;
-  const taxa=(TAXAS_CARTAO[N]||0)/100;       // taxa da maquininha p/ N parcelas
+  const N=Math.min(parseInt(selP?selP.value:'10',10)||10, maqMax());
+  const taxaPct=maqTaxa(N), taxa=taxaPct/100;   // taxa da maquininha/bandeira selecionada
   const moeda=(COT_SEL&&COT_SEL.moeda)||'USD';
   const brl = moeda==='BRL';                 // fornecedor BR: custo já em R$, sem dólar/trazer
   const fonteNome=(COT_SEL&&COT_SEL.loja)||'Fornecedor';
@@ -2723,11 +3078,11 @@ function cotCalc(){
   const custoTotal=custoBRL+extra;           // custo total (base do lucro)
   const custoBase = brl ? custoBRL : custoTotal;        // base p/ dividir frete no orçamento
   const lucro=custoTotal*pct/100;            // lucro em reais (vem do %)
-  const aVista=arredNice(custoTotal+lucro);  // preço à vista (dinheiro/PIX), sem taxa de cartão
-  const totalCartao=aVista*(1+taxa);         // repassa a taxa da maquininha
-  const parcela=arredCima5(totalCartao/N);   // parcela pra cima, múltiplo de 5
+  const aVista=COT_ARRED?arredNice(custoTotal+lucro):Math.round((custoTotal+lucro)*100)/100;  // à vista (dinheiro/PIX)
+  const totalCartao=precoComTaxa(aVista,taxaPct);   // repassa a taxa: você recebe o à vista líquido
+  const parcela=COT_ARRED?arredCima5(totalCartao/N):Math.round(totalCartao/N*100)/100;
   const totalParc=parcela*N;
-  COT_CALC = usd ? {usd,dolar,custoBRL,trazer:extra,frete,custoTotal,custoBase,fonte:fonteNome,aVista,parcelas:N,taxa:TAXAS_CARTAO[N]||0,parcela,totalParc} : null;
+  COT_CALC = usd ? {usd,dolar,custoBRL,trazer:extra,frete,custoTotal,custoBase,fonte:fonteNome,aVista,parcelas:N,taxa:taxaPct,maq:maqNome(),parcela,totalParc} : null;
   const rsField=document.getElementById('cotLucroRs');
   if(rsField && document.activeElement!==rsField) rsField.value = lucro? Math.round(lucro):'';
   const pctTxt = (pct%1? pct.toFixed(1):pct.toFixed(0)).replace('.',',');
@@ -2747,24 +3102,14 @@ function cotCalc(){
       <div class="cr-line"><span>+ Lucro (${pctTxt}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
       <div class="cr-line"><span>= À vista (dinheiro/PIX)</span><b>${fmtMoney(aVista)}</b></div>
       <div class="cr-line"><span>💵 Seu lucro (à vista − custo total)</span><b>${fmtMoney(aVista-custoTotal)}</b></div>
-      <div class="cr-line"><span>+ Taxa maquininha (${N}x · ${(TAXAS_CARTAO[N]||0).toString().replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
+      <div class="cr-line"><span>+ Taxa ${maqNome()} (${N}x · ${String(taxaPct).replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-aVista)}</b></div>
     </details>
     <div class="cr-venda big"><b>À vista · dinheiro/PIX</b><span>${fmtMoney(aVista)}</span></div>
     <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
-    <div class="cr-sub">Total no cartão ${fmtMoney(totalParc)}</div>`;
+    <div class="cr-sub">Total no cartão ${fmtMoney(totalParc)} · ${maqNome()}</div>
+    <button type="button" class="cr-arred${COT_ARRED?' on':''}" onclick="cotToggleArred()">${COT_ARRED?'✓ Arredondamento ligado':'○ Sem arredondamento'}</button>`;
   if(bar)bar.style.display='block';
   const ped=document.getElementById('cotPedidoCard'); if(ped)ped.style.display='block';
-  calcReversa();
-}
-/* cotação reversa: "quero vender por R$ X" -> mostra o lucro */
-function calcReversa(){
-  const out=document.getElementById('cotReversaOut'); if(!out)return;
-  const alvo=parseFloat(document.getElementById('cotVenderPor').value)||0;
-  const custo=COT_CALC?COT_CALC.custoTotal:0;
-  if(!alvo||!custo){ out.textContent=''; out.classList.remove('neg'); return; }
-  const lucro=alvo-custo, margem=custo?(lucro/custo*100):0;
-  out.classList.toggle('neg',lucro<0);
-  out.innerHTML=`Vendendo por <b>${fmtMoney(alvo)}</b> → lucro <b>${fmtMoney(lucro)}</b> (${margem.toFixed(0)}% sobre o custo)`;
 }
 /* ---- leitor da loja de importados (mesma lógica da função do servidor, validada) ---- */
 const CP_BASE='https://www.comprasparaguai.com.br';
@@ -2859,7 +3204,7 @@ function htmlProdHit(i,n){ const fav=isFav(i);
     <span class="ph-go">›</span></div>`; }
 /* ====== favoritos de produtos ====== */
 function favLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_fav')||'[]'); }catch(e){ return []; } }
-function favSave(a){ try{ localStorage.setItem('chip7_cot_fav',JSON.stringify(a.slice(0,80))); }catch(e){} }
+function favSave(a){ try{ localStorage.setItem('chip7_cot_fav',JSON.stringify(a.slice(0,80))); }catch(e){} if(typeof cloudSaveFav==='function')cloudSaveFav(a.slice(0,80)); }
 function favKey(i){ return (i.link||i.nome||'').toLowerCase(); }
 function isFav(i){ const k=favKey(i); return favLoad().some(f=>favKey(f)===k); }
 function toggleFav(n){ const i=COT_HITS[n]; if(!i)return; const k=favKey(i); let a=favLoad(); if(a.some(f=>favKey(f)===k)){ a=a.filter(f=>favKey(f)!==k); toast('Removido dos favoritos'); } else { a.unshift({nome:i.nome,img:i.img,link:i.link,precoUSD:i.precoUSD,ofertas:i.ofertas}); toast('⭐ Salvo nos favoritos'); } favSave(a); renderProdutos(); }
@@ -2887,6 +3232,19 @@ async function pesquisarProdutos(){
   if(!q){ msg.textContent='Digite o que quer pesquisar (ex.: placa mãe B550).'; return; }
   box.innerHTML='';
   try{
+    if(COT_CEL){
+      // 📱 modo celular: busca TUDO de uma vez (importados + fornecedores + catálogo)
+      msg.textContent='🔄 Buscando em importados + fornecedores...'; buscarDolar();
+      const [imp,forn]=await Promise.all([
+        cpPesquisa(q).then(a=>a.filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i))).catch(()=>[]),
+        fornecedorPesquisa(q).catch(()=>catBuscaLocal(q))
+      ]);
+      COT_HITS=[...imp,...forn];
+      if(!COT_HITS.length){ msg.textContent='Nada encontrado em nenhuma fonte. Tente outro termo (ex.: "iPhone 15 128").'; return; }
+      renderProdutos();
+      msg.textContent=`✔ ${imp.length} importado(s) + ${forn.length} de fornecedor(es)`+(COT_FORN_ERROS.length?(' · ⚠️ '+COT_FORN_ERROS.join(' · ')):'');
+      return;
+    }
     if(COT_MODO==='fornecedores'){
       msg.textContent='🔄 Buscando nos seus fornecedores...';
       COT_HITS = await fornecedorPesquisa(q);
@@ -3172,6 +3530,7 @@ function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
 function duplicarCart(k){ if(COT_CART[k]){ COT_CART.splice(k+1,0,Object.assign({},COT_CART[k])); renderCart(); toast('Item duplicado'); } }
 function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
 function renderCart(){
+  if(typeof cartPersist==='function')cartPersist();   // guarda o carrinho (local + nuvem) em toda mudança
   const el=document.getElementById('cotCart'); if(!el)return;
   const pc=document.getElementById('cotPedidoCard');
   if(!COT_CART.length && !COT_BUILD){ el.style.display='none'; el.innerHTML=''; if(pc&&!COT_CALC)pc.style.display='none'; return; }
@@ -3194,12 +3553,18 @@ function renderCart(){
     el.innerHTML=html; return;
   }
   html+=COT_CART.map((i,k)=>`<div class="cart-item">
-      ${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<div class="cart-ph"></div>'}
+      ${i.img?`<img src="${imgThumb(i.img)}" alt="" loading="lazy" decoding="async">`:'<div class="cart-ph"></div>'}
       <div class="ci-info"><b>${((i.tipo?('['+i.tipo+'] '):'')+i.nome).replace(/</g,'&lt;')}</b>
         <small>${[i.grade,i.cor,i.loja].filter(Boolean).join(' · ').replace(/</g,'&lt;')}</small>
         <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
       <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`).join('');
-  html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
+  if(COT_BUILD) html+=pcAnaliseHTML();
+  const tp=COT_CART.reduce((s,i)=>s+(i.totalParc||0),0);
+  html+=`<label class="cart-somar"><input type="checkbox" ${COT_SOMAR?'checked':''} onchange="toggleSomar(this.checked)"> Mostrar o valor total no orçamento</label>`;
+  if(COT_SOMAR){
+    html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
+    if(tp>0) html+=`<div class="cart-total parc"><span>💳 Parcelado (total no cartão)</span><b>${fmtMoney(tp)}</b></div>`;
+  }
   if(COT_FRETE_TOTAL>0){
     html+=`<div class="frete-tag">🚚 Frete ${fmtMoney(COT_FRETE_TOTAL)} já dividido e embutido nos preços</div>`;
   }
@@ -3207,6 +3572,7 @@ function renderCart(){
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoPDF(true)">📄 Baixar PDF</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="copiarTexto()">📋 Copiar texto</button>`;
+  html+=`<button class="btn ghost cart-send2" onclick="anexarAoDiagnostico('cot')">📎 Anexar ao diagnóstico</button>`;
   html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
   el.innerHTML=html;
 }
@@ -3218,11 +3584,11 @@ async function logoPng(){
     im.onerror=()=>res(null); im.src='logo-chip7.png'; });
 }
 function imgThumb(url){ return url?('https://images.weserv.nl/?url='+encodeURIComponent(url.replace(/^https?:\/\//,''))+'&w=120&h=120&fit=contain&cbg=white&output=jpg'):''; }
-async function imgParaDataURL(url){
+async function imgParaDataURL(url,w){
   if(!url) return null;
   const raw=url.replace(/^https?:\/\//,'');
   // weserv: proxy de imagens com CORS (converte webp->jpg e redimensiona) -> rápido e sem taint
-  const fontes=['https://images.weserv.nl/?url='+encodeURIComponent(raw)+'&w=700&output=jpg', url];
+  const fontes=['https://images.weserv.nl/?url='+encodeURIComponent(raw)+'&w='+(w||700)+'&output=jpg', url];
   for(const src of fontes){
     const data=await new Promise(res=>{ const im=new Image(); im.crossOrigin='anonymous';
       im.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=im.naturalWidth;cv.height=im.naturalHeight;
@@ -3289,7 +3655,7 @@ async function gerarCotacaoPDF(baixar){
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);doc.text((it.parcelas||10)+'x de '+fmtMoney(it.parcela),W-M-14,y+62,{align:'right'});
     y+=rowH;
   }
-  if(itens.length>1){
+  if(itens.length>1 && COT_SOMAR){
     if(y+60>bottom){ footer(); doc.addPage(); header(); y=100; }
     const tv=itens.reduce((s,i)=>s+i.aVista,0), tp=itens.reduce((s,i)=>s+(i.totalParc||0),0);
     y+=6; doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
@@ -3297,6 +3663,24 @@ async function gerarCotacaoPDF(baixar){
     doc.setFontSize(18);doc.setTextColor(10,37,80);doc.text(fmtMoney(tv),W-M-14,y+25,{align:'right'});
     doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(95,105,120);doc.text('Parcelado total: '+fmtMoney(tp),W-M-14,y+44,{align:'right'});
     y+=54;
+  }
+  // desempenho estimado (Montar PC)
+  if(COT_BUILD){
+    const an=pcAnaliseData();
+    if(an&&an.jogos){
+      if(y+120>bottom){ footer(); doc.addPage(); header(); y=100; }
+      y+=20; doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(10,37,80);doc.text('Desempenho estimado em jogos (1080p)',M,y); y+=8;
+      const cw=(W-2*M-3*8)/4, ch=52;
+      an.jogos.forEach((j,k)=>{ const x=M+k*(cw+8);
+        doc.setFillColor(10,37,80); doc.roundedRect(x,y,cw,ch,7,7,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.text(String(j.fps),x+cw/2,y+22,{align:'center'});
+        doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(190,205,230); doc.text('FPS',x+cw/2,y+31,{align:'center'});
+        doc.setFontSize(8); doc.setTextColor(255,255,255); doc.text(j.nome.split(' (')[0].slice(0,20),x+cw/2,y+43,{align:'center'});
+      });
+      y+=ch+14;
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);
+      doc.text('Resolução recomendada: '+an.res+'.  Valores estimados — variam conforme jogo, ajustes e drivers.',M,y); y+=6;
+    }
   }
   // observações / garantia
   if(obs){
@@ -3325,8 +3709,35 @@ function salvarNoHistorico(itens){
   if(!itens||!itens.length) return;
   const cliente=((document.getElementById('cotCliente')||{}).value||'').trim();
   const arr=histLoad();
-  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',modulo:(COT_CEL?'celular':COT_BUILD?'pc':'cotacao'),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
   histSave(arr);
+}
+/* histórico do módulo de câmeras — guarda o croqui (sem fotos, pra caber na nuvem) e reabre depois */
+function slimCam(){
+  return JSON.parse(JSON.stringify({comodos:CAM.comodos,paredes:CAM.paredes,cameras:CAM.cameras.map(x=>({...x,foto:''})),textos:CAM.textos,marcas:CAM.marcas,dvr:CAM.dvr,cabos:CAM.cabos,wifi:CAM.wifi,postes:CAM.postes,itens:CAM.itens}));
+}
+function salvarNoHistoricoCam(){
+  const c=CAM._calc; if(!c||!c.total)return;
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const arr=histLoad();
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente:g('camCliente'),status:'enviado',modulo:'camera',
+    totalVista:c.total, resumo:CAM.cameras.length+' câmera(s) · '+CAM.itens.filter(i=>i.desc).length+' item(ns) · '+c.parcelas+'x de '+fmtMoney(c.parcela),
+    cam:slimCam(),
+    campos:{tel:g('camTel'),endereco:g('camEndereco'),tecnico:g('camTecnico'),parede:g('camParede'),dataIni:g('camData'),cobertura:g('camCobertura'),caboM:g('camCaboM'),caboV:g('camCaboV'),horas:g('camHoras'),horaV:g('camHoraV'),lucro:g('camLucroPct'),obs:g('camObs'),escala:g('camEscala')}});
+  histSave(arr);
+}
+function reabrirHistCam(id){
+  const h=histLoad().find(x=>x.id===id); if(!h||!h.cam)return;
+  Object.assign(CAM,{comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[]}, JSON.parse(JSON.stringify(h.cam)));
+  CAM.bgOn=false; CAM.bgImg=null; camCaboAtual=null;
+  irModulo('camera');
+  const set=(i,v)=>{const e=document.getElementById(i); if(e&&v!=null&&v!=='')e.value=v;};
+  const f=h.campos||{};
+  set('camCliente',h.cliente); set('camTel',f.tel); set('camEndereco',f.endereco); set('camTecnico',f.tecnico); set('camParede',f.parede);
+  set('camData',f.dataIni); set('camCobertura',f.cobertura); set('camCaboM',f.caboM); set('camCaboV',f.caboV);
+  set('camHoras',f.horas); set('camHoraV',f.horaV); set('camLucroPct',f.lucro); set('camObs',f.obs); set('camEscala',f.escala);
+  renderCamItens(); renderCamPontos(); camRedraw(); camCalc(); camCalcCabo();
+  toast('📹 Orçamento de câmeras reaberto');
 }
 const HIST_ST={enviado:'Enviado',fechado:'✅ Fechado',perdido:'❌ Perdido'};
 function histSetStatus(id,st){ const arr=histLoad(); const h=arr.find(x=>x.id===id); if(h){ h.status=st; histSave(arr); abrirHistorico(); } }
@@ -3345,16 +3756,22 @@ function abrirHistorico(){
     <div class="vb-row vb-bad"><span>❌ Perdido</span><b>${perd.length} · ${fmtMoney(soma(perd))}</b></div></div>`;
   html+=arr.map(h=>{
     const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const nomes=h.itens.map(i=>(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
+    const mod=h.modulo||'cotacao';
+    const modTag={cotacao:'💰',pc:'🖥️ PC',celular:'📱 Celular',camera:'📹 Câmeras'}[mod]||'💰';
+    const titulo = mod==='camera' ? (h.resumo||'Orçamento de câmeras') : (h.itens?h.itens.length:0)+' item(ns)';
+    const nomes = mod==='camera' ? '' : (h.itens||[]).map(i=>(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
     const st=h.status||'enviado';
     const chips=['enviado','fechado','perdido'].map(s=>`<span class="st-chip s-${s}${st===s?' on':''}" onclick="histSetStatus(${h.id},'${s}')">${HIST_ST[s]}</span>`).join('');
     const cli=h.cliente?(' · '+h.cliente.replace(/</g,'&lt;')):'';
-    return `<div class="hist-item"><div class="hi-info"><b>${h.itens.length} item(ns) · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}</small><small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small><div class="st-chips">${chips}</div></div>
-      <div class="hi-acts"><button class="btn ghost" onclick="reabrirHist(${h.id})">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
+    const reabrir = mod==='camera' ? `reabrirHistCam(${h.id})` : `reabrirHist(${h.id})`;
+    return `<div class="hist-item"><div class="hi-info"><b>${modTag} · ${titulo} · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}</small>${nomes?`<small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small>`:''}<div class="st-chips">${chips}</div></div>
+      <div class="hi-acts"><button class="btn ghost" onclick="${reabrir}">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
   }).join('');
   box.innerHTML=html;
 }
-function reabrirHist(id){ const h=histLoad().find(x=>x.id===id); if(!h)return; COT_CART=h.itens.map(i=>({...i})); renderCart(); renderProdutos(); toast('Orçamento reaberto no carrinho ('+COT_CART.length+')'); const cc=document.getElementById('cotCart'); if(cc)cc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function reabrirHist(id){ const h=histLoad().find(x=>x.id===id); if(!h)return;
+  COT_BUILD=(h.modulo==='pc'); COT_CEL=(h.modulo==='celular'); setBuildUI();
+  COT_CART=h.itens.map(i=>({...i})); renderCart(); renderProdutos(); toast('Orçamento reaberto no carrinho ('+COT_CART.length+')'); const cc=document.getElementById('cotCart'); if(cc)cc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 function excluirHist(id){ histSave(histLoad().filter(x=>x.id!==id)); abrirHistorico(); }
 /* ====== Custos/lucros por categoria (configuráveis) ====== */
 const CAT_LABELS={'placa-mae':'Placa-mãe','iphone-novo':'iPhone (novo)','recondicionado':'Recondicionado / Seminovo','notebook':'Notebook','processador':'Processador','placa-video':'Placa de vídeo','ssd':'SSD / Armazenamento','memoria':'Memória RAM','outro':'Outro'};
@@ -3549,9 +3966,10 @@ async function gerarCotacaoImagem(){
   // card branco
   const cardX=56, cardY=180, cardW=W-112, cardH=H-300;
   cx.fillStyle='#fff'; cpRoundRect(cx,cardX,cardY,cardW,cardH,28); cx.fill();
-  // foto
-  const fotoD=await imgParaDataURL(it.img); let ty=cardY+56, tx=cardX+48;
-  if(fotoD){ const fi=await cpLoadImg(fotoD); if(fi){ const s=300; cx.save(); cpRoundRect(cx,cardX+(cardW-s)/2,cardY+40,s,s,18); cx.clip(); cx.fillStyle='#fff'; cx.fillRect(cardX+(cardW-s)/2,cardY+40,s,s); const r=Math.min(s/fi.width,s/fi.height); const dw=fi.width*r,dh=fi.height*r; cx.drawImage(fi,cardX+(cardW-dw)/2,cardY+40+(s-dh)/2,dw,dh); cx.restore(); ty=cardY+380; } }
+  // foto (alta resolução + suavização de qualidade pra não sair serrilhada)
+  cx.imageSmoothingEnabled=true; cx.imageSmoothingQuality='high';
+  const fotoD=await imgParaDataURL(it.img,1000); let ty=cardY+56, tx=cardX+48;
+  if(fotoD){ const fi=await cpLoadImg(fotoD); if(fi){ const s=340; cx.save(); cpRoundRect(cx,cardX+(cardW-s)/2,cardY+40,s,s,18); cx.clip(); cx.fillStyle='#fff'; cx.fillRect(cardX+(cardW-s)/2,cardY+40,s,s); const r=Math.min(s/fi.width,s/fi.height); const dw=fi.width*r,dh=fi.height*r; cx.drawImage(fi,cardX+(cardW-dw)/2,cardY+40+(s-dh)/2,dw,dh); cx.restore(); ty=cardY+420; } }
   // nome
   cx.fillStyle='#1b2430'; cx.font='bold 40px Arial'; cx.textAlign='center';
   const nlin=wrapText(cx,it.nome,W/2,ty,cardW-120,46,2); ty+=nlin*46+4;
@@ -3588,7 +4006,8 @@ function montarTextoOrcamento(itens){
   let text=`*${COT_BUILD?'Orçamento de Computador':'Orçamento'} — ${CHIP7.nome}*\n`;
   if(cliente) text+=`Para: ${cliente}\n`;
   text+='\n'+itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
-  if(itens.length>1){ const tv=itens.reduce((s,i)=>s+i.aVista,0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; }
+  if(itens.length>1 && COT_SOMAR){ const tv=itens.reduce((s,i)=>s+i.aVista,0), tp=itens.reduce((s,i)=>s+(i.totalParc||0),0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; if(tp>0) text+=`\n💳 Parcelado: total ${fmtMoney(tp)}`; }
+  if(COT_BUILD){ const an=pcAnaliseData(); if(an&&an.jogos){ text+='\n\n🎮 *Desempenho estimado (1080p)*\n'+an.jogos.map(j=>`• ${j.nome}: ~${j.fps} FPS`).join('\n')+`\n📺 Resolução recomendada: ${an.res}`; } }
   const prazo=parseInt(g('cotPrazo'),10)||0;
   if(prazo) text+=`\n\n🚚 Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}`;
   if(obs) text+=`\n\n${obs}`;
@@ -3630,8 +4049,7 @@ function renderClientReport(snap){
 let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[],bg:null,bgImg:null,bgOn:false,coords:null,_calc:null}, camTipoTool='comodo', camCtx=null, camCaboAtual=null;
 function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
 function camInit(){
-  const sel=document.getElementById('camParcelas');
-  if(sel && !sel.options.length){ sel.innerHTML=Object.keys(TAXAS_CARTAO).map(n=>`<option value="${n}"${n=='10'?' selected':''}>${n}x · ${String(TAXAS_CARTAO[n]).replace('.',',')}%</option>`).join(''); }
+  refreshMaqUI();
   const dt=document.getElementById('camData'); if(dt && !dt.value) dt.value=new Date().toISOString().slice(0,10);
   const cv=document.getElementById('camCanvas'); if(cv){ camCtx=cv.getContext('2d'); camBindCanvas(cv); }
   CAM.cabos=CAM.cabos||[]; CAM.wifi=CAM.wifi||[]; CAM.postes=CAM.postes||[]; camCaboAtual=null;
@@ -3872,7 +4290,7 @@ function renderCamPontos(){
       <select onchange="CAM.cameras[${i}].tipo=this.value;camRedraw();renderCamPontos()">${tipos.map(t=>`<option ${c.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="cam-pt-bot">${foto}${sinal}</div></div>`;
   }).join('');
-  camCaboAuto();
+  camCalc();
 }
 function camAddFotoPonto(i,input){ const f=input.files&&input.files[0]; if(!f)return; compressImage(f,720,0.6).then(d=>{ if(CAM.cameras[i]){ CAM.cameras[i].foto=d; renderCamPontos(); toast('📷 Foto do local adicionada'); } }).catch(()=>toast('Não consegui adicionar a foto')); input.value=''; }
 function camDelFotoPonto(i){ if(CAM.cameras[i]){ CAM.cameras[i].foto=''; renderCamPontos(); } }
@@ -3896,14 +4314,18 @@ function camAddItem(){ CAM.itens.push({desc:'',qtd:1,valor:0}); renderCamItens()
 function renderCamItens(){
   const box=document.getElementById('camItens'); if(!box)return;
   box.innerHTML=CAM.itens.map((it,i)=>`<div class="cam-item">
-    ${it.img?`<img class="cam-item-img" src="${imgThumb(it.img)}" alt="" onerror="this.style.display='none'">`:'<div class="cam-item-img ph"></div>'}
+    ${it.img?`<img class="cam-item-img" src="${imgThumb(it.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`:'<div class="cam-item-img ph"></div>'}
     <input style="flex:2;min-width:0" value="${(it.desc||'').replace(/"/g,'&quot;')}" placeholder="Descrição (ex.: Câmera Bullet 1080p)" oninput="CAM.itens[${i}].desc=this.value">
     <input style="width:42px" type="number" inputmode="numeric" value="${it.qtd}" oninput="CAM.itens[${i}].qtd=+this.value||0;camCalc()">
     <input style="width:72px" type="number" inputmode="decimal" value="${it.valor}" placeholder="R$" oninput="CAM.itens[${i}].valor=+this.value||0;camCalc()">
     <button class="ci-del" onclick="CAM.itens.splice(${i},1);renderCamItens();camCalc()">✕</button></div>`).join('');
   camCalc();
 }
-function camCaboAuto(){ const por=parseFloat((document.getElementById('camCaboPorCam')||{}).value)||0; const m=document.getElementById('camCaboM'); if(por>0 && m){ m.value=(CAM.cameras.length*por).toFixed(0); } camCalc(); }
+function camEstimarCabo(){ const por=parseFloat((document.getElementById('camCaboPorCam')||{}).value)||0; const m=document.getElementById('camCaboM'); const n=CAM.cameras.length;
+  if(!n){ toast('Adicione as câmeras primeiro'); return; }
+  if(por<=0){ toast('Digite os metros por câmera pra estimar'); return; }
+  if(m){ m.value=(n*por).toFixed(0); } camCalc(); toast('📏 Total estimado: '+(n*por)+' m ('+n+' câmera'+(n>1?'s':'')+' × '+por+' m)');
+}
 async function camBuscarCabo(){
   const q=(document.getElementById('camCaboBusca').value||'').trim(); const res=document.getElementById('camCaboRes'); if(!res)return; if(!q){res.innerHTML='';return;}
   res.innerHTML='<p class="cot-hint" style="margin:6px 0">🔄 Buscando cabo...</p>';
@@ -3921,19 +4343,48 @@ function camUsarCabo(k){ const a=(CAM._cabos||[])[k]; if(!a)return;
   document.getElementById('camCaboRes').innerHTML=''; document.getElementById('camCaboBusca').value='';
   camCalc(); toast('✔ Cabo linkado (R$ '+rsM.toFixed(2)+'/m)');
 }
+let CAM_ARRED = localStorage.getItem('chip7_cam_arred')!=='0';
+function camToggleArred(){ CAM_ARRED=!CAM_ARRED; try{localStorage.setItem('chip7_cam_arred',CAM_ARRED?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); camCalc(); }
+function camLucroRsInput(){
+  const num=id=>parseFloat((document.getElementById(id)||{}).value)||0;
+  const base=num('camCaboM')*num('camCaboV')+CAM.itens.reduce((s,it)=>s+(it.qtd||0)*(it.valor||0),0);
+  const rs=num('camLucroRs'); const pctEl=document.getElementById('camLucroPct');
+  if(pctEl && base>0){ pctEl.value=(rs/base*100).toFixed(1).replace(/\.0$/,''); }
+  camCalc();
+}
 function camCalc(){
   const num=id=>parseFloat((document.getElementById(id)||{}).value)||0;
   const cabo=num('camCaboM')*num('camCaboV'), mao=num('camHoras')*num('camHoraV');
   const itens=CAM.itens.reduce((s,it)=>s+(it.qtd||0)*(it.valor||0),0);
-  const total=cabo+mao+itens;
-  const sel=document.getElementById('camParcelas'); const N=parseInt(sel?sel.value:'10',10)||10;
-  const parcela=arredCima5(total*(1+(TAXAS_CARTAO[N]||0)/100)/N);
-  CAM._calc={total,cabo,mao,itens,parcela,parcelas:N,totalParc:parcela*N};
+  const pct=num('camLucroPct');
+  const custoMat=cabo+itens;                    // materiais (custo)
+  const lucro=custoMat*pct/100;                 // lucro sobre materiais (mão de obra é sua)
+  let total=custoMat+lucro+mao;
+  if(CAM_ARRED && total>0) total=arredNice(total);
+  const sel=document.getElementById('camParcelas'); const N=Math.min(parseInt(sel?sel.value:'10',10)||10, maqMax());
+  const taxaPct=maqTaxa(N);
+  const totalCartao=precoComTaxa(total,taxaPct);
+  const parcela=CAM_ARRED?arredCima5(totalCartao/N):Math.round(totalCartao/N*100)/100;
+  const fator=custoMat>0?(total-mao)/custoMat:1;   // p/ mostrar os itens já com lucro no PDF/Whats
+  CAM._calc={total,cabo,mao,itens,custoMat,lucro,pct,fator,parcela,parcelas:N,taxa:taxaPct,maq:maqNome(),totalParc:parcela*N};
+  const rsField=document.getElementById('camLucroRs');
+  if(rsField && document.activeElement!==rsField) rsField.value=lucro?Math.round(lucro):'';
   const el=document.getElementById('camResult'); if(!el)return;
   if(!total){ el.innerHTML='<p class="cot-result-empty">Preencha materiais/serviço para ver o total.</p>'; return; }
-  el.innerHTML=`<div class="cr-venda big"><b>Total · ${CAM.cameras.length} câmera(s)</b><span>${fmtMoney(total)}</span></div>
+  el.innerHTML=`
+    <details class="cr-calc"><summary>🔎 Como cheguei no preço · só você vê (não vai no PDF)</summary>
+      <div class="cr-line"><span>Materiais (custo)</span><b>${fmtMoney(itens)}</b></div>
+      <div class="cr-line"><span>+ Cabo (${num('camCaboM')} m)</span><b>+ ${fmtMoney(cabo)}</b></div>
+      <div class="cr-line"><span>+ Lucro (${(pct%1?pct.toFixed(1):pct.toFixed(0)).replace('.',',')}%)</span><b>+ ${fmtMoney(lucro)}</b></div>
+      <div class="cr-line"><span>+ Mão de obra (${num('camHoras')} h)</span><b>+ ${fmtMoney(mao)}</b></div>
+      <div class="cr-line"><span>= Total pro cliente${CAM_ARRED?' (arredondado)':''}</span><b>${fmtMoney(total)}</b></div>
+      <div class="cr-line"><span>💵 Seu lucro</span><b>${fmtMoney(lucro+mao)}</b></div>
+      <div class="cr-line"><span>+ Taxa ${maqNome()} (${N}x · ${String(taxaPct).replace('.',',')}%)</span><b>+ ${fmtMoney(totalCartao-total)}</b></div>
+    </details>
+    <div class="cr-venda big"><b>Total · ${CAM.cameras.length} câmera(s)</b><span>${fmtMoney(total)}</span></div>
     <div class="cr-venda parc"><b>${N}x no cartão</b><span>${N}x de ${fmtMoney(parcela)}</span></div>
-    <div class="cr-sub">Cabo ${fmtMoney(cabo)} · Mão de obra ${fmtMoney(mao)} · Itens ${fmtMoney(itens)}</div>`;
+    <div class="cr-sub">Total no cartão ${fmtMoney(parcela*N)} · ${maqNome()}</div>
+    <button type="button" class="cr-arred${CAM_ARRED?' on':''}" onclick="camToggleArred()">${CAM_ARRED?'✓ Arredondamento ligado':'○ Sem arredondamento'}</button>`;
 }
 async function gerarCameraPDF(baixar){
   if(!window.jspdf){toast('PDF indisponível');return null;}
@@ -3980,9 +4431,10 @@ async function gerarCameraPDF(baixar){
   }
   const itensF=CAM.itens.filter(it=>it.desc&&(it.qtd*it.valor)>0);
   const fotos={}; for(const it of itensF){ if(it.img&&!(it.img in fotos)) fotos[it.img]=await imgParaDataURL(it.img); }
+  const fLucro=c.fator||1;   // itens saem pro cliente já com o lucro embutido (fecham com o total)
   const body=[], rowFotos=[];
-  itensF.forEach(it=>{ rowFotos.push(it.img?fotos[it.img]:null); body.push(['',it.desc,String(it.qtd),fmtMoney(it.valor),fmtMoney(it.qtd*it.valor)]); });
-  if(c.cabo>0){ rowFotos.push(null); body.push(['','Cabeamento ('+g('camCaboM')+' m)','','',fmtMoney(c.cabo)]); }
+  itensF.forEach(it=>{ rowFotos.push(it.img?fotos[it.img]:null); body.push(['',it.desc,String(it.qtd),fmtMoney(it.valor*fLucro),fmtMoney(it.qtd*it.valor*fLucro)]); });
+  if(c.cabo>0){ rowFotos.push(null); body.push(['','Cabeamento ('+g('camCaboM')+' m)','','',fmtMoney(c.cabo*fLucro)]); }
   if(c.mao>0){ rowFotos.push(null); body.push(['','Mão de obra ('+g('camHoras')+' h)','','',fmtMoney(c.mao)]); }
   if(body.length){ doc.autoTable({startY:y,head:[['','Item','Qtd','Unit.','Total']],body,theme:'striped',styles:{fontSize:9,cellPadding:4,minCellHeight:28,valign:'middle'},headStyles:{fillColor:[10,37,80]},columnStyles:{0:{cellWidth:32},2:{halign:'center'},3:{halign:'right'},4:{halign:'right'}},margin:{left:M,right:M},
     didDrawCell:d=>{ if(d.section==='body'&&d.column.index===0){ const f=rowFotos[d.row.index]; if(f){ try{ const s=Math.min(d.cell.width,d.cell.height)-4; doc.addImage(f,'JPEG',d.cell.x+(d.cell.width-s)/2,d.cell.y+(d.cell.height-s)/2,s,s); }catch(e){} } } }
@@ -3999,11 +4451,12 @@ async function gerarCameraPDF(baixar){
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text(CHIP7.endereco,M,fy+14);doc.text('WhatsApp '+CHIP7.tel+'   ·   '+CHIP7.site,M,fy+27);
   const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   const fname='Orçamento Câmeras'+(cliente?(' - '+cliente):'')+' - '+hoje.getDate()+' de '+meses[hoje.getMonth()]+'.pdf';
-  const blob=doc.output('blob'); if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); }
+  const blob=doc.output('blob'); if(baixar){ downloadBlob(new File([blob],fname,{type:'application/pdf'})); toast('📄 PDF gerado'); salvarNoHistoricoCam(); }
   return {blob,fname};
 }
 async function enviarCameraWhatsApp(){
   const r=await gerarCameraPDF(false); if(!r)return; const c=CAM._calc;
+  salvarNoHistoricoCam();
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   let text=`*Orçamento de Câmeras (CFTV) — ${CHIP7.nome}*\n`;
   if(g('camCliente'))text+=`Para: ${g('camCliente')}\n`;
@@ -4053,7 +4506,7 @@ async function cloudSignIn(){
   try{
     await cloud.auth.signInWithEmailAndPassword(FIREBASE_TEAM_EMAIL, FIREBASE_TEAM_PASS);
     cloud.on=true; cloud.status='on'; refreshCloudStatus();
-    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); cloudSubscribeCat(); await cloudPushLocal();
+    cloudSubscribe(); cloudSubscribeProdutos(); cloudSubscribeHist(); cloudSubscribeCfg(); cloudSubscribeForn(); cloudSubscribeCat(); cloudSubscribeFav(); cloudSubscribePrefs(); cloudSubscribeCart(); await cloudPushLocal();
     return true;
   }catch(e){ cloud.on=false; cloud.status='err'; refreshCloudStatus(); console.warn('Cloud auth:',e); return false; }
 }
@@ -4178,6 +4631,57 @@ function cloudSubscribeForn(){
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_fornecedores')){ try{localStorage.setItem('chip7_fornecedores',inc);}catch(e){} if(document.querySelector('.forn-item')||document.querySelector('.forn-add')) abrirFornecedores(); } }
     else cloudSaveForn(fornLoad());
   }, err=>console.warn('Cloud forn sync',err));
+}
+/* favoritos na nuvem */
+let _favCloudTimer=null;
+function cloudSaveFav(a){ if(!cloud.on)return; clearTimeout(_favCloudTimer); _favCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('favoritos'), {itens:a,ts:Date.now()}, 'Favoritos'); },800); }
+function cloudSubscribeFav(){
+  if(!cloud.ready) return;
+  if(cloud._unsubFav){cloud._unsubFav();cloud._unsubFav=null;}
+  cloud._unsubFav=cloud.db.collection('cotacoes').doc('favoritos').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_cot_fav')){ try{localStorage.setItem('chip7_cot_fav',inc);}catch(e){} } }
+    else cloudSaveFav(favLoad());
+  }, err=>console.warn('Cloud fav sync',err));
+}
+/* preferências (maquininha, arredondamento, mostrar total) na nuvem */
+const PREF_KEYS=['chip7_maq','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
+let _prefCloudTimer=null;
+function cloudSavePrefs(){ if(!cloud.on)return; clearTimeout(_prefCloudTimer); _prefCloudTimer=setTimeout(()=>{ const p={}; PREF_KEYS.forEach(k=>{const v=localStorage.getItem(k); if(v!=null)p[k]=v;}); cloudSet(cloud.db.collection('cotacoes').doc('prefs'), {p,ts:Date.now()}, 'Preferências'); },800); }
+function cloudSubscribePrefs(){
+  if(!cloud.ready) return;
+  if(cloud._unsubPrefs){cloud._unsubPrefs();cloud._unsubPrefs=null;}
+  cloud._unsubPrefs=cloud.db.collection('cotacoes').doc('prefs').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && d.p){ let ch=false;
+      PREF_KEYS.forEach(k=>{ if(d.p[k]!=null && localStorage.getItem(k)!==d.p[k]){ try{localStorage.setItem(k,d.p[k]);}catch(e){} ch=true; } });
+      if(ch){ COT_SOMAR=localStorage.getItem('chip7_cot_somar')!=='0'; COT_ARRED=localStorage.getItem('chip7_cot_arred')!=='0'; CAM_ARRED=localStorage.getItem('chip7_cam_arred')!=='0';
+        document.body.classList.toggle('dark', localStorage.getItem('chip7_dark')==='1');
+        refreshMaqUI();
+        if(document.getElementById('cotacaoScreen').classList.contains('show')){ cotCalc(); renderCart(); }
+        if(document.getElementById('cameraScreen').classList.contains('show')) camCalc();
+        if(document.getElementById('taxasScreen').classList.contains('show')) txRender();
+      }
+    } else cloudSavePrefs();
+  }, err=>console.warn('Cloud prefs sync',err));
+}
+/* carrinho do orçamento na nuvem (continua de onde parou em outro aparelho) */
+let _cartCloudTimer=null;
+function cartPersist(){
+  try{ localStorage.setItem('chip7_cot_cart',JSON.stringify(COT_CART)); }catch(e){}
+  if(!cloud.on)return; clearTimeout(_cartCloudTimer);
+  _cartCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('carrinho'), {itens:COT_CART,ts:Date.now()}, 'Carrinho'); },1200);
+}
+function cloudSubscribeCart(){
+  if(!cloud.ready) return;
+  if(cloud._unsubCart){cloud._unsubCart();cloud._unsubCart=null;}
+  cloud._unsubCart=cloud.db.collection('cotacoes').doc('carrinho').onSnapshot(doc=>{
+    const d=doc.data();
+    if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens);
+      if(inc!==JSON.stringify(COT_CART)){ COT_CART.length=0; d.itens.forEach(i=>COT_CART.push(i)); try{localStorage.setItem('chip7_cot_cart',inc);}catch(e){}
+        if(document.getElementById('cotacaoScreen').classList.contains('show')) renderCart(); }
+    }
+  }, err=>console.warn('Cloud cart sync',err));
 }
 let _catCloudTimer=null;
 function cloudSaveCat(a){ if(!cloud.on)return; clearTimeout(_catCloudTimer); _catCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('catalogo'), {itens:a,ts:Date.now()}, 'Catálogo de planilhas'); },800); }
