@@ -250,6 +250,10 @@ textarea{min-height:60px;resize:vertical}
 .pc-fps-i b{font-size:21px;display:inline-block}
 .pc-fps-i small{font-size:9px;opacity:.75;margin-left:2px}
 .pc-fps-i span{display:block;font-size:10.5px;opacity:.92;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-qtd{display:flex;align-items:center;gap:4px;flex:none;margin-right:2px}
+.ci-qtd button{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:#f1f5fb;color:var(--brand);font-weight:800;font-size:14px;cursor:pointer;line-height:1}
+.ci-qtd b{min-width:18px;text-align:center;font-size:13px}
+body.dark .ci-qtd button{background:#1d2a47;color:#dbe7ff;border-color:var(--line)}
 .cart-somar{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);margin:10px 0 4px;cursor:pointer}
 .cart-somar input{width:18px;height:18px;accent-color:var(--brand)}
 .cart-total.parc{font-size:13px;color:var(--muted);padding-top:0}
@@ -264,6 +268,20 @@ textarea{min-height:60px;resize:vertical}
 .tx-parc b{color:var(--brand)}
 .tx-row .tx-fee,.tx-head .tx-fee{text-align:right;font-size:11.5px;color:var(--muted)}
 .tx-liq{margin-top:8px;background:#f0fdf4;border:1px solid #bbe7c8;color:#14532d;border-radius:10px;padding:9px 12px;font-size:13px}
+/* tela de orçamentos: abas por vendedor (scroll lateral) */
+.hist-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.hist-tabs .ht{flex:none;display:inline-flex;align-items:center;gap:5px;background:#f1f5fb;border:1.5px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;white-space:nowrap}
+.hist-tabs .ht.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.hist-tabs .ht i{font-style:normal;background:rgba(0,0,0,.12);border-radius:999px;padding:1px 7px;font-size:11px}
+.hist-tabs .ht.on i{background:rgba(255,255,255,.25)}
+.hist-barra{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.hist-barra .vendas-box{flex:1;min-width:220px}
+.hist-barra .btn{flex:none;font-size:12.5px;padding:8px 12px}
+body.dark .hist-tabs .ht{background:#1d2a47;color:#dbe7ff;border-color:var(--line)}
+body.dark .hist-tabs .ht.on{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* rótulo minimizável (lojas/fornecedores) */
+.lbl-tgl{cursor:pointer;display:flex!important;align-items:center;justify-content:space-between;user-select:none;-webkit-tap-highlight-color:transparent}
+.lbl-tgl span{font-size:11px;color:var(--muted)}
 /* chips de modelos (módulo celular) */
 .cel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .cel-chip{background:#eef4ff;border:1px solid #c8dcff;color:#0b3b6f;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
@@ -717,15 +735,15 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <button id="tabForn" class="cot-tab" onclick="setModo('fornecedores')">🏪 Fornecedores (BR)</button>
       </div>
       <div id="celInfo" style="display:none">
-        <p class="cot-hint" style="margin:0 0 8px">📱 A busca procura em <b>tudo de uma vez</b>: importados + Mazer + Guarapuava + catálogo. Toque num modelo:</p>
+        <p class="cot-hint" style="margin:0 0 8px">📱 Busca direto nos <b>importados</b>. Toque num modelo:</p>
         <div class="cel-chips" id="celChips"></div>
       </div>
       <div id="lojasWrap">
-        <label class="cot-lbl">Lojas (importados)</label>
+        <label class="cot-lbl lbl-tgl" onclick="toggleLojas('cotLojas',this)">Lojas (importados) <span>▾ minimizar</span></label>
         <div class="cot-lojas" id="cotLojas"></div>
       </div>
       <div id="fornLojasWrap" style="display:none">
-        <label class="cot-lbl">Fornecedores a buscar</label>
+        <label class="cot-lbl lbl-tgl" onclick="toggleLojas('fornLojas',this)">Fornecedores a buscar <span>▾ minimizar</span></label>
         <div class="cot-lojas" id="fornLojas"></div>
       </div>
       <label class="cot-lbl">Buscar produto</label>
@@ -790,6 +808,10 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div class="cot-grid">
         <div><label class="cot-lbl">Grade (condição)</label><input id="cotGrade" placeholder="ex.: Grade A+ (deixe vazio se novo)"></div>
         <div><label class="cot-lbl">Cor</label><input id="cotCor" placeholder="ex.: Titânio Natural"></div>
+      </div>
+      <div class="cot-grid">
+        <div><label class="cot-lbl">Unidades</label><input id="cotQtd" type="number" min="1" inputmode="numeric" value="1"></div>
+        <div></div>
       </div>
       <label class="cot-lbl">Maquininha / bandeira</label>
       <div id="cotMaqSwitch"></div>
@@ -974,6 +996,24 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <button class="btn ghost" onclick="txZap()">📲 WhatsApp</button>
         <button class="btn ghost" onclick="txCopiar()">📋 Copiar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE ORÇAMENTOS (HISTÓRICO POR VENDEDOR) -->
+<div class="welcome cot-screen" id="histScreen">
+  <div class="cot-wrap" style="max-width:860px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="fecharHistorico()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🕘 Orçamentos</h2>
+    </div>
+    <div class="cot-card">
+      <div class="hist-tabs" id="histTabs"></div>
+      <div class="hist-barra">
+        <div id="histResumo"></div>
+        <button class="btn ghost" id="histSortBtn" onclick="histToggleSort()">⬇ Mais recentes primeiro</button>
+      </div>
+      <div id="histLista"></div>
     </div>
   </div>
 </div>
@@ -1501,7 +1541,7 @@ function getProdutos(){
   if(!Array.isArray(p)){ p=CATALOGO.map(c=>({n:c.n,v:c.v,tipo:c.tipo||'Produto'})); saveProdutos(p); }
   return p;
 }
-function saveProdutos(arr){try{localStorage.setItem(PROD_KEY,JSON.stringify(arr));}catch(e){} if(typeof cloudSaveProdutos==='function')cloudSaveProdutos(arr);}
+function saveProdutos(arr){if(typeof marcaLocal==='function')marcaLocal('prod'); try{localStorage.setItem(PROD_KEY,JSON.stringify(arr));}catch(e){} if(typeof cloudSaveProdutos==='function')cloudSaveProdutos(arr);}
 function abrirCatalogo(target){
   target=target||'opps';
   const prods=getProdutos();
@@ -2160,9 +2200,9 @@ function anexarAoDiagnostico(tipo){
   } else {
     const itens=cotItens();
     if(!itens.length){ toast('Adicione produtos ao orçamento primeiro'); return; }
-    ax={tipo:COT_BUILD?'🖥️ Computador':'💰 Cotação', cliente:((document.getElementById('cotCliente')||{}).value||'').trim(),
-        linhas:itens.map(i=>({desc:(i.tipo?('['+i.tipo+'] '):'')+i.nome,qtd:1,valor:i.aVista,parc:(i.parcelas||10)+'x de '+fmtMoney(i.parcela)})),
-        total:itens.reduce((s,i)=>s+i.aVista,0), somar:COT_SOMAR, quando:new Date().toISOString()};
+    ax={tipo:COT_CEL?'📱 Celular':COT_BUILD?'🖥️ Computador':'💰 Cotação', cliente:((document.getElementById('cotCliente')||{}).value||'').trim(),
+        linhas:itens.map(i=>({desc:(i.tipo?('['+i.tipo+'] '):'')+i.nome,qtd:i.qtd||1,valor:i.aVista,parc:(i.parcelas||10)+'x de '+fmtMoney(i.parcela)})),
+        total:itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0), somar:COT_SOMAR, quando:new Date().toISOString()};
   }
   state.anexos=state.anexos||[];
   state.anexos.push(ax);
@@ -2791,14 +2831,15 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
+  const tag=document.querySelector('#chooser .wel-tag'); if(tag)tag.textContent='👤 '+usuarioAtual()+' — o que você quer fazer?';
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
-  ['cotacaoScreen','cameraScreen','taxasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   if(m==='cotacao'){ COT_BUILD=false; COT_CEL=false; escolherCotacao(); }
   else if(m==='montar'){ COT_CEL=false; escolherMontarPC(); }
   else if(m==='celular'){ escolherCelular(); }
@@ -2825,6 +2866,8 @@ function marcarTela(){ try{ history.pushState({chip7:1},''); }catch(e){} }
 window.addEventListener('popstate',()=>{
   const w=document.getElementById('camWrap');
   if(w && w.classList.contains('fs')){ camFull(); marcarTela(); return; }   // 1º: fecha a tela cheia do croqui
+  const hs=document.getElementById('histScreen');
+  if(hs && hs.classList.contains('show')){ fecharHistorico(); marcarTela(); return; }   // voltar fecha os orçamentos primeiro
   const overlay=['cotacaoScreen','cameraScreen','taxasScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
   const chooserOn=document.getElementById('chooser').classList.contains('show');
   const welcomeOn=document.getElementById('welcome').classList.contains('show');
@@ -3023,8 +3066,8 @@ function atualizarBotoesDark(){
 function toggleDark(){ const on=!document.body.classList.contains('dark'); document.body.classList.toggle('dark',on); try{localStorage.setItem('chip7_dark',on?'1':'0');}catch(e){} atualizarBotoesDark(); if(typeof cloudSavePrefs==='function')cloudSavePrefs(); toast(on?'🌙 Modo escuro ligado':'☀️ Modo claro'); }
 if(localStorage.getItem('chip7_dark')==='1') document.body.classList.add('dark');
 atualizarBotoesDark();
-// restaura o carrinho da última sessão (e sincroniza com a nuvem quando logado)
-try{ const _cc=JSON.parse(localStorage.getItem('chip7_cot_cart')||'[]'); if(Array.isArray(_cc)) _cc.forEach(i=>COT_CART.push(i)); }catch(e){}
+// restaura o carrinho DO USUÁRIO da última sessão (e sincroniza com a nuvem quando logado)
+try{ const _cc=JSON.parse(localStorage.getItem('chip7_cot_cart_'+(localStorage.getItem('chip7_user')||'Chip7'))||'[]'); if(Array.isArray(_cc)) _cc.forEach(i=>COT_CART.push(i)); }catch(e){}
 function setModo(m){
   COT_MODO=m;
   const ti=document.getElementById('tabImp'), tf=document.getElementById('tabForn');
@@ -3039,27 +3082,36 @@ function setModo(m){
 const PECAS_PC=['Processador','Placa-mãe','Memória RAM','SSD / HD','Placa de vídeo','Fonte','Gabinete','Cooler / Water'];
 /* ====== análise do PC: gargalo CPU×GPU + FPS estimado (heurística, escala 0–200) ====== */
 const PC_CPUS=[
-  [/i9|ryzen ?9/i,135],[/i7[- ]?1[234]\d{3}|ryzen ?7 ?7[78]00/i,115],[/ryzen ?7 ?5[78]00/i,110],[/i7/i,85],[/ryzen ?7/i,95],
-  [/i5[- ]?1[234]\d{3}/i,90],[/ryzen ?5 ?(5[56]00|7[56]00)/i,92],[/i5[- ]?(10|11)\d{3}/i,70],[/i5/i,55],[/ryzen ?5/i,70],
-  [/i3[- ]?1[234]\d{3}/i,62],[/i3/i,38],[/ryzen ?3 ?[45]\d{3}/i,52],[/ryzen ?3/i,38],
-  [/athlon|celeron|pentium/i,20]
+  [/ryzen ?9 ?9\d{3}|core ?ultra ?9/i,150],[/i9|ryzen ?9/i,135],
+  [/ryzen ?7 ?9[78]00/i,135],[/core ?ultra ?7/i,120],[/i7[- ]?1[234]\d{3}|ryzen ?7 ?(7[78]00|8[78]00)/i,115],[/ryzen ?7 ?5[78]00/i,110],[/ryzen ?7/i,95],[/i7/i,85],
+  [/ryzen ?5 ?9[56]00/i,110],[/core ?ultra ?5/i,95],[/ryzen ?5 ?(7[56]00|8[456]00)/i,100],[/i5[- ]?1[234]\d{3}/i,90],[/ryzen ?5 ?5[56]00/i,92],[/i5[- ]?(10|11)\d{3}/i,70],[/ryzen ?5/i,70],[/i5/i,55],
+  [/i3[- ]?1[234]\d{3}/i,62],[/ryzen ?3 ?[45]\d{3}/i,52],[/i3/i,38],[/ryzen ?3/i,38],
+  [/athlon|celeron|pentium/i,20],
+  [/ryzen ?7 ?\d{4}/i,110],[/ryzen ?5 ?\d{4}/i,85],[/core ?i[57]/i,80]   // reservas p/ modelos futuros
 ];
 const PC_GPUS=[
-  [/rtx ?4090/i,200],[/rtx ?4080/i,180],[/rx ?7900/i,170],[/rtx ?4070|rtx ?3080/i,150],[/rx ?7800/i,160],
-  [/rtx ?4060 ?ti/i,120],[/rtx ?4060|rtx ?3060 ?ti/i,110],[/rx ?7600|rx ?66\d0 ?xt/i,105],[/rtx ?3060/i,95],[/rx ?6600/i,100],
+  [/rtx ?5090/i,230],[/rtx ?5080/i,195],[/rtx ?5070 ?ti/i,170],[/rtx ?5070/i,148],[/rtx ?5060 ?ti/i,122],[/rtx ?5060/i,108],[/rtx ?5050/i,85],
+  [/rtx ?4090/i,200],[/rtx ?4080/i,180],[/rtx ?4070 ?ti/i,160],[/rx ?9070 ?xt/i,165],[/rx ?9070/i,150],[/rx ?9060/i,105],[/rx ?7900/i,170],
+  [/rtx ?4070|rtx ?3080/i,150],[/rx ?7800/i,160],[/rx ?7700/i,120],
+  [/rtx ?4060 ?ti/i,120],[/rtx ?4060|rtx ?3060 ?ti/i,110],[/rx ?7600|rx ?66\d0 ?xt/i,105],[/rx ?6600/i,100],[/rtx ?3060/i,95],[/arc ?(a7|b5)\d0/i,95],
   [/rtx ?3050|rtx ?2060/i,75],[/gtx ?16[65]0 ?(ti|super)/i,55],[/gtx ?1660/i,52],[/gtx ?1650/i,45],[/rx ?6500/i,55],
   [/gtx ?10[65]0 ?ti/i,40],[/gtx ?1050|rx ?580/i,33],[/rx ?550|gt ?10?30/i,22],
-  [/vega|iris|uhd|integrad|igpu|onboard/i,12]
+  [/vega|iris|uhd|integrad|igpu|onboard/i,12],
+  [/rtx ?[56]0\d0/i,150],[/rtx ?[34]0\d0/i,110],[/rx ?[89]\d{3}/i,130]   // reservas p/ modelos futuros
 ];
-const PC_GPU_SUG=[['GTX 1650',45],['RX 6500 XT',55],['RTX 3050',75],['RTX 3060',95],['RX 6600',100],['RTX 4060',110],['RTX 4060 Ti',120],['RTX 4070',150],['RX 7800 XT',160],['RTX 4080',180]];
-const PC_CPU_SUG=[['i3-12100F',62],['i5-12400F',90],['Ryzen 5 5600',92],['Ryzen 5 7600',105],['i5-13400F',95],['i7-12700F',115],['Ryzen 7 7700',120],['i9 / Ryzen 9',135]];
+const PC_GPU_SUG=[['GTX 1650',45],['RX 6500 XT',55],['RTX 3050',75],['RTX 3060',95],['RX 6600',100],['RTX 5060',108],['RTX 4060 Ti',120],['RTX 5070',148],['RX 9070 XT',165],['RTX 5080',195]];
+const PC_CPU_SUG=[['i3-12100F',62],['i5-12400F',90],['Ryzen 5 5600',92],['Ryzen 5 7600',100],['i5-14400F',95],['Ryzen 5 9600X',110],['i7-14700F',115],['Ryzen 7 7700',115],['Ryzen 7 9800X3D',135]];
 const PC_JOGOS=[['CS2 (Counter-Strike 2)',3.2],['Valorant',4.0],['GTA V',1.6],['Fortnite',1.7]];
 function pcScore(nome,tab){ for(const [re,s] of tab){ if(re.test(nome||'')) return s; } return 0; }
 function pcAnaliseData(){
   const cpuIt=COT_CART.find(i=>i.tipo==='Processador'), gpuIt=COT_CART.find(i=>i.tipo==='Placa de vídeo');
+  if(!cpuIt&&!gpuIt) return null;
   const cpu=cpuIt?pcScore(cpuIt.nome,PC_CPUS):0, gpu=gpuIt?pcScore(gpuIt.nome,PC_GPUS):0;
-  if(!cpu&&!gpu) return null;
   const out={cpu,gpu,cpuNome:cpuIt&&cpuIt.nome,gpuNome:gpuIt&&gpuIt.nome};
+  // cotado mas modelo não reconhecido ≠ faltando
+  out.desconhecidos=[];
+  if(cpuIt&&!cpu) out.desconhecidos.push('processador');
+  if(gpuIt&&!gpu) out.desconhecidos.push('placa de vídeo');
   if(cpu&&gpu){
     const eff=Math.min(gpu,cpu*1.15);
     out.eff=eff;
@@ -3069,8 +3121,8 @@ function pcAnaliseData(){
     if(r<0.6){ out.gargalo={lado:'cpu',pct:Math.round((1-r)*100),msg:'O processador segura a placa de vídeo'}; out.sug=PC_CPU_SUG.filter(s=>s[1]>=gpu*0.75&&s[1]<=gpu*1.35).map(s=>s[0]); }
     else if(r>1.7){ out.gargalo={lado:'gpu',pct:Math.round((1-1/r)*100),msg:'A placa de vídeo segura o processador'}; out.sug=PC_GPU_SUG.filter(s=>s[1]>=cpu*0.8&&s[1]<=cpu*1.3).map(s=>s[0]); }
     else out.gargalo={lado:'ok',pct:0,msg:'Conjunto equilibrado — sem gargalo relevante'};
-  } else if(cpu){ out.faltando='Placa de vídeo'; out.sug=PC_GPU_SUG.filter(s=>s[1]>=cpu*0.8&&s[1]<=cpu*1.3).map(s=>s[0]); }
-  else { out.faltando='Processador'; out.sug=PC_CPU_SUG.filter(s=>s[1]>=gpu*0.75&&s[1]<=gpu*1.35).map(s=>s[0]); }
+  } else if(cpu&&!gpuIt){ out.faltando='Placa de vídeo'; out.sug=PC_GPU_SUG.filter(s=>s[1]>=cpu*0.8&&s[1]<=cpu*1.3).map(s=>s[0]); }
+  else if(gpu&&!cpuIt){ out.faltando='Processador'; out.sug=PC_CPU_SUG.filter(s=>s[1]>=gpu*0.75&&s[1]<=gpu*1.35).map(s=>s[0]); }
   return out;
 }
 function pcAnaliseHTML(){
@@ -3082,6 +3134,7 @@ function pcAnaliseHTML(){
     h+=`<div class="pc-garg" style="border-color:${cor}"><b style="color:${cor}">${an.gargalo.lado==='ok'?'✅':'⚠️'} ${an.gargalo.msg}${an.gargalo.pct?(' (~'+an.gargalo.pct+'% de gargalo)'):''}</b></div>`;
   }
   if(an.faltando) h+=`<div class="pc-garg" style="border-color:#d97706"><b style="color:#d97706">Falta cotar: ${an.faltando}</b></div>`;
+  if(an.desconhecidos&&an.desconhecidos.length) h+=`<div class="pc-garg" style="border-color:#64748b"><b style="color:#64748b">🤔 Não reconheci o modelo do ${an.desconhecidos.join(' e do ')} pra estimar o desempenho</b></div>`;
   if(an.sug&&an.sug.length) h+=`<div class="pc-sug">👍 Combina bem: ${an.sug.map(s=>`<span>${s}</span>`).join('')}</div>`;
   if(an.jogos){
     h+='<div class="pc-fps">'+an.jogos.map(j=>`<div class="pc-fps-i"><b>${j.fps}</b><small>FPS</small><span>${j.nome.split(' (')[0]}</span></div>`).join('')+'</div>';
@@ -3113,8 +3166,8 @@ const PC_ICONES={'Processador':'🧠','Placa-mãe':'🔲','Memória RAM':'📗',
 /* deteta o tipo da peça pelo nome (se o vendedor não escolheu no select) */
 function detectarTipoPeca(nome){
   const n=(nome||'').toLowerCase();
+  if(/rtx|gtx|radeon|\brx ?\d{3,4}\b|placa de v[íi]deo|geforce|\barc ?[ab]\d{3}\b/.test(n)) return 'Placa de vídeo';
   if(/placa[\s-]?m[ãa]e|\b[abxz][3-7]\d0m?\b|h\d{3}m?\b/.test(n)) return 'Placa-mãe';
-  if(/rtx|gtx|radeon|\brx ?\d{3,4}\b|placa de v[íi]deo|geforce/.test(n)) return 'Placa de vídeo';
   if(/ryzen|core i[3579]|processador|athlon|pentium|celeron/.test(n)) return 'Processador';
   if(/mem[óo]ria|\bddr[345]\b|\bram\b/.test(n)) return 'Memória RAM';
   if(/\bssd\b|\bnvme\b|\bhd\b|hard disk|disco/.test(n)) return 'SSD / HD';
@@ -3136,7 +3189,7 @@ function renderPcBoard(){
     const k=COT_CART.findIndex(i=>i.tipo===p);
     const it=k>=0?COT_CART[k]:null;
     if(!it) return `<button type="button" class="pc-slot" onclick="escolherPeca('${p.replace(/'/g,"\\'")}')"><span class="ps-ico">${PC_ICONES[p]||'📦'}</span><b>+ ${p}</b><small>toque pra pesquisar</small></button>`;
-    return `<div class="pc-slot ok"><span class="ps-ico">${PC_ICONES[p]||'📦'}</span><b>${p}</b><small>${(it.nome||'').replace(/</g,'&lt;').slice(0,42)}</small><span class="ps-preco">${fmtMoney(it.aVista)}</span><button type="button" class="ps-x" onclick="removerCart(${k})" title="Tirar">✕</button></div>`;
+    return `<div class="pc-slot ok"><span class="ps-ico">${PC_ICONES[p]||'📦'}</span><b>${p}</b><small>${((it.qtd||1)>1?(it.qtd+'× '):'')+(it.nome||'').replace(/</g,'&lt;').slice(0,42)}</small><span class="ps-preco">${fmtMoney(it.aVista*(it.qtd||1))}</span><button type="button" class="ps-x" onclick="removerCart(${k})" title="Tirar">✕</button></div>`;
   }).join('');
   const an=document.getElementById('pcBoardAnalise');
   if(an) an.innerHTML=pcAnaliseHTML();
@@ -3284,8 +3337,8 @@ function htmlProdHit(i,n){ const fav=isFav(i);
     <span class="fav-star${fav?' on':''}" onclick="event.stopPropagation();toggleFav(${n})" title="Favoritar">${fav?'★':'☆'}</span>
     <span class="ph-go">›</span></div>`; }
 /* ====== favoritos de produtos ====== */
-function favLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_fav')||'[]'); }catch(e){ return []; } }
-function favSave(a){ try{ localStorage.setItem('chip7_cot_fav',JSON.stringify(a.slice(0,80))); }catch(e){} if(typeof cloudSaveFav==='function')cloudSaveFav(a.slice(0,80)); }
+function favLoad(){ try{ const a=JSON.parse(localStorage.getItem('chip7_cot_fav')||'[]'); a.forEach(f=>{ if(f&&f.fonte==='Paraguai')f.fonte='Importados'; }); return a; }catch(e){ return []; } }
+function favSave(a){ if(typeof marcaLocal==='function')marcaLocal('fav'); try{ localStorage.setItem('chip7_cot_fav',JSON.stringify(a.slice(0,80))); }catch(e){} if(typeof cloudSaveFav==='function')cloudSaveFav(a.slice(0,80)); }
 function favKey(i){ return (i.link||i.nome||'').toLowerCase(); }
 function isFav(i){ const k=favKey(i); return favLoad().some(f=>favKey(f)===k); }
 function toggleFav(n){ const i=COT_HITS[n]; if(!i)return; const k=favKey(i); let a=favLoad(); if(a.some(f=>favKey(f)===k)){ a=a.filter(f=>favKey(f)!==k); toast('Removido dos favoritos'); } else { a.unshift({nome:i.nome,img:i.img,link:i.link,precoUSD:i.precoUSD,ofertas:i.ofertas}); toast('⭐ Salvo nos favoritos'); } favSave(a); renderProdutos(); }
@@ -3314,16 +3367,11 @@ async function pesquisarProdutos(){
   box.innerHTML='';
   try{
     if(COT_CEL){
-      // 📱 modo celular: busca TUDO de uma vez (importados + fornecedores + catálogo)
-      msg.textContent='🔄 Buscando em importados + fornecedores...'; buscarDolar();
-      const [imp,forn]=await Promise.all([
-        cpPesquisa(q).then(a=>a.filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i))).catch(()=>[]),
-        fornecedorPesquisa(q).catch(()=>catBuscaLocal(q))
-      ]);
-      COT_HITS=[...imp,...forn];
-      if(!COT_HITS.length){ msg.textContent='Nada encontrado em nenhuma fonte. Tente outro termo (ex.: "iPhone 15 128").'; return; }
+      // 📱 modo celular: SÓ importados (celular não se compra de fornecedor BR)
+      msg.textContent='🔄 Buscando nos importados...'; buscarDolar();
+      COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
+      if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo (ex.: "iPhone 15 128").'; return; }
       renderProdutos();
-      msg.textContent=`✔ ${imp.length} importado(s) + ${forn.length} de fornecedor(es)`+(COT_FORN_ERROS.length?(' · ⚠️ '+COT_FORN_ERROS.join(' · ')):'');
       return;
     }
     if(COT_MODO==='fornecedores'){
@@ -3575,7 +3623,8 @@ function itemAtual(){
   const tp=document.getElementById('cotTipo');
   let tipo=(COT_BUILD&&tp)?(tp.value||''):'';
   if(COT_BUILD && !tipo) tipo=detectarTipoPeca(nome);   // sem tipo escolhido? deteta pelo nome (senão gargalo/FPS não aparecem)
-  return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
+  const qtd=Math.max(1,parseInt((document.getElementById('cotQtd')||{}).value,10)||1);
+  return {nome, qtd, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
     tipo,
     img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'', fonte:(COT_SEL&&COT_SEL.loja)||'',
     custoBase:COT_CALC.custoBase, custoBRL:COT_CALC.custoTotal, lucroPct:parseFloat((document.getElementById('cotLucroPct')||{}).value)||0,
@@ -3610,12 +3659,14 @@ function aplicarFreteCart(){   // divide o frete fixo de cada fornecedor entre o
 }
 function adicionarAoCart(){
   const it=itemAtual(); if(!it){ toast('Calcule um preço primeiro.'); return; }
-  COT_CART.push(it); renderCart(); toast('✔ Adicionado ao orçamento ('+COT_CART.length+')'+(it.tipo?(' — '+it.tipo):''));
+  COT_CART.push(it); renderCart(); toast('✔ Adicionado'+(it.qtd>1?(' ('+it.qtd+' un.)'):'')+(it.tipo?(' — '+it.tipo):''));
   const s=document.getElementById('cotTipo'); if(s)s.value='';   // próxima peça não herda o tipo
+  const q=document.getElementById('cotQtd'); if(q)q.value='1';
   const alvo=COT_BUILD?document.getElementById('pcBoard'):document.getElementById('cotCart');
   if(alvo) alvo.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
+function cartQtd(k,d){ const i=COT_CART[k]; if(!i)return; i.qtd=Math.max(1,(i.qtd||1)+d); renderCart(); }
 function duplicarCart(k){ if(COT_CART[k]){ COT_CART.splice(k+1,0,Object.assign({},COT_CART[k])); renderCart(); toast('Item duplicado'); } }
 function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
 function renderCart(){
@@ -3627,7 +3678,7 @@ function renderCart(){
   el.style.display='block';
   if(pc && (COT_CART.length||COT_CALC)) pc.style.display='block';
   aplicarFreteCart();   // divide o frete fixo dos fornecedores entre os produtos (automático)
-  const tv=COT_CART.reduce((s,i)=>s+i.aVista,0);
+  const tv=COT_CART.reduce((s,i)=>s+i.aVista*(i.qtd||1),0);
   let html='';
   if(COT_BUILD){
     html+=`<div class="cart-head">🖥️ Orçamento de Computador</div>`;
@@ -3638,14 +3689,16 @@ function renderCart(){
     html+=`<p class="cot-hint">${COT_BUILD?'Toque numa peça no painel "monte o computador" (acima, à esquerda), pesquise e adicione. As peças aparecem aqui e somam no total.':'Cote cada produto e clique em "Adicionar ao orçamento". Eles aparecem aqui e somam no total.'}</p>`;
     el.innerHTML=html; return;
   }
-  html+=COT_CART.map((i,k)=>`<div class="cart-item">
+  html+=COT_CART.map((i,k)=>{const q=i.qtd||1; return `<div class="cart-item">
       ${i.img?`<img src="${imgThumb(i.img)}" alt="" loading="lazy" decoding="async">`:'<div class="cart-ph"></div>'}
       <div class="ci-info"><b>${((i.tipo?('['+i.tipo+'] '):'')+i.nome).replace(/</g,'&lt;')}</b>
         <small>${[i.grade,i.cor,i.loja].filter(Boolean).join(' · ').replace(/</g,'&lt;')}</small>
-        <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small></div>
-      <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`).join('');
+        <small>À vista <b>${fmtMoney(i.aVista)}</b> · ${i.parcelas||10}x de ${fmtMoney(i.parcela)}</small>
+        ${q>1?`<small>Subtotal <b>${q} un. = ${fmtMoney(i.aVista*q)}</b></small>`:''}</div>
+      <div class="ci-qtd"><button onclick="cartQtd(${k},-1)" title="Menos uma unidade">−</button><b>${q}</b><button onclick="cartQtd(${k},1)" title="Mais uma unidade">+</button></div>
+      <div class="ci-acts"><button class="ci-dup" onclick="duplicarCart(${k})" title="Duplicar (outra cor/grade)">＋</button><button class="ci-del" onclick="removerCart(${k})" title="Remover">✕</button></div></div>`;}).join('');
   if(COT_BUILD) html+=pcAnaliseHTML();
-  const tp=COT_CART.reduce((s,i)=>s+(i.totalParc||0),0);
+  const tp=COT_CART.reduce((s,i)=>s+(i.totalParc||0)*(i.qtd||1),0);
   html+=`<label class="cart-somar"><input type="checkbox" ${COT_SOMAR?'checked':''} onchange="toggleSomar(this.checked)"> Mostrar o valor total no orçamento</label>`;
   if(COT_SOMAR){
     html+=`<div class="cart-total"><span>${COT_BUILD?'Total do computador':'Total à vista'}</span><b>${fmtMoney(tv)}</b></div>`;
@@ -3734,16 +3787,17 @@ async function gerarCotacaoPDF(baixar){
     doc.text(nl.slice(0,2),tx,y+22);
     let sy=y+22+Math.min(nl.length,2)*13+3;
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
-    const det=[it.grade, it.cor?('Cor: '+it.cor):''].filter(Boolean).join('   ·   ');
+    const qI=it.qtd||1;
+    const det=[qI>1?(qI+' unidades'):'', it.grade, it.cor?('Cor: '+it.cor):''].filter(Boolean).join('   ·   ');
     if(det){ doc.text(det,tx,sy); }
-    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text('À vista',W-M-14,y+24,{align:'right'});
-    doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(10,37,80);doc.text(fmtMoney(it.aVista),W-M-14,y+44,{align:'right'});
-    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);doc.text((it.parcelas||10)+'x de '+fmtMoney(it.parcela),W-M-14,y+62,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(95,105,120);doc.text(qI>1?('À vista ('+qI+' un.)'):'À vista',W-M-14,y+24,{align:'right'});
+    doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(10,37,80);doc.text(fmtMoney(it.aVista*qI),W-M-14,y+44,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);doc.text((it.parcelas||10)+'x de '+fmtMoney(it.parcela*qI)+(qI>1?(' ('+fmtMoney(it.aVista)+' cada)'):''),W-M-14,y+62,{align:'right'});
     y+=rowH;
   }
-  if(itens.length>1 && COT_SOMAR){
+  if((itens.length>1 || itens.some(i=>(i.qtd||1)>1)) && COT_SOMAR){
     if(y+60>bottom){ footer(); doc.addPage(); header(); y=100; }
-    const tv=itens.reduce((s,i)=>s+i.aVista,0), tp=itens.reduce((s,i)=>s+(i.totalParc||0),0);
+    const tv=itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0), tp=itens.reduce((s,i)=>s+(i.totalParc||0)*(i.qtd||1),0);
     y+=6; doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
     doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);doc.text('Total à vista',M+14,y+23);
     doc.setFontSize(18);doc.setTextColor(10,37,80);doc.text(fmtMoney(tv),W-M-14,y+25,{align:'right'});
@@ -3790,12 +3844,12 @@ async function gerarCotacaoPDF(baixar){
 }
 /* ---- histórico de orçamentos (localStorage) ---- */
 function histLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_hist')||'[]'); }catch(e){ return []; } }
-function histSave(arr){ const a=arr.slice(0,60); try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveHist==='function')cloudSaveHist(a); }
+function histSave(arr){ const a=arr.slice(0,60); if(typeof marcaLocal==='function')marcaLocal('hist'); try{ localStorage.setItem('chip7_cot_hist',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveHist==='function')cloudSaveHist(a); }
 function salvarNoHistorico(itens){
   if(!itens||!itens.length) return;
   const cliente=((document.getElementById('cotCliente')||{}).value||'').trim();
   const arr=histLoad();
-  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',modulo:(COT_CEL?'celular':COT_BUILD?'pc':'cotacao'),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista,0)});
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',vendedor:usuarioAtual(),modulo:(COT_CEL?'celular':COT_BUILD?'pc':'cotacao'),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0)});
   histSave(arr);
 }
 /* histórico do módulo de câmeras — guarda o croqui (sem fotos, pra caber na nuvem) e reabre depois */
@@ -3806,7 +3860,7 @@ function salvarNoHistoricoCam(){
   const c=CAM._calc; if(!c||!c.total)return;
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   const arr=histLoad();
-  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente:g('camCliente'),status:'enviado',modulo:'camera',
+  arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente:g('camCliente'),status:'enviado',vendedor:usuarioAtual(),modulo:'camera',
     totalVista:c.total, resumo:CAM.cameras.length+' câmera(s) · '+CAM.itens.filter(i=>i.desc).length+' item(ns) · '+c.parcelas+'x de '+fmtMoney(c.parcela),
     cam:slimCam(),
     campos:{tel:g('camTel'),endereco:g('camEndereco'),tecnico:g('camTecnico'),parede:g('camParede'),dataIni:g('camData'),cobertura:g('camCobertura'),caboM:g('camCaboM'),caboV:g('camCaboV'),horas:g('camHoras'),horaV:g('camHoraV'),lucro:g('camLucroPct'),obs:g('camObs'),escala:g('camEscala')}});
@@ -3814,6 +3868,7 @@ function salvarNoHistoricoCam(){
 }
 function reabrirHistCam(id){
   const h=histLoad().find(x=>x.id===id); if(!h||!h.cam)return;
+  fecharHistorico();
   Object.assign(CAM,{comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[]}, JSON.parse(JSON.stringify(h.cam)));
   CAM.bgOn=false; CAM.bgImg=null; camCaboAtual=null;
   irModulo('camera');
@@ -3826,44 +3881,71 @@ function reabrirHistCam(id){
   toast('📹 Orçamento de câmeras reaberto');
 }
 const HIST_ST={enviado:'Enviado',fechado:'✅ Fechado',perdido:'❌ Perdido'};
-function histSetStatus(id,st){ const arr=histLoad(); const h=arr.find(x=>x.id===id); if(h){ h.status=st; histSave(arr); abrirHistorico(); } }
+function histSetStatus(id,st){ const arr=histLoad(); const h=arr.find(x=>x.id===id); if(h){ h.status=st; histSave(arr); renderHistScreen(); } }
+let HIST_PESSOA=null, HIST_DESC=true;
 function abrirHistorico(){
-  const arr=histLoad(), box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
-  let html=`<div class="prod-back" onclick="renderProdutos()">‹ voltar</div>`;
-  if(!arr.length){ msg.textContent=''; box.innerHTML=html+`<p class="cot-fallback">Nenhum orçamento salvo ainda. Quando você enviar ou baixar, ele fica guardado aqui (e sincroniza com a equipe no site publicado).</p>`; return; }
-  msg.textContent=`🕘 ${arr.length} orçamento(s)`;
+  HIST_PESSOA=usuarioAtual();   // abre na SUA aba
+  document.getElementById('histScreen').classList.add('show');
+  marcarTela();
+  renderHistScreen();
+  window.scrollTo(0,0);
+}
+function fecharHistorico(){ document.getElementById('histScreen').classList.remove('show'); }
+function toggleLojas(id,l){ const e=document.getElementById(id); if(!e)return; const fechado=e.style.display==='none'; e.style.display=fechado?'':'none'; const s=l.querySelector('span'); if(s)s.textContent=fechado?'▾ minimizar':'▸ mostrar'; }
+function histToggleSort(){ HIST_DESC=!HIST_DESC; const b=document.getElementById('histSortBtn'); if(b)b.textContent=HIST_DESC?'⬇ Mais recentes primeiro':'⬆ Mais antigos primeiro'; renderHistScreen(); }
+function renderHistScreen(){
+  const tabs=document.getElementById('histTabs'), lista=document.getElementById('histLista'), resumo=document.getElementById('histResumo');
+  if(!tabs) return;
+  const arr=histLoad().map(h=>({...h, vendedor:h.vendedor||'Chip7'}));
+  // abas: usuários na ordem do cadastro (só os que têm orçamento) + o logado + Todos
+  const comRegistros=new Set(arr.map(h=>h.vendedor));
+  comRegistros.add(usuarioAtual());
+  const pessoas=Object.keys(USUARIOS).filter(n=>comRegistros.has(n));
+  [...comRegistros].forEach(n=>{ if(!pessoas.includes(n)) pessoas.push(n); });   // nomes antigos fora do cadastro
+  if(!HIST_PESSOA || (HIST_PESSOA!=='__todos__' && !pessoas.includes(HIST_PESSOA))) HIST_PESSOA=usuarioAtual();
+  tabs.innerHTML=[`<button class="ht${HIST_PESSOA==='__todos__'?' on':''}" onclick="HIST_PESSOA='__todos__';renderHistScreen()">👥 Todos</button>`]
+    .concat(pessoas.map(n=>{ const qt=arr.filter(h=>h.vendedor===n).length;
+      return `<button class="ht${HIST_PESSOA===n?' on':''}" onclick="HIST_PESSOA='${n}';renderHistScreen()">👤 ${n}${qt?` <i>${qt}</i>`:''}</button>`; })).join('');
+  const doFiltro = HIST_PESSOA==='__todos__' ? arr : arr.filter(h=>h.vendedor===HIST_PESSOA);
+  // resumo do mês (da aba selecionada)
   const now=new Date(), mes=now.getMonth(), ano=now.getFullYear();
-  const noMes=arr.filter(h=>{const d=new Date(h.data);return d.getMonth()===mes&&d.getFullYear()===ano;});
+  const noMes=doFiltro.filter(h=>{const d=new Date(h.data);return d.getMonth()===mes&&d.getFullYear()===ano;});
   const soma=l=>l.reduce((s,h)=>s+(h.totalVista||0),0);
   const fech=noMes.filter(h=>h.status==='fechado'), perd=noMes.filter(h=>h.status==='perdido'), abe=noMes.filter(h=>!h.status||h.status==='enviado');
-  html+=`<div class="vendas-box"><div class="vb-title">📊 Este mês</div>
+  resumo.innerHTML=`<div class="vendas-box" style="margin:0"><div class="vb-title">📊 Este mês${HIST_PESSOA!=='__todos__'?(' · '+HIST_PESSOA):''}</div>
     <div class="vb-row vb-ok"><span>✅ Fechado</span><b>${fech.length} · ${fmtMoney(soma(fech))}</b></div>
     <div class="vb-row"><span>Em aberto</span><b>${abe.length} · ${fmtMoney(soma(abe))}</b></div>
     <div class="vb-row vb-bad"><span>❌ Perdido</span><b>${perd.length} · ${fmtMoney(soma(perd))}</b></div></div>`;
-  html+=arr.map(h=>{
+  // lista vertical, ordenável
+  const ordenado=doFiltro.slice().sort((a,b)=>HIST_DESC?String(b.data).localeCompare(String(a.data)):String(a.data).localeCompare(String(b.data)));
+  if(!ordenado.length){ lista.innerHTML='<p class="cot-fallback" style="margin-top:10px">Nenhum orçamento aqui ainda. Ao enviar ou baixar um orçamento, ele aparece nesta aba.</p>'; return; }
+  lista.innerHTML=ordenado.map(h=>{
     const d=new Date(h.data), dt=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     const mod=h.modulo||'cotacao';
     const modTag={cotacao:'💰',pc:'🖥️ PC',celular:'📱 Celular',camera:'📹 Câmeras'}[mod]||'💰';
     const titulo = mod==='camera' ? (h.resumo||'Orçamento de câmeras') : (h.itens?h.itens.length:0)+' item(ns)';
-    const nomes = mod==='camera' ? '' : (h.itens||[]).map(i=>(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
+    const nomes = mod==='camera' ? '' : (h.itens||[]).map(i=>((i.qtd||1)>1?(i.qtd+'× '):'')+(i.tipo?('['+i.tipo+'] '):'')+i.nome).join(', ');
     const st=h.status||'enviado';
     const chips=['enviado','fechado','perdido'].map(s=>`<span class="st-chip s-${s}${st===s?' on':''}" onclick="histSetStatus(${h.id},'${s}')">${HIST_ST[s]}</span>`).join('');
     const cli=h.cliente?(' · '+h.cliente.replace(/</g,'&lt;')):'';
+    const quem=HIST_PESSOA==='__todos__'?` · 👤 ${h.vendedor}`:'';
     const reabrir = mod==='camera' ? `reabrirHistCam(${h.id})` : `reabrirHist(${h.id})`;
-    return `<div class="hist-item"><div class="hi-info"><b>${modTag} · ${titulo} · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}</small>${nomes?`<small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small>`:''}<div class="st-chips">${chips}</div></div>
+    return `<div class="hist-item"><div class="hi-info"><b>${modTag} · ${titulo} · ${fmtMoney(h.totalVista)}</b><small>${dt}${cli}${quem}</small>${nomes?`<small>${nomes.replace(/</g,'&lt;').slice(0,90)}</small>`:''}<div class="st-chips">${chips}</div></div>
       <div class="hi-acts"><button class="btn ghost" onclick="${reabrir}">Reabrir</button><button class="ci-del" onclick="excluirHist(${h.id})" title="Excluir">✕</button></div></div>`;
   }).join('');
-  box.innerHTML=html;
 }
 function reabrirHist(id){ const h=histLoad().find(x=>x.id===id); if(!h)return;
-  COT_BUILD=(h.modulo==='pc'); COT_CEL=(h.modulo==='celular'); setBuildUI();
+  fecharHistorico();
+  COT_BUILD=(h.modulo==='pc'); COT_CEL=(h.modulo==='celular');
+  if(!document.getElementById('cotacaoScreen').classList.contains('show')) escolherCotacao();
+  setBuildUI();
   COT_CART=h.itens.map(i=>({...i})); renderCart(); renderProdutos(); toast('Orçamento reaberto no carrinho ('+COT_CART.length+')'); const cc=document.getElementById('cotCart'); if(cc)cc.scrollIntoView({behavior:'smooth',block:'nearest'}); }
-function excluirHist(id){ histSave(histLoad().filter(x=>x.id!==id)); abrirHistorico(); }
+function excluirHist(id){ histSave(histLoad().filter(x=>x.id!==id)); renderHistScreen(); }
 /* ====== Custos/lucros por categoria (configuráveis) ====== */
 const CAT_LABELS={'placa-mae':'Placa-mãe','iphone-novo':'iPhone (novo)','recondicionado':'Recondicionado / Seminovo','notebook':'Notebook','processador':'Processador','placa-video':'Placa de vídeo','ssd':'SSD / Armazenamento','memoria':'Memória RAM','outro':'Outro'};
 const CAT_BASE={'placa-mae':{lucro:30,trazer:20},'iphone-novo':{lucro:12,trazer:10},'recondicionado':{lucro:30,trazer:10},'notebook':{lucro:35,trazer:20},'processador':{lucro:20,trazer:20},'placa-video':{lucro:20,trazer:20},'ssd':{lucro:20,trazer:20},'memoria':{lucro:20,trazer:20},'outro':{lucro:20,trazer:20}};
 function cfgLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_cfg')||'{}'); }catch(e){ return {}; } }
-function cfgSave(o){ try{ localStorage.setItem('chip7_cot_cfg',JSON.stringify(o)); }catch(e){} if(typeof cloudSaveCfg==='function')cloudSaveCfg(o); }
+function cfgSave(o){ if(typeof marcaLocal==='function')marcaLocal('cfg'); try{ localStorage.setItem('chip7_cot_cfg',JSON.stringify(o)); }catch(e){} if(typeof cloudSaveCfg==='function')cloudSaveCfg(o); }
 function catDefaults(cat){ return Object.assign({}, CAT_BASE[cat]||{lucro:20,trazer:20}, cfgLoad()[cat]||{}); }
 function abrirConfig(){
   const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
@@ -3891,7 +3973,7 @@ function exportarBackup(){
 }
 /* ====== Fornecedores ====== */
 function fornLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_fornecedores')||'[]'); }catch(e){ return []; } }
-function fornSave(a){ try{ localStorage.setItem('chip7_fornecedores',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveForn==='function')cloudSaveForn(a); }
+function fornSave(a){ if(typeof marcaLocal==='function')marcaLocal('forn'); try{ localStorage.setItem('chip7_fornecedores',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveForn==='function')cloudSaveForn(a); }
 function _fv(id){ return ((document.getElementById(id)||{}).value||'').trim(); }
 function abrirFornecedores(){
   const box=document.getElementById('cotResultados'), msg=document.getElementById('cotBuscaMsg');
@@ -3935,7 +4017,7 @@ function abrirFornSite(i){ const f=fornLoad()[i]; if(f&&f.url) window.open(/^htt
 function buscarNoForn(i){ const f=fornLoad()[i]; if(!f)return; const q=(document.getElementById('cotBusca').value||'').trim()||prompt('O que buscar nesse fornecedor?')||''; if(!q)return; if(f.busca&&f.busca.indexOf('%s')>=0){ window.open(f.busca.replace('%s',encodeURIComponent(q)),'_blank'); } else if(f.url){ window.open(/^https?:/i.test(f.url)?f.url:'https://'+f.url,'_blank'); } }
 /* ====== catálogo manual (planilhas) — fornecedores sem site ====== */
 function catLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_cot_catalogo')||'[]'); }catch(e){ return []; } }
-function catSave(a){ try{ localStorage.setItem('chip7_cot_catalogo',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveCat==='function')cloudSaveCat(a); }
+function catSave(a){ if(typeof marcaLocal==='function')marcaLocal('cat'); try{ localStorage.setItem('chip7_cot_catalogo',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveCat==='function')cloudSaveCat(a); }
 function semAcento(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 function catBuscaLocal(q){
   const termos=semAcento(q).split(/\s+/).filter(Boolean);
@@ -4091,8 +4173,8 @@ function montarTextoOrcamento(itens){
   const cliente=g('cotCliente'), obs=g('cotObs'); const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
   let text=`*${COT_BUILD?'Orçamento de Computador':'Orçamento'} — ${CHIP7.nome}*\n`;
   if(cliente) text+=`Para: ${cliente}\n`;
-  text+='\n'+itens.map(i=>{ const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista)} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela)}`;}).join('\n');
-  if(itens.length>1 && COT_SOMAR){ const tv=itens.reduce((s,i)=>s+i.aVista,0), tp=itens.reduce((s,i)=>s+(i.totalParc||0),0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; if(tp>0) text+=`\n💳 Parcelado: total ${fmtMoney(tp)}`; }
+  text+='\n'+itens.map(i=>{ const q=i.qtd||1; const d=[i.grade,i.cor].filter(Boolean).join(', '); const nm=(q>1?(q+'× '):'')+(i.tipo?('['+i.tipo+'] '):'')+i.nome; return `• ${nm}${d?(' ('+d+')'):''}\n   💵 À vista ${fmtMoney(i.aVista*q)}${q>1?(' ('+fmtMoney(i.aVista)+' cada)'):''} · 💳 ${i.parcelas||10}x de ${fmtMoney(i.parcela*q)}`;}).join('\n');
+  if((itens.length>1 || itens.some(i=>(i.qtd||1)>1)) && COT_SOMAR){ const tv=itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0), tp=itens.reduce((s,i)=>s+(i.totalParc||0)*(i.qtd||1),0); text+=`\n\n*${COT_BUILD?'Total do computador':'Total à vista'}: ${fmtMoney(tv)}*`; if(tp>0) text+=`\n💳 Parcelado: total ${fmtMoney(tp)}`; }
   if(COT_BUILD){ const an=pcAnaliseData(); if(an&&an.jogos){ text+='\n\n🎮 *Desempenho estimado (1080p)*\n'+an.jogos.map(j=>`• ${j.nome}: ~${j.fps} FPS`).join('\n')+`\n📺 Resolução recomendada: ${an.res}`; } }
   const prazo=parseInt(g('cotPrazo'),10)||0;
   if(prazo) text+=`\n\n🚚 Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}`;
@@ -4601,6 +4683,7 @@ function cloudSubscribe(){
   if(!cloud.ready) return;
   if(cloud.unsub){cloud.unsub();cloud.unsub=null;}
   cloud.unsub=cloud.db.collection('visitas').onSnapshot(snap=>{
+    if(snapLocal(snap) || ecoRecente('visitas')) return;   // salvamento local recente manda
     const localById={}; (load(LIST_KEY)||[]).forEach(r=>{ if(r&&r.id!=null) localById[r.id]=r; });
     const list=[]; snap.forEach(doc=>{const d=doc.data(); if(d&&d.rec){ let rec=d.rec; if(d.fotosOmitidas) rec=mesclarFotosLocais(rec, localById[rec.id]); list.push(rec); }});
     list.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
@@ -4617,6 +4700,14 @@ function mesclarFotosLocais(rec, local){
 }
 let _cloudWarnAt=0;
 function cloudWarn(msg){ const now=Date.now(); if(now-_cloudWarnAt>4000){ _cloudWarnAt=now; try{ if(typeof toast==='function') toast('⚠️ '+msg); }catch(e){} } }
+/* Anti-eco: entre a mudança local e o save chegar na nuvem (~1-2s), pode chegar um snapshot
+   ATRASADO com os dados antigos — se a gente aplicar, o item recém-adicionado "some".
+   Regra: mudança local dos últimos 5s tem prioridade; snapshot atrasado é ignorado
+   (o nosso save por cima resolve a nuvem em seguida). */
+const _cloudLocalTs={};
+function marcaLocal(k){ _cloudLocalTs[k]=Date.now(); }
+function ecoRecente(k){ return Date.now()-(_cloudLocalTs[k]||0)<5000; }
+function snapLocal(doc){ try{ return !!(doc.metadata && doc.metadata.hasPendingWrites); }catch(e){ return false; } }
 /* Escreve no Firestore tratando a rejeição ASSÍNCRONA (try/catch síncrono não pega .set())
    e protegendo o limite de 1MB por documento — assim a falha aparece em vez de sumir calada. */
 function cloudSet(ref,data,label,opts){
@@ -4630,6 +4721,7 @@ function cloudSet(ref,data,label,opts){
 }
 async function cloudUpsert(rec){
   if(!cloud.on) return;
+  marcaLocal('visitas');
   let payload={rec, savedAt:rec.savedAt||new Date().toISOString()};
   if(JSON.stringify(payload).length>1000000){
     // fotos pesadas demais p/ 1 documento: sobe os dados sem as fotos (ficam neste aparelho)
@@ -4642,6 +4734,7 @@ async function cloudUpsert(rec){
 }
 async function cloudDelete(id){
   if(!cloud.on) return;
+  marcaLocal('visitas');
   try{ await cloud.db.collection('visitas').doc(id).delete(); }catch(e){ console.warn('Cloud del:',e); }
 }
 async function cloudPushLocal(){
@@ -4660,6 +4753,7 @@ function cloudSubscribeProdutos(){
   if(!cloud.ready) return;
   if(cloud._unsubProd){cloud._unsubProd();cloud._unsubProd=null;}
   cloud._unsubProd=cloud.db.collection('catalogo').doc('lista').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('prod')) return;
     const d=doc.data();
     if(d && Array.isArray(d.itens)){
       const incoming=JSON.stringify(d.itens);
@@ -4685,12 +4779,13 @@ function cloudSubscribeHist(){
   if(!cloud.ready) return;
   if(cloud._unsubHist){cloud._unsubHist();cloud._unsubHist=null;}
   cloud._unsubHist=cloud.db.collection('cotacoes').doc('historico').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('hist')) return;
     const d=doc.data();
     if(d && Array.isArray(d.itens)){
       const incoming=JSON.stringify(d.itens);
       if(incoming!==localStorage.getItem('chip7_cot_hist')){
         try{localStorage.setItem('chip7_cot_hist',incoming);}catch(e){}
-        if(document.querySelector('.hist-item')) abrirHistorico();   // atualiza a lista se estiver aberta
+        const hs=document.getElementById('histScreen'); if(hs&&hs.classList.contains('show')) renderHistScreen();   // atualiza a tela se aberta
       }
     } else {
       cloudSaveHist(histLoad());   // ainda não existe na nuvem -> sobe o local
@@ -4704,6 +4799,7 @@ function cloudSubscribeCfg(){
   if(!cloud.ready) return;
   if(cloud._unsubCfg){cloud._unsubCfg();cloud._unsubCfg=null;}
   cloud._unsubCfg=cloud.db.collection('cotacoes').doc('config').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('cfg')) return;
     const d=doc.data();
     if(d && d.cfg){ const inc=JSON.stringify(d.cfg); if(inc!==localStorage.getItem('chip7_cot_cfg')){ try{localStorage.setItem('chip7_cot_cfg',inc);}catch(e){} if(document.querySelector('.cfg-row')) abrirConfig(); else if(document.getElementById('cotCategoria')) onCategoria(); } }
     else cloudSaveCfg(cfgLoad());
@@ -4714,6 +4810,7 @@ function cloudSubscribeForn(){
   if(!cloud.ready) return;
   if(cloud._unsubForn){cloud._unsubForn();cloud._unsubForn=null;}
   cloud._unsubForn=cloud.db.collection('cotacoes').doc('fornecedores').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('forn')) return;
     const d=doc.data();
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_fornecedores')){ try{localStorage.setItem('chip7_fornecedores',inc);}catch(e){} if(document.querySelector('.forn-item')||document.querySelector('.forn-add')) abrirFornecedores(); } }
     else cloudSaveForn(fornLoad());
@@ -4726,6 +4823,7 @@ function cloudSubscribeFav(){
   if(!cloud.ready) return;
   if(cloud._unsubFav){cloud._unsubFav();cloud._unsubFav=null;}
   cloud._unsubFav=cloud.db.collection('cotacoes').doc('favoritos').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('fav')) return;
     const d=doc.data();
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_cot_fav')){ try{localStorage.setItem('chip7_cot_fav',inc);}catch(e){} } }
     else cloudSaveFav(favLoad());
@@ -4734,11 +4832,12 @@ function cloudSubscribeFav(){
 /* preferências (maquininha, arredondamento, mostrar total) na nuvem */
 const PREF_KEYS=['chip7_maq','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
 let _prefCloudTimer=null;
-function cloudSavePrefs(){ if(!cloud.on)return; clearTimeout(_prefCloudTimer); _prefCloudTimer=setTimeout(()=>{ const p={}; PREF_KEYS.forEach(k=>{const v=localStorage.getItem(k); if(v!=null)p[k]=v;}); cloudSet(cloud.db.collection('cotacoes').doc('prefs'), {p,ts:Date.now()}, 'Preferências'); },800); }
+function cloudSavePrefs(){ marcaLocal('prefs'); if(!cloud.on)return; clearTimeout(_prefCloudTimer); _prefCloudTimer=setTimeout(()=>{ const p={}; PREF_KEYS.forEach(k=>{const v=localStorage.getItem(k); if(v!=null)p[k]=v;}); cloudSet(cloud.db.collection('cotacoes').doc('prefs'), {p,ts:Date.now()}, 'Preferências'); },800); }
 function cloudSubscribePrefs(){
   if(!cloud.ready) return;
   if(cloud._unsubPrefs){cloud._unsubPrefs();cloud._unsubPrefs=null;}
   cloud._unsubPrefs=cloud.db.collection('cotacoes').doc('prefs').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('prefs')) return;
     const d=doc.data();
     if(d && d.p){ let ch=false;
       PREF_KEYS.forEach(k=>{ if(d.p[k]!=null && localStorage.getItem(k)!==d.p[k]){ try{localStorage.setItem(k,d.p[k]);}catch(e){} ch=true; } });
@@ -4753,20 +4852,29 @@ function cloudSubscribePrefs(){
     } else cloudSavePrefs();
   }, err=>console.warn('Cloud prefs sync',err));
 }
-/* carrinho do orçamento na nuvem (continua de onde parou em outro aparelho) */
+/* carrinho do orçamento na nuvem — POR USUÁRIO (cada vendedor tem o seu, sem conflito) */
 let _cartCloudTimer=null;
+function cartKey(){ return 'chip7_cot_cart_'+usuarioAtual(); }
 function cartPersist(){
-  try{ localStorage.setItem('chip7_cot_cart',JSON.stringify(COT_CART)); }catch(e){}
+  marcaLocal('cart');
+  try{ localStorage.setItem(cartKey(),JSON.stringify(COT_CART)); }catch(e){}
   if(!cloud.on)return; clearTimeout(_cartCloudTimer);
-  _cartCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('carrinho'), {itens:COT_CART,ts:Date.now()}, 'Carrinho'); },1200);
+  _cartCloudTimer=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('carrinho_'+usuarioAtual()), {itens:COT_CART,ts:Date.now()}, 'Carrinho'); },1200);
+}
+function carregarCartUsuario(){
+  COT_CART.length=0;
+  try{ const cc=JSON.parse(localStorage.getItem(cartKey())||'[]'); if(Array.isArray(cc)) cc.forEach(i=>COT_CART.push(i)); }catch(e){}
+  if(cloud && cloud.ready) cloudSubscribeCart();   // re-inscreve no doc do usuário novo
+  renderCart();
 }
 function cloudSubscribeCart(){
   if(!cloud.ready) return;
   if(cloud._unsubCart){cloud._unsubCart();cloud._unsubCart=null;}
-  cloud._unsubCart=cloud.db.collection('cotacoes').doc('carrinho').onSnapshot(doc=>{
+  cloud._unsubCart=cloud.db.collection('cotacoes').doc('carrinho_'+usuarioAtual()).onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('cart')) return;   // mudança local recente manda (senão o item recém-adicionado some)
     const d=doc.data();
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens);
-      if(inc!==JSON.stringify(COT_CART)){ COT_CART.length=0; d.itens.forEach(i=>COT_CART.push(i)); try{localStorage.setItem('chip7_cot_cart',inc);}catch(e){}
+      if(inc!==JSON.stringify(COT_CART)){ COT_CART.length=0; d.itens.forEach(i=>COT_CART.push(i)); try{localStorage.setItem(cartKey(),inc);}catch(e){}
         if(document.getElementById('cotacaoScreen').classList.contains('show')) renderCart(); }
     }
   }, err=>console.warn('Cloud cart sync',err));
@@ -4777,6 +4885,7 @@ function cloudSubscribeCat(){
   if(!cloud.ready) return;
   if(cloud._unsubCat){cloud._unsubCat();cloud._unsubCat=null;}
   cloud._unsubCat=cloud.db.collection('cotacoes').doc('catalogo').onSnapshot(doc=>{
+    if(snapLocal(doc) || ecoRecente('cat')) return;
     const d=doc.data();
     if(d && Array.isArray(d.itens)){ const inc=JSON.stringify(d.itens); if(inc!==localStorage.getItem('chip7_cot_catalogo')){ try{localStorage.setItem('chip7_cot_catalogo',inc);}catch(e){} if(document.getElementById('ctForn')) abrirCatalogo(); } }
     else cloudSaveCat(catLoad());
@@ -4789,20 +4898,26 @@ function refreshCloudStatus(){
   el.className='cloud-status '+(cloud.status==='on'?'ok':cloud.status==='err'?'err':'off');
 }
 
-/* ---------- login ---------- */
-const AUTH_USER='chip7', AUTH_PASS='Chip72017', AUTH_KEY='chip7_auth';
+/* ---------- login (multiusuário: cada um tem o PRÓPRIO carrinho/orçamentos) ---------- */
+const USUARIOS={ 'Chip7':'Chip72017', 'Gabriel':'Chip72017', 'Necke':'190608', 'Marllon':'1234', 'Thierri':'@123b', 'Fabio':'0000' };
+const AUTH_KEY='chip7_auth';
+function usuarioAtual(){ return localStorage.getItem('chip7_user')||'Chip7'; }
 function isAuthed(){return load(AUTH_KEY)===true;}
 function doLogin(e){
   if(e)e.preventDefault();
-  const u=(document.getElementById('loginUser').value||'').trim().toLowerCase();
+  const u=(document.getElementById('loginUser').value||'').trim();
   const p=document.getElementById('loginPass').value||'';
-  if(u===AUTH_USER && p===AUTH_PASS){
+  const nome=Object.keys(USUARIOS).find(n=>n.toLowerCase()===u.toLowerCase());
+  if(nome && p===USUARIOS[nome]){
     save(AUTH_KEY,true);
+    try{ localStorage.setItem('chip7_user',nome); }catch(e2){}
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('loginPass').value='';
     document.getElementById('loginErr').textContent='';
     cloudSignIn();
+    if(typeof carregarCartUsuario==='function') carregarCartUsuario();
     showChooser();
+    toast('👤 Bem-vindo, '+nome+'!');
     return false;
   }
   document.getElementById('loginErr').textContent='Usuário ou senha incorretos.';
