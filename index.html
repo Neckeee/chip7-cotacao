@@ -221,6 +221,7 @@ textarea{min-height:60px;resize:vertical}
 .cot-sep::after{content:'';flex:1;height:1px;background:var(--line)}
 .topbar-mods{background:#eef2f7;color:var(--brand);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:800;cursor:pointer;margin-right:10px;white-space:nowrap}
 .topbar-mods:hover{background:#e2e8f4}
+.dark-btn.on{background:#f5c542!important;color:#4a3800!important;border-color:#e0b02e!important}
 /* seletor de maquininha / bandeira */
 .maq-switch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
 .maq-switch .mq{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
@@ -366,10 +367,6 @@ body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua br
 .var-lbl{flex:none;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);padding-top:7px;min-width:42px}
 .cot-cart{background:#fff;border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.3);color:var(--text)}
 .cart-head{font-weight:800;font-size:15px;color:var(--brand);margin-bottom:10px}
-.pc-checklist{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
-.pc-chip{background:#f1f5fb;border:1px dashed var(--line);border-radius:18px;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--brand);cursor:pointer;user-select:none}
-.pc-chip:hover{background:#e9f0fa}
-.pc-chip.ok{background:#e8f7ec;border-style:solid;border-color:#bfe6c8;color:#15803d;cursor:default}
 .cart-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 .cart-item img,.cart-ph{width:44px;height:44px;flex:none;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line)}
 .ci-info{flex:1;min-width:0}
@@ -391,9 +388,28 @@ body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua br
 .frete-tag span{color:#c0392b;cursor:pointer;font-weight:700;text-decoration:underline;font-size:12px}
 /* módulo câmera (croqui) */
 .cam-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.cam-groups{flex-direction:column;gap:7px}
-.cam-g{display:flex;flex-wrap:wrap;gap:5px;align-items:center;background:#f6f8fc;border:1px solid var(--line);border-radius:11px;padding:7px 9px 8px}
-.cam-g-l{width:100%;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 1px 3px}
+.cam-groups{flex-direction:column;gap:6px}
+.cam-g{display:flex;flex-wrap:wrap;gap:5px;align-items:center;background:#f6f8fc;border:1px solid var(--line);border-radius:11px;padding:6px 9px 7px}
+.cam-g-l{width:100%;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 1px 3px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;-webkit-tap-highlight-color:transparent}
+.cam-g-l::after{content:'▾';font-size:11px}
+.cam-g.closed .cam-g-l{margin-bottom:0}
+.cam-g.closed .cam-g-l::after{content:'▸'}
+.cam-g.closed>*:not(.cam-g-l){display:none}
+/* slots do Montar PC */
+.pc-slots{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+@media(max-width:400px){.pc-slots{grid-template-columns:1fr}}
+.pc-slot{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#f6f8fc;border:1.5px dashed #b9c6dd;border-radius:11px;padding:9px 11px;cursor:pointer;min-height:58px}
+.pc-slot b{font-size:13px;color:var(--brand)}
+.pc-slot small{font-size:11px;color:var(--muted)}
+.pc-slot .ps-ico{font-size:15px}
+.pc-slot.ok{border-style:solid;border-color:#79c98f;background:#f2fbf4;cursor:default;padding-right:56px}
+.pc-slot.ok small{color:var(--text)}
+.pc-slot .ps-preco{position:absolute;right:30px;top:9px;font-size:11.5px;font-weight:800;color:#166534}
+.pc-slot .ps-x{position:absolute;right:7px;top:7px;width:20px;height:20px;border:none;border-radius:50%;background:#fee2e2;color:#b91c1c;font-size:11px;cursor:pointer;line-height:1}
+body.dark .pc-slot{background:#101a30;border-color:#3a4c74}
+body.dark .pc-slot b{color:#bcd6ff}
+body.dark .pc-slot.ok{background:#0f2b1c;border-color:#1f5c38}
+body.dark .pc-slot .ps-preco{color:#7fd6a0}
 .cam-g .cam-tool{background:#fff;padding:6px 9px;font-size:12.5px;border-radius:8px}
 .cam-tool{background:#f1f5fb;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
 .cam-tool.on{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -656,7 +672,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca em todos os fornecedores</small></button>
       <button class="wel-btn func" onclick="escolherTaxas()"><span>🧮</span><b>Calcular Taxas</b><small>Parcelas da maquininha</small></button>
     </div>
-    <button class="wel-wa" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo claro / escuro</button>
+    <button class="wel-wa dark-btn" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo escuro: desligado</button>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
   </div>
 </div>
@@ -678,6 +694,11 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     </div>
     <div class="cot-cols">
     <div class="cot-col-l">
+    <div class="cot-card" id="pcBoard" style="display:none">
+      <div class="cot-sep">monte o computador — toque na peça</div>
+      <div class="pc-slots" id="pcSlots"></div>
+      <div id="pcBoardAnalise"></div>
+    </div>
     <div class="cot-card">
       <label class="cot-lbl">Categoria (define o lucro %)</label>
       <select id="cotCategoria" onchange="onCategoria()">
@@ -812,7 +833,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cam-wrap" id="camWrap">
           <div class="cam-tools cam-groups">
             <div class="cam-g">
-              <span class="cam-g-l">✏️ Desenhar</span>
+              <span class="cam-g-l" onclick="camGrupo(this)">✏️ Desenhar</span>
               <button class="cam-tool on" id="ctComodo" onclick="camTool('comodo')">⬛ Cômodo</button>
               <button class="cam-tool" id="ctParede" onclick="camTool('parede')">✏️ Parede</button>
               <button class="cam-tool" id="ctTexto" onclick="camTool('texto')">🔤 Texto</button>
@@ -820,8 +841,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
               <button class="cam-tool" id="ctJanela" onclick="camTool('janela')">🪟 Janela</button>
               <button class="cam-tool" id="ctPortao" onclick="camTool('portao')">🚧 Portão</button>
             </div>
-            <div class="cam-g">
-              <span class="cam-g-l">📷 Equipamentos</span>
+            <div class="cam-g closed">
+              <span class="cam-g-l" onclick="camGrupo(this)">📷 Equipamentos</span>
               <button class="cam-tool" id="ctCamera" onclick="camTool('camera')">📷 Câmera</button>
               <button class="cam-tool" id="ctDvr" onclick="camTool('dvr')">📦 DVR</button>
               <button class="cam-tool" id="ctCabo" onclick="camTool('cabo')">🔌 Cabo</button>
@@ -829,8 +850,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
               <button class="cam-tool" id="ctAp" onclick="camTool('ap')">📡 Access Point</button>
               <button class="cam-tool" id="ctPoste" onclick="camTool('poste')">🗼 Poste</button>
             </div>
-            <div class="cam-g">
-              <span class="cam-g-l">🧰 Ações e medida</span>
+            <div class="cam-g closed">
+              <span class="cam-g-l" onclick="camGrupo(this)">🧰 Ações e medida</span>
               <button class="cam-tool" id="ctApagar" onclick="camTool('apagar')">🧽 Apagar</button>
               <button class="cam-tool" id="ctCaboFim" onclick="camCaboUndo()">↶ Desfazer</button>
               <button class="cam-tool" onclick="camLimpar()">🗑️ Limpar</button>
@@ -838,8 +859,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
               <input id="camEscala" class="cam-esc" inputmode="decimal" placeholder="m/quadr." title="Metros que cada quadradinho do croqui representa (pra medir cabo)" oninput="camCalcCabo()">
               <button class="cam-tool" onclick="camSomarCabos()">📏 Somar cabos</button>
             </div>
-            <div class="cam-g">
-              <span class="cam-g-l">🏠 Começar rápido</span>
+            <div class="cam-g closed">
+              <span class="cam-g-l" onclick="camGrupo(this)">🏠 Começar rápido</span>
               <button class="cam-tool" onclick="camModelo('casa')">🏠 Casa pronta</button>
               <button class="cam-tool" onclick="camModelo('loja')">🏪 Loja pronta</button>
               <button class="cam-tool" id="ctSat" onclick="camSatelite()" title="Puxar a vista de cima (satélite) do endereço como fundo do croqui — opcional">🛰️ Satélite</button>
@@ -987,7 +1008,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <span>Diagnóstico Tecnológico<small>Levantamento em campo</small></span>
       </div>
       <div class="spacer"></div>
-      <button class="topbar-mods" onclick="toggleDark()" title="Modo claro/escuro">🌙</button>
+      <button class="topbar-mods dark-btn" onclick="toggleDark()" title="Modo claro/escuro">🌙</button>
       <button class="topbar-mods" onclick="showChooser()" title="Trocar de módulo (Cotações, Câmeras...)">⧉ Módulos</button>
       <div class="score-pill" title="Pontuação geral da infraestrutura">
         <span class="score-dot" id="scoreDot"></span>
@@ -2774,7 +2795,7 @@ function showChooser(){
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
   ['cotacaoScreen','cameraScreen','taxasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
@@ -2789,6 +2810,7 @@ function irModulo(m){
 function escolherCotacao(){
   document.getElementById('chooser').classList.remove('show');
   document.getElementById('cotacaoScreen').classList.add('show');
+  marcarTela();
   refreshMaqUI();
   renderLojas();
   onCategoria();
@@ -2797,7 +2819,19 @@ function escolherCotacao(){
   cotCalc();
   setBuildUI();
 }
-function voltarChooser(){ document.getElementById('cotacaoScreen').classList.remove('show'); showChooser(); }
+function voltarChooser(){ if(history.state && history.state.chip7){ history.back(); return; } showChooser(); }
+/* ---- botão físico/gesto de VOLTAR do celular navega dentro do app ---- */
+function marcarTela(){ try{ history.pushState({chip7:1},''); }catch(e){} }
+window.addEventListener('popstate',()=>{
+  const w=document.getElementById('camWrap');
+  if(w && w.classList.contains('fs')){ camFull(); marcarTela(); return; }   // 1º: fecha a tela cheia do croqui
+  const overlay=['cotacaoScreen','cameraScreen','taxasScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
+  const chooserOn=document.getElementById('chooser').classList.contains('show');
+  const welcomeOn=document.getElementById('welcome').classList.contains('show');
+  const loginOn=document.getElementById('loginScreen').classList.contains('show');
+  const noDiag=!overlay && !chooserOn && !welcomeOn && !loginOn;
+  if(overlay || (noDiag && typeof isAuthed==='function' && isAuthed())){ showChooser(); }
+});
 /* ---------- cotação ---------- */
 const LOJAS_PY=[
   {id:'nissei',nome:'Nissei'},
@@ -2897,6 +2931,7 @@ let TX_ARRED=false;
 function escolherTaxas(){
   document.getElementById('chooser').classList.remove('show');
   document.getElementById('taxasScreen').classList.add('show');
+  marcarTela();
   refreshMaqUI(); txRender(); window.scrollTo(0,0);
   const v=document.getElementById('txValor'); if(v&&!v.value)v.focus();
 }
@@ -2977,8 +3012,17 @@ function toggleSomar(on){ COT_SOMAR=!!on; try{localStorage.setItem('chip7_cot_so
 let COT_ARRED = localStorage.getItem('chip7_cot_arred')!=='0';   // arredondar bonito (à vista de 50 em 50, parcela múltipla de 5)
 function cotToggleArred(){ COT_ARRED=!COT_ARRED; try{localStorage.setItem('chip7_cot_arred',COT_ARRED?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); cotCalc(); }
 /* 🌙 modo escuro (persistido e sincronizado) */
-function toggleDark(){ const on=!document.body.classList.contains('dark'); document.body.classList.toggle('dark',on); try{localStorage.setItem('chip7_dark',on?'1':'0');}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); toast(on?'🌙 Modo escuro ligado':'☀️ Modo claro'); }
+function atualizarBotoesDark(){
+  const on=document.body.classList.contains('dark');
+  document.querySelectorAll('.dark-btn').forEach(b=>{
+    b.classList.toggle('on',on);
+    if(b.classList.contains('wel-wa')) b.textContent=on?'☀️ Modo escuro: ligado':'🌙 Modo escuro: desligado';
+    else b.textContent=on?'☀️':'🌙';
+  });
+}
+function toggleDark(){ const on=!document.body.classList.contains('dark'); document.body.classList.toggle('dark',on); try{localStorage.setItem('chip7_dark',on?'1':'0');}catch(e){} atualizarBotoesDark(); if(typeof cloudSavePrefs==='function')cloudSavePrefs(); toast(on?'🌙 Modo escuro ligado':'☀️ Modo claro'); }
 if(localStorage.getItem('chip7_dark')==='1') document.body.classList.add('dark');
+atualizarBotoesDark();
 // restaura o carrinho da última sessão (e sincroniza com a nuvem quando logado)
 try{ const _cc=JSON.parse(localStorage.getItem('chip7_cot_cart')||'[]'); if(Array.isArray(_cc)) _cc.forEach(i=>COT_CART.push(i)); }catch(e){}
 function setModo(m){
@@ -3059,7 +3103,44 @@ function setBuildUI(){
 }
 function escolherCelular(){ COT_BUILD=false; COT_CEL=true; escolherCotacao(); const c=document.getElementById('cotCategoria'); if(c){c.value='iphone-novo'; onCategoria();} }
 function celBuscar(m){ const b=document.getElementById('cotBusca'); if(b)b.value=m; pesquisarProdutos(); }
-function escolherPeca(tp){ COT_BUILD=true; setBuildUI(); const s=document.getElementById('cotTipo'); if(s)s.value=tp; const i=document.getElementById('cotBusca'); if(i){i.focus();i.scrollIntoView({behavior:'smooth',block:'center'});} }
+function escolherPeca(tp){ COT_BUILD=true; setBuildUI(); const s=document.getElementById('cotTipo'); if(s)s.value=tp;
+  const i=document.getElementById('cotBusca');
+  if(i){ i.placeholder='Buscar '+tp+' (ex.: '+(PC_EXEMPLOS[tp]||tp)+')'; i.value=''; i.focus(); i.scrollIntoView({behavior:'smooth',block:'center'}); }
+  toast('🔎 Pesquise a peça: '+tp);
+}
+const PC_EXEMPLOS={'Processador':'Ryzen 5 5600','Placa-mãe':'B550M','Memória RAM':'DDR4 16GB','SSD / HD':'SSD 480GB','Placa de vídeo':'RTX 3060','Fonte':'600W 80 Plus','Gabinete':'gabinete gamer','Cooler / Water':'water cooler 240'};
+const PC_ICONES={'Processador':'🧠','Placa-mãe':'🔲','Memória RAM':'📗','SSD / HD':'💾','Placa de vídeo':'🎮','Fonte':'🔌','Gabinete':'🗄️','Cooler / Water':'❄️'};
+/* deteta o tipo da peça pelo nome (se o vendedor não escolheu no select) */
+function detectarTipoPeca(nome){
+  const n=(nome||'').toLowerCase();
+  if(/placa[\s-]?m[ãa]e|\b[abxz][3-7]\d0m?\b|h\d{3}m?\b/.test(n)) return 'Placa-mãe';
+  if(/rtx|gtx|radeon|\brx ?\d{3,4}\b|placa de v[íi]deo|geforce/.test(n)) return 'Placa de vídeo';
+  if(/ryzen|core i[3579]|processador|athlon|pentium|celeron/.test(n)) return 'Processador';
+  if(/mem[óo]ria|\bddr[345]\b|\bram\b/.test(n)) return 'Memória RAM';
+  if(/\bssd\b|\bnvme\b|\bhd\b|hard disk|disco/.test(n)) return 'SSD / HD';
+  if(/fonte|\b\d{3,4}w\b.*(plus|atx)|80 ?plus/.test(n)) return 'Fonte';
+  if(/gabinete|\bcase\b/.test(n)) return 'Gabinete';
+  if(/cooler|water|airflow|fan\b/.test(n)) return 'Cooler / Water';
+  if(/monitor/.test(n)) return 'Monitor';
+  if(/teclado|mouse/.test(n)) return 'Teclado / Mouse';
+  if(/windows|office/.test(n)) return 'Windows / Office';
+  return '';
+}
+/* painel de slots do Montar PC — toque na peça pra pesquisar/adicionar */
+function renderPcBoard(){
+  const board=document.getElementById('pcBoard'); if(!board)return;
+  board.style.display=COT_BUILD?'block':'none';
+  if(!COT_BUILD)return;
+  const box=document.getElementById('pcSlots');
+  box.innerHTML=PECAS_PC.map(p=>{
+    const k=COT_CART.findIndex(i=>i.tipo===p);
+    const it=k>=0?COT_CART[k]:null;
+    if(!it) return `<button type="button" class="pc-slot" onclick="escolherPeca('${p.replace(/'/g,"\\'")}')"><span class="ps-ico">${PC_ICONES[p]||'📦'}</span><b>+ ${p}</b><small>toque pra pesquisar</small></button>`;
+    return `<div class="pc-slot ok"><span class="ps-ico">${PC_ICONES[p]||'📦'}</span><b>${p}</b><small>${(it.nome||'').replace(/</g,'&lt;').slice(0,42)}</small><span class="ps-preco">${fmtMoney(it.aVista)}</span><button type="button" class="ps-x" onclick="removerCart(${k})" title="Tirar">✕</button></div>`;
+  }).join('');
+  const an=document.getElementById('pcBoardAnalise');
+  if(an) an.innerHTML=pcAnaliseHTML();
+}
 function escolherMontarPC(){ escolherCotacao(); COT_BUILD=true; setBuildUI(); }
 function cotCalc(){
   const usd=parseFloat(document.getElementById('cotPreco').value)||0;
@@ -3492,8 +3573,10 @@ function itemAtual(){
   const np=document.getElementById('cotNomePdf'), cc=document.getElementById('cotCor'), cg=document.getElementById('cotGrade');
   const nome=((np&&np.value)||'').trim()||(COT_SEL&&COT_SEL.nome)||'Produto';
   const tp=document.getElementById('cotTipo');
+  let tipo=(COT_BUILD&&tp)?(tp.value||''):'';
+  if(COT_BUILD && !tipo) tipo=detectarTipoPeca(nome);   // sem tipo escolhido? deteta pelo nome (senão gargalo/FPS não aparecem)
   return {nome, cor:((cc&&cc.value)||'').trim(), grade:((cg&&cg.value)||'').trim(),
-    tipo:(COT_BUILD&&tp)?(tp.value||''):'',
+    tipo,
     img:(COT_SEL&&COT_SEL.img)||'', loja:(COT_SEL&&COT_SEL.loja)||'', fonte:(COT_SEL&&COT_SEL.loja)||'',
     custoBase:COT_CALC.custoBase, custoBRL:COT_CALC.custoTotal, lucroPct:parseFloat((document.getElementById('cotLucroPct')||{}).value)||0,
     aVista:COT_CALC.aVista, parcelas:COT_CALC.parcelas, parcela:COT_CALC.parcela, totalParc:COT_CALC.totalParc};
@@ -3502,9 +3585,13 @@ function recomputaItem(i){
   const pct=i.lucroPct||0;
   const custo=(i.custoBase!=null?i.custoBase:(i.custoBRL||0))+(i.freteShare||0);
   i.custoBRL=custo;
-  i.aVista=arredNice(custo*(1+pct/100));
-  const N=i.parcelas||10, taxa=(TAXAS_CARTAO[N]||0)/100;
-  i.parcela=arredCima5(i.aVista*(1+taxa)/N); i.totalParc=i.parcela*N;
+  const bruto=custo*(1+pct/100);
+  i.aVista=COT_ARRED?arredNice(bruto):Math.round(bruto*100)/100;
+  const N=Math.min(i.parcelas||10, maqMax());
+  const totalCartao=precoComTaxa(i.aVista, maqTaxa(N));   // mesma conta do cotCalc (maquininha/bandeira atual)
+  i.parcelas=N;
+  i.parcela=COT_ARRED?arredCima5(totalCartao/N):Math.round(totalCartao/N*100)/100;
+  i.totalParc=i.parcela*N;
 }
 let COT_FRETE_TOTAL=0;
 function aplicarFreteCart(){   // divide o frete fixo de cada fornecedor entre os produtos dele (automático)
@@ -3523,14 +3610,17 @@ function aplicarFreteCart(){   // divide o frete fixo de cada fornecedor entre o
 }
 function adicionarAoCart(){
   const it=itemAtual(); if(!it){ toast('Calcule um preço primeiro.'); return; }
-  COT_CART.push(it); renderCart(); toast('✔ Adicionado ao orçamento ('+COT_CART.length+')');
-  const cc=document.getElementById('cotCart'); if(cc) cc.scrollIntoView({behavior:'smooth',block:'nearest'});
+  COT_CART.push(it); renderCart(); toast('✔ Adicionado ao orçamento ('+COT_CART.length+')'+(it.tipo?(' — '+it.tipo):''));
+  const s=document.getElementById('cotTipo'); if(s)s.value='';   // próxima peça não herda o tipo
+  const alvo=COT_BUILD?document.getElementById('pcBoard'):document.getElementById('cotCart');
+  if(alvo) alvo.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function removerCart(k){ COT_CART.splice(k,1); renderCart(); }
 function duplicarCart(k){ if(COT_CART[k]){ COT_CART.splice(k+1,0,Object.assign({},COT_CART[k])); renderCart(); toast('Item duplicado'); } }
 function limparCart(){ if(COT_CART.length&&!confirm('Limpar o orçamento?'))return; COT_CART=[]; renderCart(); }
 function renderCart(){
   if(typeof cartPersist==='function')cartPersist();   // guarda o carrinho (local + nuvem) em toda mudança
+  renderPcBoard();                                    // painel de slots do Montar PC segue o carrinho/modo
   const el=document.getElementById('cotCart'); if(!el)return;
   const pc=document.getElementById('cotPedidoCard');
   if(!COT_CART.length && !COT_BUILD){ el.style.display='none'; el.innerHTML=''; if(pc&&!COT_CALC)pc.style.display='none'; return; }
@@ -3541,15 +3631,11 @@ function renderCart(){
   let html='';
   if(COT_BUILD){
     html+=`<div class="cart-head">🖥️ Orçamento de Computador</div>`;
-    html+=`<div class="pc-checklist">`+PECAS_PC.map(p=>{
-      const tem=COT_CART.some(i=>i.tipo===p);
-      return tem?`<span class="pc-chip ok">✓ ${p}</span>`:`<span class="pc-chip" onclick="escolherPeca('${p.replace(/'/g,"\\'")}')">+ ${p}</span>`;
-    }).join('')+`</div>`;
   } else {
     html+=`<div class="cart-head">🧾 Orçamento — ${COT_CART.length} ${COT_CART.length>1?'itens':'item'}</div>`;
   }
   if(!COT_CART.length){
-    html+=`<p class="cot-hint">Cote cada peça (toque em "+ peça" acima ou pesquise) e clique em "Adicionar ao orçamento". As peças aparecem aqui e somam no total.</p>`;
+    html+=`<p class="cot-hint">${COT_BUILD?'Toque numa peça no painel "monte o computador" (acima, à esquerda), pesquise e adicione. As peças aparecem aqui e somam no total.':'Cote cada produto e clique em "Adicionar ao orçamento". Eles aparecem aqui e somam no total.'}</p>`;
     el.innerHTML=html; return;
   }
   html+=COT_CART.map((i,k)=>`<div class="cart-item">
@@ -4047,7 +4133,7 @@ function renderClientReport(snap){
 
 /* ================= ORÇAMENTO DE CÂMERA (CFTV) ================= */
 let CAM={comodos:[],paredes:[],cameras:[],textos:[],marcas:[],dvr:null,cabos:[],wifi:[],postes:[],itens:[],bg:null,bgImg:null,bgOn:false,coords:null,_calc:null}, camTipoTool='comodo', camCtx=null, camCaboAtual=null;
-function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); camInit(); window.scrollTo(0,0); }
+function escolherCamera(){ document.getElementById('chooser').classList.remove('show'); document.getElementById('cameraScreen').classList.add('show'); marcarTela(); camInit(); window.scrollTo(0,0); }
 function camInit(){
   refreshMaqUI();
   const dt=document.getElementById('camData'); if(dt && !dt.value) dt.value=new Date().toISOString().slice(0,10);
@@ -4058,7 +4144,8 @@ function camInit(){
 }
 function camTool(t){ if(camCaboAtual && t!=='cabo') camCaboFim(); camTipoTool=t; [['comodo','ctComodo'],['parede','ctParede'],['camera','ctCamera'],['dvr','ctDvr'],['cabo','ctCabo'],['roteador','ctRot'],['ap','ctAp'],['poste','ctPoste'],['porta','ctPorta'],['janela','ctJanela'],['portao','ctPortao'],['texto','ctTexto'],['apagar','ctApagar']].forEach(([k,id])=>{const b=document.getElementById(id); if(b)b.classList.toggle('on',k===t);}); camCaboHint(); }
 function camLimpar(){ if(!confirm('Limpar o croqui?'))return; CAM.comodos=[];CAM.paredes=[];CAM.cameras=[];CAM.textos=[];CAM.marcas=[];CAM.dvr=null;CAM.cabos=[];CAM.wifi=[];CAM.postes=[];camCaboAtual=null; camRedraw(); renderCamPontos(); }
-function camFull(){ const w=document.getElementById('camWrap'); if(!w)return; const fs=w.classList.toggle('fs'); document.body.style.overflow=fs?'hidden':''; camRedraw(); }
+function camFull(){ const w=document.getElementById('camWrap'); if(!w)return; const fs=w.classList.toggle('fs'); document.body.style.overflow=fs?'hidden':''; if(fs&&typeof marcarTela==='function')marcarTela(); camRedraw(); }
+function camGrupo(l){ l.parentElement.classList.toggle('closed'); }
 /* ---- Cabos (caminhos câmera→DVR) ---- */
 function camCaboAncora(p){ const c=CAM.cameras.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<26); if(c)return{x:c.x,y:c.y}; if(CAM.dvr&&Math.hypot(CAM.dvr.x-p.x,CAM.dvr.y-p.y)<28)return{x:CAM.dvr.x,y:CAM.dvr.y}; const w=CAM.wifi.find(w=>Math.hypot(w.x-p.x,w.y-p.y)<24); if(w)return{x:w.x,y:w.y}; return null; }
 function camCaboTap(p){
@@ -4657,6 +4744,7 @@ function cloudSubscribePrefs(){
       PREF_KEYS.forEach(k=>{ if(d.p[k]!=null && localStorage.getItem(k)!==d.p[k]){ try{localStorage.setItem(k,d.p[k]);}catch(e){} ch=true; } });
       if(ch){ COT_SOMAR=localStorage.getItem('chip7_cot_somar')!=='0'; COT_ARRED=localStorage.getItem('chip7_cot_arred')!=='0'; CAM_ARRED=localStorage.getItem('chip7_cam_arred')!=='0';
         document.body.classList.toggle('dark', localStorage.getItem('chip7_dark')==='1');
+        if(typeof atualizarBotoesDark==='function')atualizarBotoesDark();
         refreshMaqUI();
         if(document.getElementById('cotacaoScreen').classList.contains('show')){ cotCalc(); renderCart(); }
         if(document.getElementById('cameraScreen').classList.contains('show')) camCalc();
