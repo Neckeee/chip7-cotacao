@@ -3,7 +3,7 @@
    - HTML (navegação): NETWORK-FIRST → sempre pega a versão mais nova quando online,
      e cai para o cache quando offline (funciona na visita sem internet).
    - Demais arquivos (ícones, logo, manifest): CACHE-FIRST (rápido + offline). */
-const CACHE = 'chip7-diag-v69';
+const CACHE = 'chip7-diag-v74';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './jspdf.umd.min.js',
   './jspdf.autotable.min.js',
   './logo-chip7.png',
+  './logo-garantia.png',
   './icon-180.png',
   './icon-192.png',
   './icon-512.png',

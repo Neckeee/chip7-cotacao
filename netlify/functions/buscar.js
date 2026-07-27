@@ -6,6 +6,9 @@
 //   ?detalhe=/caminho_123/&lojas=nissei,mobilezone
 //                            -> ofertas por loja {loja, precoUSD, nome} (filtra pelas lojas)
 
+// Apelidos das lojas = texto exato que o site imprime em 'advertiser' (minúsculo).
+// ATENÇÃO: hoje o filtro de loja é NO CLIENTE (LOJAS_TERMOS no index.html) — parseDetalhe
+// devolve todas as ofertas. Esta tabela ficou sem uso; se mexer numa, mexa na outra.
 const LOJAS = {
   nissei:        ['nissei'],
   mega:          ['mega eletr'],       // Mega Eletrônicos / Mega Eletro
@@ -14,7 +17,8 @@ const LOJAS = {
   mobilezone:    ['mobile zone'],
   atacado:       ['atacado connect'],
   visaovip:      ['visãovip', 'visaovip', 'visão vip', 'visao vip'],
-  stargames:     ['star games']
+  stargames:     ['star games'],
+  topdek:        ['topdek']            // Topdek Informática — com K, sem espaço
 };
 
 const PRICE = /US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/i;

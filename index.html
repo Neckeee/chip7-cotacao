@@ -178,6 +178,11 @@ textarea{min-height:60px;resize:vertical}
 .wel-tag{opacity:.82;margin:0 0 22px;font-size:14px;animation:upFade .6s .35s both}
 .wel-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;animation:upFade .6s .45s both}
 @media(max-width:380px){.wel-choice{grid-template-columns:1fr}}
+/* no computador só o chooser abre em 3 colunas; a tela inicial tem 2 botões e continua em 430px */
+@media(min-width:900px){
+  #chooser .wel-card{max-width:720px}
+  #chooser .wel-choice{grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr}
+}
 .wel-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:18px 12px;border-radius:16px;
   border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;transition:.15s}
 .wel-btn:hover{background:rgba(255,255,255,.16);transform:translateY(-2px)}
@@ -200,6 +205,16 @@ textarea{min-height:60px;resize:vertical}
 .cot-head .btn{min-height:42px}
 .cot-cols{display:flex;flex-direction:column;gap:14px}
 .cot-hint{font-size:11.5px;color:var(--muted);margin:6px 2px 0}
+.dolar-fonte{font-size:11px;margin:5px 2px 0}
+.dolar-fonte.velho .dl-nota{color:#b45309;font-weight:700}
+.dl-chips{display:flex;gap:6px;flex-wrap:wrap}
+.dl-chip{background:#f1f5fb;border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}
+.dl-chip:hover{border-color:var(--brand)}
+.dl-chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.dl-chip b{font-weight:800}
+.dl-nota{display:block;margin-top:4px;color:var(--muted)}
+body.dark .dl-chip{background:#1d2a47;border-color:var(--line);color:#dbe7ff}
+body.dark .dl-chip.on{background:var(--brand)}
 @media(min-width:860px){
   .cot-wrap{max-width:980px}
   .cot-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
@@ -226,11 +241,21 @@ textarea{min-height:60px;resize:vertical}
 /* seletor de maquininha / bandeira */
 .maq-switch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
 .maq-switch .mq{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
+.maq-switch .mq.on{border-color:var(--brand);background:#eef3fc}   /* maquininha cadastrada na mão também acende; mp/ip abaixo têm cor própria */
 .maq-switch .mq.mp.on{border-color:#00a3e0;background:#e8f7fe;color:#01364e}
 .maq-switch .mq.ip.on{border-color:#84cc16;background:#f3fbe4;color:#2a3b06}
 .maq-switch .mq.band{padding:5px 8px}
 .maq-switch .mq.band.on{border-color:var(--brand);background:#eef3fc}
 .maq-switch .mq-div{width:1px;height:22px;background:var(--line)}
+/* ---------- editar taxas da maquininha ---------- */
+.maq-ed-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.maq-ed-tabs .mq{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer}
+.maq-ed-tabs .mq.on{border-color:var(--brand);background:#eef3fc}
+.maq-ed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-top:6px}
+.maq-ed-p{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:9px;padding:5px 7px;background:#fff}
+.maq-ed-p span{font-size:12px;font-weight:800;color:var(--brand);min-width:26px}
+.maq-ed-p input{width:100%;min-width:0;padding:5px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;background:#fbfcfe;color:var(--text)}
+body.dark .maq-ed-tabs .mq,body.dark .maq-ed-p{background:#1d2a47;color:#dbe7ff;border-color:var(--line)}
 .lg-mp{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#00a3e0;align-items:center;justify-content:center;font-size:11px}
 .lg-ip{display:inline-flex;width:20px;height:20px;border-radius:6px;background:#1a1a1a;color:#a3e635;align-items:center;justify-content:center;font-size:14px;font-weight:900}
 .lg-mc{display:inline-flex;width:26px;height:16px;position:relative;flex:none}
@@ -303,6 +328,31 @@ body.dark .hist-tabs .ht.on{background:var(--accent2);border-color:var(--accent2
 .repcfg-row input,.repcfg-row select{width:64px;padding:6px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;background:#fbfcfe;color:var(--text)}
 .repcfg-row select{width:auto}
 body.dark .rep-foto,body.dark .repcfg-row{background:var(--card);border-color:var(--line)}
+/* ---------- pré-visualização da garantia (imita o papel) ---------- */
+.gar-prev{overflow-x:auto}
+/* o papel é preto-e-branco como o .doc: sem azul da marca, sem sombreado */
+.gp-doc{border:1px solid #000;background:#fff;color:#000;font-size:9px;line-height:1.35;min-width:290px;font-family:Calibri,Carlito,"Segoe UI",sans-serif}
+.gp-sec{font-weight:700;font-size:8px;padding:3px 6px;border-top:1px solid #000;border-bottom:1px solid #000}
+.gp-row{display:flex;border-bottom:1px solid #000}
+.gp-row:last-of-type{border-bottom:0}
+.gp-top b{font-size:9.5px;font-weight:700}
+.gp-ctr{text-align:center}
+.gp-th b{font-size:6.8px;font-weight:700;letter-spacing:.2px}
+.gp-pg{padding:4px 6px;font-size:7.4px;border-bottom:1px solid #000}
+.gp-c{flex:1;min-width:0;padding:3px 6px;border-right:1px solid #000}
+.gp-c:last-child{border-right:0}
+.gp-c i{display:block;font-style:normal;font-size:6.5px;color:#444;letter-spacing:.2px}   /* sem uppercase: "Fatura"/"Vendedor responsável" são caixa mista no modelo */
+.gp-c b{display:block;font-size:8.5px;word-break:break-word}
+.gp-txt{padding:7px 8px;border-top:1px solid #788498}
+.gp-txt p{margin:0 0 4px}
+.gp-imp{font-weight:800;margin-top:7px!important}
+.gp-ac{margin-top:11px!important;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.gp-cb{padding:8px;text-align:center;border-bottom:1px solid #000}   /* no modelo isto é o cabeçalho do Word */
+.gp-cb span{display:block;font-size:7.5px;color:#000}
+.gp-cb span:first-child{font-weight:700;font-size:9.5px}
+.gp-logo{display:block;width:114px;max-width:45%;height:auto;margin:0 auto 4px}
+.gar-pagos{display:flex;flex-wrap:wrap;gap:7px}
+body.dark .gp-doc{background:#fff}   /* papel é papel: continua branco no modo escuro */
 body.dark .rep-prev{background:#12233f;border-color:#2b4a80}
 body.dark .rep-aviso{background:#3a2e10;border-color:#8a6d1f;color:#fcd34d}
 /* chips de modelos (módulo celular) */
@@ -713,6 +763,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca nos importados</small></button>
       <button class="wel-btn func" onclick="irModulo('reparo')"><span>🔧</span><b>Reparos</b><small>Peça + serviço de celular</small></button>
       <button class="wel-btn func" onclick="escolherTaxas()"><span>🧮</span><b>Calcular Taxas</b><small>Parcelas da maquininha</small></button>
+      <button class="wel-btn cli" onclick="irModulo('garantia')"><span>🛡️</span><b>Garantia</b><small>Certificado pro cliente</small></button>
     </div>
     <button class="wel-wa dark-btn" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo escuro: desligado</button>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
@@ -794,7 +845,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div class="cot-grid">
         <div><label class="cot-lbl" id="lblPreco">Custo importado (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
         <div id="colDolar"><label class="cot-lbl">Cotação do dólar (R$)</label>
-          <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="cotCalc()"><button class="btn ghost" onclick="buscarDolar()" title="Atualizar dólar">↻</button></div></div>
+          <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="dolarManual()"><button class="btn ghost" onclick="buscarDolar()" title="Buscar o dólar do dia">↻</button></div>
+          <div class="cot-hint dolar-fonte" id="cotDolarFonte"></div></div>
       </div>
       <div id="rowTrazer">
       <label class="cot-lbl">Custo de trazer (%) — 10% iPhone · 20% peças</label>
@@ -1019,6 +1071,66 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <button class="btn primary" onclick="txPDF()">📄 PDF pro cliente</button>
         <button class="btn ghost" onclick="txZap()">📲 WhatsApp</button>
         <button class="btn ghost" onclick="txCopiar()">📋 Copiar</button>
+      </div>
+    </div>
+    <!-- editar taxa fica separado de calcular: card à parte, atrás de um botão -->
+    <div class="cot-card" style="margin-top:14px">
+      <button class="btn ghost" style="width:100%" id="maqCfgBtn" onclick="maqAbrirCfg()">⚙️ Editar taxas da maquininha</button>
+      <p class="cot-hint">Muda o preço que o cliente paga na cotação, na câmera, no reparo e aqui. Só mexa se a maquininha mudou a taxa.</p>
+      <div id="maqCfgBox"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE GARANTIA (certificado pro cliente) -->
+<div class="welcome cot-screen" id="garantiaScreen">
+  <div class="cot-wrap" style="max-width:860px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🛡️ Recibo / Garantia</h2>
+      <button class="btn ghost" style="margin-left:auto" onclick="garAbrirHist()">🕘 Emitidas</button>
+    </div>
+    <div class="cot-cols">
+      <div class="cot-col-l">
+        <div class="cot-card">
+          <div class="cot-sep">cliente</div>
+          <input id="garCliente" type="text" placeholder="Nome / razão social" oninput="garPreview()">
+          <input id="garEndereco" type="text" placeholder="Endereço" oninput="garPreview()" style="margin-top:8px">
+          <input id="garDoc" type="text" placeholder="CPF / CNPJ" oninput="garPreview()" style="margin-top:8px">
+          <div class="cot-row" style="margin-top:8px">
+            <input id="garMunicipio" type="text" placeholder="Município" value="São Mateus do Sul" oninput="garPreview()">
+            <input id="garUF" type="text" placeholder="UF" value="PR" maxlength="2" style="max-width:70px" oninput="garPreview()">
+          </div>
+          <input id="garTel" type="text" placeholder="Telefone" oninput="garPreview()" style="margin-top:8px">
+          <div class="cot-sep">produto</div>
+          <textarea id="garEquip" rows="3" placeholder="Descrição / modelo / número de série" oninput="garPreview()"></textarea>
+          <div class="cot-sep">forma de pagamento</div>
+          <div id="garPagoBox" class="gar-pagos"></div>
+          <p class="cot-hint">Pode marcar mais de uma (ex.: entrada no Débito + resto no Crédito).</p>
+          <div id="garTrocaBox" class="hide">
+            <div class="cot-sep">o que entrou na troca</div>
+            <input id="garTroca" type="text" placeholder="Aparelho que o cliente deu (modelo, estado)" oninput="garPreview()">
+            <input id="garTrocaValor" type="text" inputmode="decimal" placeholder="Quanto foi avaliado (R$)" oninput="garPreview()" style="margin-top:8px">
+          </div>
+          <div class="cot-sep">garantia e data</div>
+          <div class="cot-row">
+            <input id="garMeses" type="number" min="1" step="1" value="6" placeholder="Meses" oninput="garPreview()">
+            <input id="garData" type="date" onchange="garPreview()">
+          </div>
+          <p class="cot-hint">Prazo em meses — entra na cláusula 1. Município e UF já vêm preenchidos; troque se o cliente for de fora.</p>
+          <div class="ab-actions" style="margin-top:12px">
+            <button class="btn primary" onclick="gerarGarantiaPDF()">📄 Gerar PDF</button>
+            <button class="btn ghost" onclick="garImprimir()">🖨️ Imprimir</button>
+            <button class="btn ghost" onclick="garLimpar()">🧹 Limpar</button>
+          </div>
+        </div>
+        <div id="garHistBox"></div>
+      </div>
+      <div class="cot-col-r">
+        <div class="cot-card">
+          <div class="cot-sep">como vai sair no papel</div>
+          <div id="garPrev" class="gar-prev"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2956,21 +3068,22 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   const tag=document.querySelector('#chooser .wel-tag'); if(tag)tag.textContent='👤 '+usuarioAtual()+' — o que você quer fazer?';
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
-  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   if(m==='cotacao'){ COT_BUILD=false; COT_CEL=false; escolherCotacao(); }
   else if(m==='montar'){ COT_CEL=false; escolherMontarPC(); }
   else if(m==='celular'){ escolherCelular(); }
   else if(m==='camera'){ escolherCamera(); }
   else if(m==='taxas'){ escolherTaxas(); }
   else if(m==='reparo'){ escolherReparo(); }
+  else if(m==='garantia'){ escolherGarantia(); }
   else if(m==='diagnostico'){ escolherDiagnostico(); }
   else showChooser();
 }
@@ -2981,7 +3094,7 @@ function escolherCotacao(){
   refreshMaqUI();
   renderLojas();
   onCategoria();
-  if(!document.getElementById('cotDolar').value) buscarDolar();
+  dolarInit();
   setMoedaUI('USD');
   cotCalc();
   setBuildUI();
@@ -2997,7 +3110,7 @@ window.addEventListener('popstate',()=>{
   if(w && w.classList.contains('fs')){ camFull(); marcarTela(); return; }   // 1º: fecha a tela cheia do croqui
   const hs=document.getElementById('histScreen');
   if(hs && hs.classList.contains('show')){ fecharHistorico(); marcarTela(); return; }   // voltar fecha os orçamentos primeiro
-  const overlay=['cotacaoScreen','cameraScreen','taxasScreen','reparoScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
+  const overlay=['cotacaoScreen','cameraScreen','taxasScreen','reparoScreen','garantiaScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
   const chooserOn=document.getElementById('chooser').classList.contains('show');
   const welcomeOn=document.getElementById('welcome').classList.contains('show');
   const loginOn=document.getElementById('loginScreen').classList.contains('show');
@@ -3013,7 +3126,8 @@ const LOJAS_PY=[
   {id:'mobilezone',nome:'Mobile Zone'},
   {id:'atacado',nome:'Atacado Connect'},
   {id:'visaovip',nome:'Visão VIP'},
-  {id:'stargames',nome:'Star Games'}
+  {id:'stargames',nome:'Star Games'},
+  {id:'topdek',nome:'Topdek Informática'}
 ];
 let COT_HITS=[], COT_OFS=[];
 function renderLojas(){
@@ -3045,25 +3159,124 @@ function lucroDeReais(){
 }
 function buscarNaInternet(){ const q=(document.getElementById('cotBusca').value||(COT_SEL&&COT_SEL.nome)||'').trim(); if(!q){toast('Digite o que quer pesquisar');return;} window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); }
 function compararBrasil(){ const q=((COT_SEL&&COT_SEL.nome)||document.getElementById('cotBusca').value||'').trim(); if(!q){toast('Pesquise/escolha um produto primeiro');return;} window.open('https://lista.mercadolivre.com.br/'+encodeURIComponent(q),'_blank'); }
-async function buscarDolar(){
-  try{
-    const r=await fetch('https://economia.awesomeapi.com.br/last/USD-BRL',{cache:'no-store'});
-    const d=await r.json(); const v=parseFloat(d.USDBRL.bid);
-    if(v){ document.getElementById('cotDolar').value=v.toFixed(2); cotCalc(); }
-  }catch(e){ /* informe manual */ }
+/* ================= DÓLAR (atualiza sozinho) =================
+   Abriu a cotação, ele busca. Cache de 10 min pra não martelar a API.
+   Dois tipos, porque são preços diferentes e os dois importam pra loja:
+     comercial = o valor cotado no mercado (USD-BRL bid)
+     turismo   = a VENDA na casa de câmbio (USD-BRLT ask) — é o que se paga
+                 de verdade pra pôr dólar na mão e ir buscar no Paraguai
+   Escolha salva em chip7_dolar_tipo e sincronizada pra equipe.
+   Digitou na mão? Vira 'manual' e o automático para de mexer até voltar no chip. */
+function dolarSel(){ return document.getElementById('cotDolar'); }
+function dolarMostraFonte(txt,velho){
+  const el=document.getElementById('cotDolarFonte'); if(!el)return;
+  el.textContent=txt||''; el.classList.toggle('velho',!!velho);
 }
+function dolarDDMM(d){ return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`; }
+async function dolarPTAX(){
+  const f=n=>{const d=new Date(Date.now()-n*864e5);return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${d.getFullYear()}`;};
+  const url="https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarPeriodo(dataInicial=@di,dataFinalCotacao=@df)"
+    +`?@di='${f(12)}'&@df='${f(0)}'&$format=json&$orderby=dataHoraCotacao%20desc&$top=1`;
+  const r=await fetch(url,{cache:'no-store'});
+  const j=await r.json(); const c=(j.value||[])[0]; if(!c)return null;
+  const v=parseFloat(c.cotacaoVenda)||parseFloat(c.cotacaoCompra);   // venda: é o que se paga pra comprar dólar
+  return v?{valor:v, data:new Date(c.dataHoraCotacao.replace(' ','T')), fonte:'BC'}:null;
+}
+/* ⚠️ NÃO voltar pro /last/USD-BRL (sem "json"): em jul/2026 ele estava CONGELADO
+   (devolvia 16/07 no dia 22, 5,11 com o mercado em 5,07). O /json/last/ do MESMO
+   provedor responde ao vivo. Trocou de endpoint? Confira o create_date. */
+let DOLAR_CACHE=null;   // {com,tur,data,em} — evita bater na API a cada tela
+async function dolarBuscarPar(){
+  if(DOLAR_CACHE && Date.now()-DOLAR_CACHE.em < 6e5) return DOLAR_CACHE;   // 10 min
+  const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,USD-BRLT',{cache:'no-store'});
+  const j=await r.json(); const c=j.USDBRL, t=j.USDBRLT;
+  const com=parseFloat(c&&c.bid);                       // comercial: é o valor cotado
+  const tur=parseFloat((t&&t.ask)||(t&&t.bid));         // turismo: a VENDA, o que se paga na casa de câmbio
+  if(!com) throw new Error('sem cotação');
+  DOLAR_CACHE={com, tur:tur||0, data:new Date(String((c&&c.create_date)||'').replace(' ','T')), em:Date.now()};
+  return DOLAR_CACHE;
+}
+function dolarTipo(){ const t=localStorage.getItem('chip7_dolar_tipo'); return (t==='tur'||t==='manual')?t:'com'; }
+function dolarSetTipo(t,silencioso){
+  try{ localStorage.setItem('chip7_dolar_tipo',t); }catch(e){}
+  if(typeof marcaLocal==='function')marcaLocal('prefs');
+  if(typeof cloudSavePrefs==='function')cloudSavePrefs();
+  if(!silencioso) buscarDolar(true);
+}
+function dolarManualSalvo(){ try{ return JSON.parse(localStorage.getItem('chip7_dolar')||'null'); }catch(e){ return null; } }
+/* digitou na mão: vale pra equipe toda e o automático não sobrescreve mais */
+function dolarManual(){
+  const inp=dolarSel(); if(!inp)return;
+  const v=parseFloat(inp.value)||0;
+  if(v>0){
+    try{ localStorage.setItem('chip7_dolar',JSON.stringify({v, ts:Date.now(), quem:(typeof usuarioAtual==='function'?usuarioAtual():'')})); }catch(e){}
+    dolarSetTipo('manual',true);
+  }
+  dolarPinta(); cotCalc();
+}
+function dolarPinta(){
+  const el=document.getElementById('cotDolarFonte'); if(!el)return;
+  const tipo=dolarTipo(), c=DOLAR_CACHE;
+  const n=v=>(+v).toFixed(2).replace('.',',');
+  const chip=(t,rot,val)=>`<button type="button" class="dl-chip${tipo===t?' on':''}" onclick="dolarSetTipo('${t}')">${rot}${val?` <b>${n(val)}</b>`:''}</button>`;
+  let h=chip('com','comercial',c&&c.com)+chip('tur','turismo',c&&c.tur);
+  if(tipo==='manual'){
+    const m=dolarManualSalvo();
+    h+=`<button type="button" class="dl-chip on">na mão <b>${m?n(m.v):'—'}</b></button>`;
+  }
+  let nota='';
+  if(tipo==='manual'){
+    const m=dolarManualSalvo(), dias=m?Math.floor((Date.now()-m.ts)/864e5):0;
+    nota=`digitado por ${(m&&m.quem)||'alguém'} ${dias===0?'hoje':(dias===1?'ontem':dias+' dias atrás')}`
+       +(dias>=1?' · ⚠️ confira se ainda vale':'')+' — toque em comercial/turismo pra voltar ao automático';
+    el.classList.toggle('velho',dias>=1);
+  }else if(c){
+    const min=Math.round((Date.now()-c.em)/6e4);
+    nota=`atualizado ${isNaN(c.data)?'':('às '+String(c.data.getHours()).padStart(2,'0')+':'+String(c.data.getMinutes()).padStart(2,'0'))}`
+       +(min>=15?` (há ${min} min)`:'');
+    el.classList.remove('velho');
+  }
+  el.innerHTML=`<span class="dl-chips">${h}</span>${nota?`<span class="dl-nota">${nota}</span>`:''}`;
+}
+function dolarAplica(){
+  const inp=dolarSel(); if(!inp)return;
+  const tipo=dolarTipo();
+  if(tipo==='manual'){ const m=dolarManualSalvo(); if(m&&m.v>0)inp.value=(+m.v).toFixed(2); }
+  else if(DOLAR_CACHE){ const v=tipo==='tur'?DOLAR_CACHE.tur:DOLAR_CACHE.com; if(v>0)inp.value=(+v).toFixed(2); }
+  dolarPinta(); cotCalc();
+}
+/* forcar=true ignora o cache (é o botão ↻ e a troca de tipo) */
+async function buscarDolar(forcar){
+  const inp=dolarSel(); if(!inp)return;
+  if(forcar) DOLAR_CACHE=null;
+  const el=document.getElementById('cotDolarFonte');
+  if(el && !DOLAR_CACHE) el.innerHTML='<span class="dl-nota">buscando o dólar…</span>';
+  try{ await dolarBuscarPar(); }
+  catch(e){
+    try{ const p=await dolarPTAX(); if(p&&p.valor) DOLAR_CACHE={com:p.valor, tur:0, data:p.data, em:Date.now()}; }catch(e2){}
+  }
+  if(!DOLAR_CACHE && dolarTipo()!=='manual'){
+    if(el)el.innerHTML='<span class="dl-nota">não consegui buscar — digite o dólar do dia</span>';
+    el&&el.classList.add('velho'); return;
+  }
+  dolarAplica();
+}
+/* abre a cotação: busca sozinho, sempre (o cache de 10 min segura o excesso) */
+function dolarInit(){ if(dolarSel()) buscarDolar(false); }
 function arredCima5(v){ return Math.ceil(v/5)*5; }   // sempre pra cima, múltiplo de 5
 function arredNice(v){                                // sobe de 50 em 50; último degrau antes do milhar vira X.999,90
   v=Math.ceil(v/50)*50;
   if(v%1000===950) v=v+50-0.10;
   return v;
 }
-// taxas reais da maquininha (% que a loja repassa por nº de parcelas)
-const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
 /* ====== maquininhas e bandeiras ======
+   ESTE É O PADRÃO DE FÁBRICA: os únicos números de taxa do código ficam aqui.
+   O que roda é MAQS = fábrica + o que a loja editou (chip7_maq_cfg), e tudo passa por
+   maqTaxa()/maqBand()/maqMax(). Pra mudar taxa no dia a dia: Calcular Taxas → ⚙️ Editar taxas.
    MP = Mercado Pago (mesma taxa p/ todas as bandeiras, até 18x)
    IP = InfinitePay plano "1 Dia Útil" (Master/Visa ≠ Elo/Amex, débito + até 12x) */
-const MAQS={
+const TAXAS_CARTAO={1:2.99,2:5.39,3:6.49,4:7.26,5:8.04,6:8.79,7:9.63,8:10.43,9:10.88,10:11.09,11:11.84,12:12.49,13:13.39,14:14.24,15:15.09,16:15.94,17:16.79,18:17.64};
+const MAQS_PADRAO={
   mp:{nome:'Mercado Pago', logo:'<span class="lg-mp">🤝</span>', max:18, bandeiras:{
     todas:{nome:'Todas as bandeiras', logo:'<i class="lg-mc"><u></u><u></u></i><b class="lg-visa">VISA</b><b class="lg-elo">elo</b>', deb:null, tx:TAXAS_CARTAO}}},
   ip:{nome:'InfinitePay', logo:'<b class="lg-ip">∞</b>', max:12, bandeiras:{
@@ -3072,12 +3285,35 @@ const MAQS={
     ea:{nome:'Elo / Amex', logo:'<b class="lg-elo">elo</b><b class="lg-amex">AMEX</b>', deb:1.88,
         tx:{1:4.46,2:5.81,3:6.32,4:6.83,5:7.33,6:7.83,7:8.34,8:8.83,9:9.32,10:9.81,11:10.29,12:10.77}}}}
 };
-function maqPref(){ try{ const m=JSON.parse(localStorage.getItem('chip7_maq')||'{}'); if(MAQS[m.maq] && MAQS[m.maq].bandeiras[m.band]) return m; }catch(e){} return {maq:'mp',band:'todas'}; }
-function maqSet(maq,band){ const M=MAQS[maq]||MAQS.mp; if(!band||!M.bandeiras[band]) band=Object.keys(M.bandeiras)[0]; try{localStorage.setItem('chip7_maq',JSON.stringify({maq,band}));}catch(e){} if(typeof cloudSavePrefs==='function')cloudSavePrefs(); }
-function maqBand(){ const p=maqPref(); return MAQS[p.maq].bandeiras[p.band]; }
+function maqCfgPadrao(){ return JSON.parse(JSON.stringify(MAQS_PADRAO)); }
+function maqCfgLoad(){   // salva inteiro (não mescla): senão máquina removida voltava do padrão
+  try{ const o=JSON.parse(localStorage.getItem('chip7_maq_cfg')||'null'); if(o && typeof o==='object' && Object.keys(o).length) return o; }catch(e){}
+  return maqCfgPadrao();
+}
+function maqCfgSave(o){
+  MAQS=o;
+  if(typeof marcaLocal==='function')marcaLocal('prefs');
+  try{ localStorage.setItem('chip7_maq_cfg',JSON.stringify(o)); }catch(e){}
+  if(typeof cloudSavePrefs==='function')cloudSavePrefs();
+}
+let MAQS=maqCfgLoad();   // o que o app usa de verdade
+function maqPref(){
+  try{ const m=JSON.parse(localStorage.getItem('chip7_maq')||'{}'); if(MAQS[m.maq] && MAQS[m.maq].bandeiras[m.band]) return m; }catch(e){}
+  const maq=MAQS.mp?'mp':(Object.keys(MAQS)[0]||'');   // se removeram/renomearam, cai na primeira que existir
+  const M=MAQS[maq];
+  return {maq, band:M?(Object.keys(M.bandeiras)[0]||''):''};
+}
+function maqSet(maq,band){
+  if(!MAQS[maq]) maq=maqPref().maq;
+  const M=MAQS[maq]; if(!M)return;
+  if(!band||!M.bandeiras[band]) band=Object.keys(M.bandeiras)[0]||'';
+  try{localStorage.setItem('chip7_maq',JSON.stringify({maq,band}));}catch(e){}
+  if(typeof cloudSavePrefs==='function')cloudSavePrefs();
+}
+function maqBand(){ const p=maqPref(); const M=MAQS[p.maq]; return (M && M.bandeiras[p.band]) || {nome:'',logo:'',deb:null,tx:{}}; }
 function maqTaxa(n){ return maqBand().tx[n]||0; }
-function maqMax(){ return MAQS[maqPref().maq].max; }
-function maqNome(){ const p=maqPref(); const M=MAQS[p.maq]; const B=M.bandeiras[p.band]; return M.nome+(Object.keys(M.bandeiras).length>1?(' · '+B.nome):''); }
+function maqMax(){ const M=MAQS[maqPref().maq]; return (M && M.max)||12; }
+function maqNome(){ const p=maqPref(); const M=MAQS[p.maq]; if(!M)return ''; const B=M.bandeiras[p.band]; return M.nome+((Object.keys(M.bandeiras).length>1 && B)?(' · '+B.nome):''); }
 /* preço a cobrar p/ VOCÊ receber v líquido: a taxa incide sobre o total cobrado */
 function precoComTaxa(v,txPct){ return txPct>=100?0:v/(1-txPct/100); }
 function maqSwitchHTML(cb){
@@ -3097,6 +3333,403 @@ function refreshParcelasSelect(id){ const s=document.getElementById(id); if(!s)r
 function refreshMaqUI(){
   [['cotMaqSwitch','cotCalc'],['camMaqSwitch','camCalc'],['txMaqSwitch','txRender'],['repMaqSwitch','repCalc']].forEach(([id,cb])=>{ const el=document.getElementById(id); if(el)el.innerHTML=maqSwitchHTML(cb); });
   refreshParcelasSelect('cotParcelas'); refreshParcelasSelect('camParcelas'); refreshParcelasSelect('repParcelas');
+}
+/* ====== editar as taxas (Calcular Taxas → ⚙️) ======
+   Mexe só em MAQS/chip7_maq_cfg. Quem calcula continua lendo maqTaxa()/maqBand()/maqMax(). */
+let MAQ_ED={maq:'',band:''};
+function maqEdSel(){   // mantém a seleção do editor apontando pra algo que existe
+  const maq=MAQS[MAQ_ED.maq]?MAQ_ED.maq:(Object.keys(MAQS)[0]||'');
+  const M=MAQS[maq];
+  const band=(M && M.bandeiras[MAQ_ED.band])?MAQ_ED.band:(M?(Object.keys(M.bandeiras)[0]||''):'');
+  MAQ_ED={maq,band};
+  return MAQ_ED;
+}
+function maqAbrirCfg(){
+  const box=document.getElementById('maqCfgBox'); if(!box)return;
+  if(box.dataset.on==='1'){ maqFecharCfg(); return; }
+  box.dataset.on='1';
+  const b=document.getElementById('maqCfgBtn'); if(b)b.textContent='⚙️ Fechar edição de taxas';
+  maqRenderCfg();
+}
+function maqFecharCfg(){
+  const box=document.getElementById('maqCfgBox'); if(box){ box.dataset.on=''; box.innerHTML=''; }
+  const b=document.getElementById('maqCfgBtn'); if(b)b.textContent='⚙️ Editar taxas da maquininha';
+}
+function maqRenderCfg(){
+  const box=document.getElementById('maqCfgBox'); if(!box || box.dataset.on!=='1')return;
+  const {maq,band}=maqEdSel(), M=MAQS[maq];
+  if(!M){ box.innerHTML='<p class="cot-hint">Nenhuma maquininha cadastrada.</p><button class="btn ghost" style="width:100%" onclick="maqAddMaq()">➕ Nova maquininha</button>'; return; }
+  const B=M.bandeiras[band]||{tx:{},deb:null};
+  let h='<div class="cot-sep" style="margin-top:12px">qual maquininha</div><div class="maq-ed-tabs">';
+  h+=Object.entries(MAQS).map(([k,m])=>`<button type="button" class="mq${k===maq?' on':''}" onclick="maqEdGo('${k}','')">${esc(m.nome)}</button>`).join('');
+  h+='<button type="button" class="mq" onclick="maqAddMaq()">➕ Nova</button></div>';
+  h+=`<div class="repcfg-row"><b>Máquina</b>
+    <label>Nome<input type="text" style="width:140px" value="${esc(M.nome)}" onchange="maqEdSetNome(this.value)"></label>
+    <label>Máx. parcelas<input type="number" min="1" max="24" value="${M.max}" onchange="maqEdSetMax(this.value)"></label>
+    <button class="ci-del" title="Remover esta maquininha" onclick="maqDelMaq()">✕</button></div>`;
+  const bs=Object.entries(M.bandeiras);
+  if(bs.length>1){
+    h+='<div class="cot-sep">qual bandeira</div><div class="maq-ed-tabs">';
+    h+=bs.map(([k,b])=>`<button type="button" class="mq${k===band?' on':''}" onclick="maqEdGo('${maq}','${k}')">${esc(b.nome)}</button>`).join('')+'</div>';
+  }
+  h+=`<div class="repcfg-row"><b>Débito</b><label>%<input type="number" step="0.01" min="0" value="${B.deb==null?'':B.deb}" placeholder="—" onchange="maqEdSetDeb(this.value)"></label>
+    <span class="cot-hint" style="margin:0">vazio = essa maquininha não tem débito</span></div>`;
+  h+='<div class="cot-sep">taxa de cada parcela (%)</div><div class="maq-ed-grid">';
+  for(let n=1;n<=M.max;n++) h+=`<label class="maq-ed-p"><span>${n}x</span><input type="number" step="0.01" min="0" value="${(B.tx&&B.tx[n]!=null)?B.tx[n]:''}" onchange="maqEdSetTx(${n},this.value)"></label>`;
+  h+='</div><div class="ab-actions" style="margin-top:10px"><button class="btn ghost" onclick="maqRestaurar()">♻️ Restaurar padrão de fábrica</button></div>';
+  box.innerHTML=h;
+}
+function maqEdGo(maq,band){ MAQ_ED={maq,band:band||''}; maqRenderCfg(); }
+function maqNum(v){ const n=parseFloat(String(v).replace(',','.')); return isNaN(n)?0:Math.max(0,n); }
+/* salva e atualiza quem mostra preço. Só re-desenha o editor quando a estrutura muda —
+   re-desenhar a cada dígito tiraria o foco de quem está digitando a taxa. */
+function maqEdApply(fn,rerender){
+  const c=JSON.parse(JSON.stringify(MAQS));
+  fn(c);
+  maqCfgSave(c);
+  refreshMaqUI();
+  if(typeof txRender==='function')txRender();
+  if(rerender)maqRenderCfg();
+}
+function maqEdSetNome(v){ const {maq}=maqEdSel(); const nome=String(v).trim()||'Maquininha'; maqEdApply(c=>{ c[maq].nome=nome; },true); }
+function maqEdSetMax(v){ const {maq}=maqEdSel(); const n=Math.max(1,Math.min(24,parseInt(v,10)||1)); maqEdApply(c=>{ c[maq].max=n; },true); }
+function maqEdSetDeb(v){ const {maq,band}=maqEdSel(); const s=String(v).trim(); maqEdApply(c=>{ c[maq].bandeiras[band].deb = s===''?null:maqNum(s); },false); }
+function maqEdSetTx(n,v){ const {maq,band}=maqEdSel(); const s=String(v).trim(); maqEdApply(c=>{ const tx=c[maq].bandeiras[band].tx; if(s==='') delete tx[n]; else tx[n]=maqNum(s); },false); }
+function maqAddMaq(){
+  const nome=(prompt('Nome da maquininha:')||'').trim(); if(!nome)return;
+  const id='m'+Date.now();
+  maqEdApply(c=>{ c[id]={nome, logo:'💳', max:12, bandeiras:{todas:{nome:'Todas as bandeiras', logo:'', deb:null, tx:{}}}}; },false);
+  MAQ_ED={maq:id,band:'todas'}; maqRenderCfg();
+  toast('Cadastrada — agora preencha as taxas');
+}
+function maqDelMaq(){
+  const {maq}=maqEdSel();
+  if(Object.keys(MAQS).length<=1){ toast('Deixe pelo menos uma maquininha'); return; }
+  if(!confirm('Remover a maquininha "'+((MAQS[maq]||{}).nome||maq)+'"?'))return;
+  maqEdApply(c=>{ delete c[maq]; },false);
+  MAQ_ED={maq:'',band:''};
+  maqSet(maqPref().maq,null);   // se a removida era a escolhida, reaponta pra uma que existe
+  refreshMaqUI(); maqRenderCfg();
+}
+function maqRestaurar(){
+  if(!confirm('Restaurar as taxas de fábrica? Você perde as taxas que editou aqui.'))return;
+  maqCfgSave(maqCfgPadrao());
+  MAQ_ED={maq:'',band:''};
+  maqSet(maqPref().maq,null);
+  refreshMaqUI();
+  if(typeof txRender==='function')txRender();
+  maqRenderCfg();
+  toast('♻️ Taxas de fábrica restauradas');
+}
+/* ================= 🛡️ RECIBO / GARANTIA =================
+   Cópia 1:1 do modelo da loja (o .doc "CERTIFICADO DE GARANTIA"): mesmos quadros,
+   mesma ordem, mesmos textos. A loja decidiu (jul/2026):
+   - O formulário só edita CLIENTE, DATA, PRODUTO e TEMPO DE GARANTIA.
+   - Loja (EMITENTE) e termos são fixos aqui embaixo — não vão pra tela.
+   - Nº, vendedor, PAGO via, troca, valor, quantidade: os quadros SAEM no papel
+     igual ao modelo, mas em branco — "não quero nada de recibo".
+   ⚠️ NÃO reescrever a redação das cláusulas nem "arrumar" o typo "sendo está
+   contada" — é documento assinado pelo cliente. Só {MESES} é variável. */
+const GAR_LOJA={
+  razao:'GABRIEL CORDEIRO DA SILVA EIRELI',
+  cnpj:'27.768.371/0001-74',
+  ie:'90750522-75',
+  municipio:'SÃO MATEUS DO SUL',
+  uf:'PR',
+  tel:'42 3532- 6046',
+  natureza:'VENDA',
+  cfop:'5102',
+  pagoVia:['Transferência bancária','Dinheiro','Crédito','Débito','Troca total','Troca parcial'],
+  /* No modelo isto é o CABEÇALHO do Word (topo da página), não rodapé.
+     Endereço = o do app (CHIP7): a loja confirmou que o do .doc está velho. */
+  cabecalho:['Chip7 Tecnologia e Inovação','Av. Ozy Mendonça de Lima, 837 — Centro','e-mail: contato@chip7.net.br','São Mateus do Sul – Paraná, CEP: 83900-000'],
+  clausulas:[
+    '1 – Chip7 Informática inscrita no CNPJ nº 27.768.371/0001-74 assegura ao cliente acima identificado uma garantia de {MESES} sobre o objeto acima descrito, contada a partir da data de emissão desse certificado.',
+    '2 – Essa garantia cobre somente os defeitos de funcionamento das peças e componentes dos equipamentos descritos nas condições normais de uso.',
+    '3 – Essa garantia ficará automaticamente cancelada se o equipamento vier a sofrer reparos por pessoas não autorizadas, receber maus tratos ou sofrer danos decorrentes de acidentes, quedas, variações de tensão elétrica e sobrecarga acima do especificado, ou qualquer ocorrência imprevisível, decorrentes de má utilização do equipamento por parte do usuário.'
+  ],
+  importante:[
+    'Guarde este Certificado em local seguro, apresentando-o quando necessitar de assistência técnica.',
+    'Eventuais despesas de transporte entre domicilio/empresa e assistência técnica e outras que se façam necessárias correrão por conta do cliente/usuário do produto.',
+    'As substituições ou reparos feitos durante o período de garantia não acarretam a prorrogação do prazo de validade da mesma, sendo está contada sempre a partir da data de compra.'
+  ],
+  cdc:'De acordo com o artigo 18 do Código de Defesa do Consumidor, a Chip7 tem 30 dias, a partir da data da reclamação, para sanar um eventual problema no produto.',
+  aceite:'Declaro estar ciente e aceito os termos acima descritos: ______________________________'
+};
+function escolherGarantia(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('garantiaScreen').classList.add('show');
+  marcarTela();
+  garPagoBox(); garLogoCarrega();
+  const d=document.getElementById('garData'); if(d&&!d.value)d.value=garISOHoje();
+  garPreview(); window.scrollTo(0,0);
+  const c=document.getElementById('garCliente'); if(c&&!c.value)c.focus();
+}
+function garISOHoje(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function garDataObj(iso){ const p=String(iso||'').split('-'); if(p.length!==3)return null; const d=new Date(+p[0],+p[1]-1,+p[2]); return isNaN(d)?null:d; }
+function garBR(d){ return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`:''; }
+function garMesesTexto(n){ n=parseInt(n,10)||0; return n===1?'1 MÊS':n+' MESES'; }
+/* marca (X) nas formas escolhidas (pode ser mais de uma); o resto fica ( ) */
+function garPagoTexto(escolhidas,sep){
+  const on=new Set(escolhidas||[]);
+  return 'PAGO via '+GAR_LOJA.pagoVia.map(p=>(on.has(p)?'(X) ':'( ) ')+p).join(sep||'   ');
+}
+function garPagoBox(){
+  const box=document.getElementById('garPagoBox'); if(!box||box.dataset.done)return;
+  box.innerHTML=GAR_LOJA.pagoVia.map(p=>
+    `<label class="loja-chip"><input type="checkbox" value="${p}" onchange="garPreview()"> ${p}</label>`).join('');
+  box.dataset.done='1';
+}
+function garPagoSel(){ return [...document.querySelectorAll('#garPagoBox input:checked')].map(i=>i.value); }
+function garTemTroca(sel){ return (sel||[]).some(p=>p.indexOf('Troca')===0); }
+/* número vira R$; texto livre passa direto (às vezes o valor não é só número) */
+function garValorTxt(v){
+  v=String(v||'').trim(); if(!v)return '';
+  const n=(typeof parsePrecoBR==='function')?parsePrecoBR(v):parseFloat(v.replace(',','.'));
+  return (n>0 && /^[\d.,\sR$]+$/.test(v)) ? fmtMoney(n) : v;
+}
+function garDados(){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const emissao=garDataObj(g('garData'))||new Date();
+  return {cliente:g('garCliente'), endereco:g('garEndereco'), doc:g('garDoc'),
+          municipio:g('garMunicipio'), uf:g('garUF').toUpperCase(), tel:g('garTel'),
+          equip:g('garEquip'), meses:parseInt(g('garMeses'),10)||0, pago:garPagoSel(),
+          troca:g('garTroca'), trocaValor:g('garTrocaValor'),
+          data:g('garData')||garISOHoje(), emissao};
+}
+function garSlug(s){
+  return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9 ]/g,' ')
+    .split(/\s+/).filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join('') || 'Cliente';
+}
+function garNomeArquivo(d){
+  const dd=String(d.emissao.getDate()).padStart(2,'0'), mm=String(d.emissao.getMonth()+1).padStart(2,'0');
+  return `Garantia_${garSlug(d.cliente)}_${dd}${mm}${d.emissao.getFullYear()}.pdf`;
+}
+function garFalta(d){
+  if(!d.cliente) return 'Preencha o nome do cliente';
+  if(!d.equip)   return 'Preencha o produto';
+  if(!d.meses)   return 'Preencha o prazo em meses';
+  return '';
+}
+/* espelha o modelo linha por linha. Quadro em branco = a loja preenche à mão se quiser. */
+function garPreview(){
+  const el=document.getElementById('garPrev'); if(!el)return;
+  const d=garDados(), L=GAR_LOJA;
+  // campos da troca só aparecem quando alguma troca está marcada
+  const tb=document.getElementById('garTrocaBox');
+  if(tb)tb.classList.toggle('hide',!garTemTroca(d.pago));
+  const c=(lb,v,f)=>`<div class="gp-c" style="flex:${f||1}"><i>${lb}</i><b>${esc(v)||'&nbsp;'}</b></div>`;
+  const t=(v,f,cls)=>`<div class="gp-c ${cls||''}" style="flex:${f||1}"><b>${v}</b></div>`;
+  el.innerHTML=`<div class="gp-doc">
+    <div class="gp-cb"><img src="logo-garantia.png" alt="Chip7" class="gp-logo">${L.cabecalho.map(r=>`<span>${esc(r)}</span>`).join('')}</div>
+    <div class="gp-row gp-top">
+      ${t('RECIBO/ GARANTIA Nº ______',3)}${t('X',.35,'gp-ctr')}${t('SAÍDA',.9,'gp-ctr')}${t('&nbsp;',.35,'gp-ctr')}${t('ENTRADA',1,'gp-ctr')}
+    </div>
+    <div class="gp-sec">EMITENTE</div>
+    <div class="gp-row">${c('NOME RAZÃO SOCIAL',L.razao,2)}${c('CPF/CNPJ',L.cnpj,1.1)}${c('INSCRIÇÃO ESTADUAL',L.ie,1)}</div>
+    <div class="gp-row">${c('MUNICÍPIO',L.municipio,1.4)}${c('UF',L.uf,.4)}${c('TELEFONE',L.tel,1.2)}${c('DATA DA EMISSÃO',garBR(d.emissao),1.2)}</div>
+    <div class="gp-sec">CLIENTE</div>
+    <div class="gp-row">${c('NOME RAZÃO SOCIAL',d.cliente,1.7)}${c('ENDEREÇO',d.endereco,1.5)}${c('CPF/ CNPJ',d.doc,1)}</div>
+    <div class="gp-row">${c('MUNICIPIO',d.municipio,1.5)}${c('UF',d.uf,.4)}${c('TELEFONE',d.tel,1.5)}</div>
+    <div class="gp-row">${c('NATUREZA DA OPERAÇÃO',L.natureza,1.2)}${c('CFOP',L.cfop,.6)}${c('INSCRIÇÃO ESTADUAL DO SUBSTITUTO TRIBUTARIOS','',1.7)}${c('INSCRIÇÃO ESTADUAL','',1)}</div>
+    <div class="gp-row">${c('Fatura','',.7)}${c('Vendedor responsável:','',3)}</div>
+    <div class="gp-pg">${esc(garPagoTexto(d.pago)).replace(/\(X\)/g,'<b>(X)</b>')}</div>
+    <div class="gp-row">${c('INFORMAÇÕES TROCA',d.troca,2)}${c('VALOR',garValorTxt(d.trocaValor),1)}</div>
+    <div class="gp-sec">DADOS DO PRODUTO</div>
+    <div class="gp-row gp-th">${t('DESCRIÇÃO DOS PRODUTOS',2.6)}${t('QUANTIDADE',1,'gp-ctr')}${t('VALOR UNITÁRIO',1,'gp-ctr')}${t('VALOR TOTAL',1,'gp-ctr')}</div>
+    <div class="gp-row">${t(esc(d.equip)||'&nbsp;',2.6)}${t('&nbsp;',1)}${t('R$',1)}${t('R$',1)}</div>
+    <div class="gp-sec">INFORMAÇÕES COMPLEMENTARES</div>
+    <div class="gp-txt">
+      ${L.clausulas.map(cl=>`<p>${esc(cl.replace('{MESES}',garMesesTexto(d.meses)||'___'))}</p>`).join('')}
+      <p class="gp-imp">IMPORTANTE</p>
+      ${L.importante.map(i=>`<p>* ${esc(i)}</p>`).join('')}
+      <p>${esc(L.cdc)}</p>
+      <p class="gp-ac">${esc(L.aceite)} <span>DATA ${garBR(d.emissao)}</span></p>
+    </div>
+  </div>`;
+}
+function garLimpar(){
+  ['garCliente','garDoc','garTel','garEquip','garTroca','garTrocaValor'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('#garPagoBox input:checked').forEach(i=>{i.checked=false;});
+  const p=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  // o modelo em branco já vem com estes preenchidos
+  p('garEndereco','São Mateus do Sul'); p('garMunicipio','São Mateus do Sul'); p('garUF','PR');
+  p('garMeses',6); p('garData',garISOHoje());
+  garPreview();
+}
+/* ---- PDF: redesenha o formulário quadriculado do modelo, linha por linha ----
+   Medido no .doc: página A4, margens L/R 28pt, fonte Calibri, bordas pretas e
+   NENHUM sombreado (Shading = wdColorAutomatic). Nada de azul da marca aqui —
+   isto é papel de cartório, não tela do app. */
+const GAR_LINHA=[0,0,0];
+/* cells: [{f:peso, label:'', valor:'', center:bool, size:n, fill:bool}] — sem label = texto solto na célula */
+function garLinhaPDF(doc,x,y,LW,h,cells){
+  const tot=cells.reduce((a,c)=>a+c.f,0); let cx=x;
+  cells.forEach(c=>{
+    const w=LW*c.f/tot;
+    doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5);
+    if(c.fill){ doc.setFillColor(238,242,249); doc.rect(cx,y,w,h,'FD'); } else doc.rect(cx,y,w,h);
+    if(c.label!=null){
+      doc.setFont('helvetica','normal'); doc.setFontSize(5.8); doc.setTextColor(0,0,0);
+      doc.text(doc.splitTextToSize(String(c.label),w-6).slice(0,1),cx+3.5,y+7.5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(0,0,0);
+      doc.text(doc.splitTextToSize(String(c.valor||''),w-7).slice(0,2),cx+3.5,y+18);
+    }else{
+      doc.setFont('helvetica','bold'); doc.setFontSize(c.size||9);
+      doc.setTextColor(0,0,0);
+      const ls=doc.splitTextToSize(String(c.valor||''),w-7);
+      // 1 linha centraliza na célula; várias linhas começam do topo, senão vaza
+      doc.text(ls,c.center?cx+w/2:cx+3.5,ls.length>1?y+11:y+h/2+2.6,{align:c.center?'center':'left'});
+    }
+    cx+=w;
+  });
+  return h;
+}
+function garSecaoPDF(doc,x,y,w,txt){
+  const h=13; doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5);
+  doc.rect(x,y,w,h);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(0,0,0);
+  doc.text(String(txt),x+3.5,y+9);
+  return h;
+}
+/* logo do cabeçalho — extraída do próprio .doc da loja (1280x720, 114x64pt no Word) */
+let GAR_LOGO=null;
+function garLogoCarrega(){
+  if(GAR_LOGO!==null)return Promise.resolve(GAR_LOGO);
+  return new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>{ try{
+      const cv=document.createElement('canvas'); cv.width=im.naturalWidth; cv.height=im.naturalHeight;
+      const cx=cv.getContext('2d');
+      cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height);   // JPEG não tem transparência
+      cx.drawImage(im,0,0);
+      GAR_LOGO=cv.toDataURL('image/jpeg',0.92);   // JPEG: PDF ~10x menor que PNG e vai por WhatsApp
+    }catch(e){ GAR_LOGO=''; } res(GAR_LOGO); };
+    im.onerror=()=>{ GAR_LOGO=''; res(GAR_LOGO); };
+    im.src='logo-garantia.png';
+  });
+}
+function garMontarPDF(d){
+  const {jsPDF}=window.jspdf, doc=new jsPDF({unit:'pt',format:'a4'});
+  const L=GAR_LOJA, W=doc.internal.pageSize.getWidth(), M=28, LW=W-M*2;   // margens do .doc
+  let y=M;
+  // cabeçalho do modelo: logo + endereço da loja, centralizados no TOPO
+  if(GAR_LOGO){
+    try{ doc.addImage(GAR_LOGO,'JPEG',M+LW/2-57,y,114,64); y+=64+4; }catch(e){}
+  }
+  L.cabecalho.forEach((r,i)=>{
+    doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(i===0?10:7.6);
+    doc.setTextColor(0,0,0);
+    doc.text(r,M+LW/2,y+8,{align:'center'}); y+=i===0?13:9.6;
+  });
+  y+=8;
+  // RECIBO/GARANTIA Nº | X | SAÍDA | | ENTRADA
+  y+=garLinhaPDF(doc,M,y,LW,20,[
+    {f:3,valor:'RECIBO/ GARANTIA Nº ______'},{f:.35,valor:'X',center:1},{f:.9,valor:'SAÍDA',center:1},
+    {f:.35,valor:'',center:1},{f:1,valor:'ENTRADA',center:1}]);
+  y+=garSecaoPDF(doc,M,y,LW,'EMITENTE');
+  y+=garLinhaPDF(doc,M,y,LW,24,[
+    {f:2,label:'NOME RAZÃO SOCIAL',valor:L.razao},{f:1.1,label:'CPF/CNPJ',valor:L.cnpj},{f:1,label:'INSCRIÇÃO ESTADUAL',valor:L.ie}]);
+  y+=garLinhaPDF(doc,M,y,LW,24,[
+    {f:1.4,label:'MUNICÍPIO',valor:L.municipio},{f:.4,label:'UF',valor:L.uf},
+    {f:1.2,label:'TELEFONE',valor:L.tel},{f:1.2,label:'DATA DA EMISSÃO',valor:garBR(d.emissao)}]);
+  y+=garSecaoPDF(doc,M,y,LW,'CLIENTE');
+  y+=garLinhaPDF(doc,M,y,LW,24,[
+    {f:1.7,label:'NOME RAZÃO SOCIAL',valor:d.cliente},{f:1.5,label:'ENDEREÇO',valor:d.endereco},{f:1,label:'CPF/ CNPJ',valor:d.doc}]);
+  y+=garLinhaPDF(doc,M,y,LW,24,[
+    {f:1.5,label:'MUNICIPIO',valor:d.municipio},{f:.4,label:'UF',valor:d.uf},{f:1.5,label:'TELEFONE',valor:d.tel}]);
+  y+=garLinhaPDF(doc,M,y,LW,24,[
+    {f:1.2,label:'NATUREZA DA OPERAÇÃO',valor:L.natureza},{f:.6,label:'CFOP',valor:L.cfop},
+    {f:1.7,label:'INSCRIÇÃO ESTADUAL DO SUBSTITUTO TRIBUTARIOS',valor:''},{f:1,label:'INSCRIÇÃO ESTADUAL',valor:''}]);
+  y+=garLinhaPDF(doc,M,y,LW,22,[{f:.7,label:'Fatura',valor:''},{f:3,label:'Vendedor responsável:',valor:''}]);
+  y+=garLinhaPDF(doc,M,y,LW,16,[{f:1,valor:garPagoTexto(d.pago),size:7.4}]);
+  y+=garLinhaPDF(doc,M,y,LW,22,[{f:2,label:'INFORMAÇÕES TROCA',valor:d.troca},{f:1,label:'VALOR',valor:garValorTxt(d.trocaValor)}]);
+  y+=garSecaoPDF(doc,M,y,LW,'DADOS DO PRODUTO');
+  y+=garLinhaPDF(doc,M,y,LW,12,[
+    {f:2.6,valor:'DESCRIÇÃO DOS PRODUTOS',size:6.8},{f:1,valor:'QUANTIDADE',size:6.8,center:1},
+    {f:1,valor:'VALOR UNITÁRIO',size:6.8,center:1},{f:1,valor:'VALOR TOTAL',size:6.8,center:1}]);
+  const eqLin=doc.splitTextToSize(d.equip,LW*(2.6/5.6)-7);
+  y+=garLinhaPDF(doc,M,y,LW,Math.max(24,10+eqLin.length*11),[
+    {f:2.6,valor:d.equip,size:8.5},{f:1,valor:''},{f:1,valor:'R$',size:8.5},{f:1,valor:'R$',size:8.5}]);
+  // bloco de texto
+  y+=garSecaoPDF(doc,M,y,LW,'INFORMAÇÕES COMPLEMENTARES');
+  const topo=y; let ty=y+11;
+  const par=(txt,bold)=>{
+    doc.setFont('helvetica',bold?'bold':'normal'); doc.setFontSize(7.6); doc.setTextColor(0,0,0);
+    const ls=doc.splitTextToSize(txt,LW-14);
+    doc.text(ls,M+7,ty); ty+=ls.length*9.4+5.5;
+  };
+  L.clausulas.forEach(cl=>par(cl.replace('{MESES}',garMesesTexto(d.meses))));
+  ty+=1; par('IMPORTANTE',true);
+  L.importante.forEach(i=>par('* '+i));
+  par(L.cdc);
+  ty+=12;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.6); doc.setTextColor(0,0,0);
+  doc.text(L.aceite,M+7,ty);
+  doc.text('DATA '+garBR(d.emissao),M+LW-7,ty,{align:'right'});
+  ty+=10;
+  doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5); doc.rect(M,topo,LW,ty-topo);
+  return doc;
+}
+async function garGerar(){
+  const d=garDados(), falta=garFalta(d);
+  if(falta){ toast(falta); return null; }
+  if(!window.jspdf){ toast('PDF indisponível'); return null; }
+  await garLogoCarrega();   // sem isso o cabeçalho sai sem a logo
+  garHistAdd(d);
+  return {doc:garMontarPDF(d), d};
+}
+async function gerarGarantiaPDF(){
+  const r=await garGerar(); if(!r)return;
+  r.doc.save(garNomeArquivo(r.d));
+  toast('📄 Garantia gerada');
+}
+async function garImprimir(){
+  const r=await garGerar(); if(!r)return;
+  try{
+    r.doc.autoPrint();
+    const url=r.doc.output('bloburl');
+    const w=window.open(url,'_blank');
+    if(!w){ r.doc.save(garNomeArquivo(r.d)); toast('Bloqueou a janela — baixei o PDF'); }
+  }catch(e){ r.doc.save(garNomeArquivo(r.d)); toast('Não consegui imprimir — baixei o PDF'); }
+}
+/* ---- histórico: reimprimir sem redigitar (padrão repCatLoad/repCatSave) ---- */
+function garHistLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_gar_hist')||'[]'); }catch(e){ return []; } }
+function garHistSave(a){ if(typeof marcaLocal==='function')marcaLocal('garhist'); try{ localStorage.setItem('chip7_gar_hist',JSON.stringify(a)); }catch(e){} if(typeof cloudSaveGarHist==='function')cloudSaveGarHist(a); }
+function garHistAdd(d){
+  const h=garHistLoad();
+  h.unshift({ts:Date.now(), cliente:d.cliente, endereco:d.endereco, doc:d.doc, municipio:d.municipio, uf:d.uf,
+             tel:d.tel, equip:d.equip, meses:d.meses, pago:d.pago,
+             troca:d.troca, trocaValor:d.trocaValor, data:d.data,
+             vendedor:(typeof usuarioAtual==='function'?usuarioAtual():'')});
+  garHistSave(h.slice(0,200));
+}
+function garAbrirHist(){
+  const box=document.getElementById('garHistBox'); if(!box)return;
+  if(box.dataset.on==='1'){ box.dataset.on=''; box.innerHTML=''; return; }
+  box.dataset.on='1';
+  const h=garHistLoad();
+  box.innerHTML=`<div class="cot-card" style="margin-top:14px"><div class="cot-sep">garantias emitidas</div>`+
+    (h.length?h.map((g,i)=>`<div class="repcfg-row" style="cursor:pointer" onclick="garReabrir(${i})">
+        <b style="min-width:0;flex:1">${esc(g.cliente)}</b>
+        <span class="cot-hint" style="margin:0">${esc(g.equip).slice(0,38)}</span>
+        <span class="cot-hint" style="margin:0">${garBR(garDataObj(g.data))} · ${g.meses}m</span>
+      </div>`).join('')
+      :'<p class="cot-hint">Nenhuma garantia emitida ainda.</p>')+
+    `</div>`;
+}
+function garReabrir(i){
+  const g=garHistLoad()[i]; if(!g)return;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v==null?'':v;};
+  s('garCliente',g.cliente); s('garEndereco',g.endereco); s('garDoc',g.doc); s('garMunicipio',g.municipio);
+  s('garUF',g.uf); s('garTel',g.tel); s('garEquip',g.equip); s('garMeses',g.meses);
+  s('garTroca',g.troca); s('garTrocaValor',g.trocaValor); s('garData',g.data);
+  // pago virou lista; histórico antigo guardava texto — aceita os dois
+  const pg=Array.isArray(g.pago)?g.pago:(g.pago?[g.pago]:[]);
+  garPagoBox();
+  document.querySelectorAll('#garPagoBox input').forEach(i=>{i.checked=pg.indexOf(i.value)>=0;});
+  garAbrirHist(); garPreview(); window.scrollTo(0,0);
+  toast('Carregado — é só gerar de novo');
 }
 /* ================= 🔧 REPARO DE CELULAR (peça + serviço) ================= */
 const REP_MARCAS=['Apple','Samsung','Motorola','Xiaomi','LG','Outra'];
@@ -3257,7 +3890,7 @@ function repPrevisao(fornId){
     const dias=Math.max(0,parseInt(f.prazo,10)||0);
     if(!dias){ out.chega='a combinar com o fornecedor'; out.pronto='a combinar'; }
     else { const d=new Date(agora); let n=0; while(n<dias){ d.setDate(d.getDate()+1); if(d.getDay()!==0&&d.getDay()!==6)n++; }
-      out.chega=d.toLocaleDateString('pt-BR')+' ('+dias+' dia'+(dias>1?'s':'')+' útil'+(dias>1?'eis':'')+')'; out.pronto='no dia da chegada, até o fim do dia'; }
+      out.chega=d.toLocaleDateString('pt-BR')+' ('+(dias>1?dias+' dias úteis':'1 dia útil')+')'; out.pronto='no dia da chegada, até o fim do dia'; }
   }
   return out;
 }
@@ -3709,7 +4342,8 @@ function cotCalc(){
 /* ---- leitor da loja de importados (mesma lógica da função do servidor, validada) ---- */
 const CP_BASE='https://www.comprasparaguai.com.br';
 const CP_PRICE=/US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/i;
-const LOJAS_TERMOS={nissei:['nissei'],mega:['mega eletr'],cellshop:['cellshop','cell shop'],shoppingchina:['shopping china'],mobilezone:['mobile zone'],atacado:['atacado connect'],visaovip:['visãovip','visaovip','visão vip','visao vip'],stargames:['star games']};
+// apelidos = texto exato que o comprasparaguai imprime em 'advertiser' (minúsculo). O site escreve "Topdek Informática" — com K, sem espaço.
+const LOJAS_TERMOS={nissei:['nissei'],mega:['mega eletr'],cellshop:['cellshop','cell shop'],shoppingchina:['shopping china'],mobilezone:['mobile zone'],atacado:['atacado connect'],visaovip:['visãovip','visaovip','visão vip','visao vip'],stargames:['star games'],topdek:['topdek']};
 function termosDeLojas(){ return lojasSelecionadas().flatMap(id=>LOJAS_TERMOS[id]||[]); }
 function cpPrecoNum(s){ s=String(s||'').trim(); if(/,\d{2}$/.test(s)) s=s.replace(/\./g,'').replace(',','.'); const n=parseFloat(s); return (!isNaN(n)&&n>0)?n:null; }
 function cpDecode(s){ const t=document.createElement('textarea'); t.innerHTML=s||''; return t.value.replace(/\s+/g,' ').trim(); }
@@ -3829,7 +4463,7 @@ async function pesquisarProdutos(){
   try{
     if(COT_CEL){
       // 📱 modo celular: SÓ importados (celular não se compra de fornecedor BR)
-      msg.textContent='🔄 Buscando nos importados...'; buscarDolar();
+      msg.textContent='🔄 Buscando nos importados...'; dolarInit();
       COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo (ex.: "iPhone 15 128").'; return; }
       renderProdutos();
@@ -3848,7 +4482,7 @@ async function pesquisarProdutos(){
       }
       if(COT_FORN_ERROS.length){ renderProdutos(); document.getElementById('cotBuscaMsg').textContent='✔ '+COT_HITS.length+' resultado(s) · ⚠️ '+COT_FORN_ERROS.join(' · '); return; }
     } else {
-      msg.textContent='🔄 Buscando produtos importados...'; buscarDolar();
+      msg.textContent='🔄 Buscando produtos importados...'; dolarInit();
       COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
     }
@@ -3976,7 +4610,7 @@ async function abrirPorLink(){
   if(/mazer\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); return verMazer({nome:'Produto Mazer',link:path,fonte:'Mazer',moeda:'BRL',img:''}); }
   if(/distribuidoraguarapuava\.com\.br/i.test(url)){ const path=url.replace(/^https?:\/\/[^/]+/,''); msg.textContent='🔄 Abrindo (Guarapuava)...'; try{ const r=await fetch('/.netlify/functions/guarapuava?detalhe='+encodeURIComponent(path)); const d=r.ok?await r.json():{}; return usarFornecedorDireto({nome:d.nome||'Produto Guarapuava',link:path,fonte:'Guarapuava',moeda:'BRL',img:d.img||'',preco:d.preco||0}); }catch(e){ msg.textContent='⚠ Não consegui abrir (Guarapuava).'; return; } }
   if(!/comprasparaguai\.com\.br\/.+_\d+/i.test(url)){ msg.textContent='Cole o link de um produto (loja de importados, mazer.com.br ou distribuidoraguarapuava.com.br).'; return; }
-  msg.textContent='🔄 Abrindo o produto...'; box.innerHTML=''; buscarDolar();
+  msg.textContent='🔄 Abrindo o produto...'; box.innerHTML=''; dolarInit();
   const path=url.replace(/^https?:\/\/[^/]+/,'');
   try{
     const d=await cpDetalhe(path);
@@ -5292,7 +5926,7 @@ function cloudSubscribeFav(){
   }, err=>console.warn('Cloud fav sync',err));
 }
 /* preferências (maquininha, arredondamento, mostrar total) na nuvem */
-const PREF_KEYS=['chip7_maq','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
+const PREF_KEYS=['chip7_maq','chip7_maq_cfg','chip7_dolar','chip7_dolar_tipo','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
 let _prefCloudTimer=null;
 function cloudSavePrefs(){ marcaLocal('prefs'); if(!cloud.on)return; clearTimeout(_prefCloudTimer); _prefCloudTimer=setTimeout(()=>{ const p={}; PREF_KEYS.forEach(k=>{const v=localStorage.getItem(k); if(v!=null)p[k]=v;}); cloudSet(cloud.db.collection('cotacoes').doc('prefs'), {p,ts:Date.now()}, 'Preferências'); },800); }
 function cloudSubscribePrefs(){
@@ -5306,6 +5940,8 @@ function cloudSubscribePrefs(){
       if(ch){ COT_SOMAR=localStorage.getItem('chip7_cot_somar')!=='0'; COT_ARRED=localStorage.getItem('chip7_cot_arred')!=='0'; CAM_ARRED=localStorage.getItem('chip7_cam_arred')!=='0';
         document.body.classList.toggle('dark', localStorage.getItem('chip7_dark')==='1');
         if(typeof atualizarBotoesDark==='function')atualizarBotoesDark();
+        MAQS=maqCfgLoad();   // taxa editada em outra máquina chega por aqui
+        if(typeof maqRenderCfg==='function')maqRenderCfg();
         refreshMaqUI();
         if(document.getElementById('cotacaoScreen').classList.contains('show')){ cotCalc(); renderCart(); }
         if(document.getElementById('cameraScreen').classList.contains('show')) camCalc();
