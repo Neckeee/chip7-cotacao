@@ -430,6 +430,23 @@ body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua br
 .prod-prodhead{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;font-weight:600}
 .prod-prodhead img{width:40px;height:40px;border-radius:7px;object-fit:contain;background:#fff;flex:none}
 .prod-back{font-size:13px;color:#bfe3ff;font-weight:700;cursor:pointer;padding:2px 0 4px}
+/* ---- filtros da busca (RAM / SSD / processador / acessórios) ---- */
+.filt-bar{display:flex;flex-direction:column;gap:7px;margin:2px 0 10px;padding:9px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px}
+.filt-g{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filt-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.72);min-width:82px;text-transform:uppercase;letter-spacing:.3px}
+.filt-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.24);border-radius:16px;padding:4px 11px;font-size:12.5px;font-weight:600;color:#fff;cursor:pointer;transition:.12s}
+.filt-chip:hover{border-color:#fff}
+.filt-chip.on{background:var(--accent2);border-color:var(--accent2);color:#06301a}
+.filt-chip.aces{background:transparent;border-style:dashed;color:rgba(255,255,255,.85)}
+.filt-chip.aces.on{background:rgba(255,255,255,.16);border-style:solid}
+/* ---- paginador ---- */
+.pg-bar{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:12px 0 2px}
+.pg-btn{min-width:34px;height:34px;padding:0 9px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:.12s}
+.pg-btn:hover:not(:disabled){border-color:var(--brand)}
+.pg-btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.pg-btn:disabled{opacity:.4;cursor:default}
+.pg-el{align-self:center;padding:0 2px;color:var(--muted);font-weight:700}
+body.dark .pg-btn{background:var(--card);border-color:var(--line);color:var(--text)}
 .prod-back:hover{text-decoration:underline}
 .cot-fallback{font-size:12px;color:rgba(255,255,255,.8);margin:6px 2px 0;line-height:1.5}
 .cot-or{text-align:center;color:rgba(255,255,255,.6);font-size:11.5px;margin:12px 0 8px;letter-spacing:.3px}
@@ -475,6 +492,8 @@ body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua br
 .cart-send{width:100%;margin-top:14px;font-size:15px;padding:13px}
 .cart-send2,.cart-clear{width:100%;margin-top:8px;font-size:13px;padding:9px}
 .cart-clear{color:var(--muted)}
+.btn.cart-save{width:100%;margin-top:14px;font-size:15px;padding:13px;background:linear-gradient(120deg,#2ea44f,#26893f);color:#fff;border:0}
+.btn.cart-save:hover{filter:brightness(1.06)}
 .frete-tag{display:flex;justify-content:space-between;align-items:center;background:#eef4ff;border:1px solid #c5d8f5;color:#1f4fa3;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;margin-top:8px}
 .frete-tag span{color:#c0392b;cursor:pointer;font-weight:700;text-decoration:underline;font-size:12px}
 /* módulo câmera (croqui) */
@@ -4370,8 +4389,9 @@ function cpParseBusca(html){
     const preco=pm?cpPrecoNum(pm[1]):null;
     if(nm&&preco) out.push({nome:cpDecode(nm[1].replace(/<[^>]+>/g,'')),precoUSD:preco,ofertas:of?+of[1]:1,link:lk?lk[1]:'',img:im?im[1]:''});
   }
-  return out.slice(0,30);   // ordem de relevância do site (o produto certo vem no topo)
+  return out;   // ordem de relevância do site (o produto certo vem no topo)
 }
+function cpTotalBusca(html){ const m=html.match(/([\d.]+)\s*resultados?/i); return m?parseInt(m[1].replace(/\./g,''),10)||0:0; }
 const CP_CORES=/(deep\s*blue|cosmic\s*orange|space\s*black|space\s*gray|sierra\s*blue|alpine\s*green|jet\s*black|rose\s*gold|product\s*red|natural\s*titanium|desert\s*titanium|preto|branco|azul|verde|vermelho|rosa|roxo|dourado|prateado|prata|cinza|chumbo|grafite|tit[âa]nio|meia.?noite|estelar|natural|deserto?|areia|coral|menta|lil[áa]s|bege|marrom|laranja|amarelo|midnight|starlight|graphite|black|white|blue|green|red|pink|purple|violet|golden|gold|silver|gray|grey|teal|orange|yellow|cosmic|titanium|space|sierra|jet|ultramarine|sky)/i;
 // grade aceita os vários jeitos do site: "Grade A+", "Grad A", "Grado A", "Swap A", "A+"
 function extrairGrade(nome){ const m=(nome||'').match(/(?:grad[eo]?|swap)\s*([a-cA-C][+\-]?)(?![a-z])/i); return m?('Grade '+m[1].toUpperCase()):''; }
@@ -4408,11 +4428,27 @@ function cpParseDetalhe(html){
   }
   return Object.values(map).sort((a,b)=>a.precoUSD-b.precoUSD);  // todas; o filtro de loja é dinâmico no cliente
 }
-// tenta a função do Netlify; se não existir (site arrastado), faz pelo navegador
+// tenta a função do Netlify (já pagina no servidor); se não existir (site arrastado),
+// pagina pelo navegador — até 5 páginas pra não ficar lento no proxy
+let COT_SITE_TOTAL=0;   // quantos o comprasparaguai diz ter (pode ser > baixado)
 async function cpPesquisa(q){
-  try{ const r=await fetch('/.netlify/functions/buscar?q='+encodeURIComponent(q)); if(r.ok){const d=await r.json(); if(!d.erro&&d.itens) return d.itens;} }catch(_){}
-  const html=await cpProxy(CP_BASE+'/busca/?q='+encodeURIComponent(q));
-  return cpParseBusca(html);
+  COT_SITE_TOTAL=0;
+  try{ const r=await fetch('/.netlify/functions/buscar?q='+encodeURIComponent(q)); if(r.ok){const d=await r.json(); if(!d.erro&&d.itens){ COT_SITE_TOTAL=d.total||d.itens.length; return d.itens; }} }catch(_){}
+  const base=CP_BASE+'/busca/?q='+encodeURIComponent(q);
+  const html1=await cpProxy(base);
+  let itens=cpParseBusca(html1);
+  // categoria (ex.: "notebook") pagina pela canonical /notebook/?page=N, não pelo /busca/
+  const canon=(html1.match(/rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)||[])[1]||'';
+  const usaCanon=canon&&!/\/busca/i.test(canon);
+  const pagUrl=p=>usaCanon?(canon+(canon.includes('?')?'&':'?')+'page='+p):(base+'&page='+p);
+  const total=cpTotalBusca(html1), nPag=Math.min(5,Math.max(1,Math.ceil((total||itens.length)/20)));
+  for(let p=2;p<=nPag;p++){
+    try{ itens=itens.concat(cpParseBusca(await cpProxy(pagUrl(p)))); }catch(_){ break; }
+  }
+  const visto=new Set(), out=[];
+  for(const it of itens){ const k=it.link||it.nome; if(visto.has(k))continue; visto.add(k); out.push(it); }
+  COT_SITE_TOTAL=total||out.length;
+  return out;
 }
 async function cpDetalhe(link){
   try{ const r=await fetch('/.netlify/functions/buscar?detalhe='+encodeURIComponent(link)); if(r.ok){const d=await r.json(); if(!d.erro&&d.ofertas){return {ofertas:d.ofertas,nome:d.nome||'',img:d.img||''};}} }catch(_){}
@@ -4450,21 +4486,107 @@ function abrirFavoritos(){
 }
 async function cotarFavorito(i){ const f=favLoad()[i]; if(!f)return; COT_HITS=[f]; await verOfertas(0); }
 function removerFav(i){ const a=favLoad(); a.splice(i,1); favSave(a); abrirFavoritos(); }
+/* ====== specs do nome (pra filtrar como no comprasparaguai) ====== */
+const CP_RE_RAM=/(?:mem[óo]ria|ram)\s*(\d{1,3})\s?gb/i;
+const CP_RE_SSD=/(?:ssd|hd|ufs|emmc|armazenamento)\s*(\d{1,4})\s?(gb|tb)/i;
+const CP_RE_STOR=/(\d{2,4})\s?(gb|tb)\b/i;   // armazenamento "solto" (celular: iPhone 128GB)
+const CP_RE_CPU=/(intel\s+core\s+(?:ultra\s+\d|i[3579]|[3579]))|(apple\s+[am]\d+(?:\s+(?:pro|max|ultra))?)|(amd\s+ryzen\s+\d)|(snapdragon(?:\s+x)?)|(intel\s+(?:celeron|pentium|atom))/i;
+const CP_RE_ACES=/\b(capa|p[eé]l[íi]cula|pel[íi]cula|cabo|carregad|fonte\s|suporte|case|protector|protetor|adaptad|caneta|pen\s?drive|mochila|hub|dock|vidro|glass|pantalla|bracelete|correa|pulseira|teclado|mouse|forro|estojo|bolsa|kit\b|reposi[çc]|speaker|\bflex\b|estuche|funda)/i;
+function cpNum(v,un){ v=parseInt(v,10)||0; return un&&/tb/i.test(un)?v*1024:v; }   // tudo em GB pra ordenar
+function cpArmazLabel(gb){ return gb>=1024?(gb/1024)+'TB':gb+'GB'; }
+function cpSpecs(nome){
+  nome=nome||'';
+  const s={};
+  const ram=nome.match(CP_RE_RAM); if(ram) s.ram=cpNum(ram[1],'gb');
+  const ssd=nome.match(CP_RE_SSD);
+  if(ssd){ s.armaz=cpNum(ssd[1],ssd[2]); s.ssdExpl=true; }
+  else { const st=nome.match(CP_RE_STOR); if(st) s.armaz=cpNum(st[1],st[2]); }
+  const cpu=nome.match(CP_RE_CPU);
+  if(cpu){ let c=cpu[0].replace(/\s+/g,' ').trim().toLowerCase().replace(/\b\w/g,m=>m.toUpperCase());
+    c=c.replace(/Core I(\d)/,'Core i$1').replace(/\bAmd\b/,'AMD'); s.cpu=c; }
+  s.aces=CP_RE_ACES.test(nome);
+  return s;
+}
+/* ====== filtros + paginação da busca de importados ====== */
+let COT_FILT={aces:false, ram:new Set(), armaz:new Set(), cpu:new Set()};
+let COT_PAGE=1; const COT_PORPAG=20;
+function cotFiltraReset(){ COT_FILT={aces:false, ram:new Set(), armaz:new Set(), cpu:new Set()}; COT_PAGE=1; }
+function cotItensFiltrados(){
+  return COT_HITS.filter(i=>{
+    const s=i._spec||{};
+    if(!COT_FILT.aces && s.aces) return false;                       // esconde acessório por padrão
+    if(COT_FILT.ram.size && !COT_FILT.ram.has(s.ram)) return false;
+    if(COT_FILT.armaz.size && !COT_FILT.armaz.has(s.armaz)) return false;
+    if(COT_FILT.cpu.size && !COT_FILT.cpu.has(s.cpu)) return false;
+    return true;
+  });
+}
+function cotToggleFiltro(dim,val){
+  if(dim==='aces'){ COT_FILT.aces=!COT_FILT.aces; }
+  else { const set=COT_FILT[dim]; const v=(dim==='cpu')?val:+val; set.has(v)?set.delete(v):set.add(v); }
+  COT_PAGE=1; renderProdutos();
+}
+function cotIrPagina(p){ COT_PAGE=p; renderProdutos(); document.getElementById('cotResultados').scrollIntoView({block:'nearest'}); }
+function cotBarraFiltros(){
+  const base=COT_HITS.filter(i=>!(i._spec&&i._spec.aces));   // as dimensões saem dos produtos reais
+  const nAces=COT_HITS.filter(i=>i._spec&&i._spec.aces).length;
+  const grupo=(dim,label,fmt)=>{
+    const vals=[...new Set(base.map(i=>i._spec&&i._spec[dim]).filter(v=>v!=null&&v!==''))];
+    if(vals.length<2) return '';   // só mostra o filtro se houver o que escolher
+    vals.sort((a,b)=>(typeof a==='number')?a-b:String(a).localeCompare(String(b)));
+    return `<div class="filt-g"><span class="filt-lbl">${label}</span>`+
+      vals.map(v=>`<button type="button" class="filt-chip${COT_FILT[dim].has(v)?' on':''}" onclick="cotToggleFiltro('${dim}','${String(v).replace(/'/g,'')}')">${fmt(v)}</button>`).join('')+`</div>`;
+  };
+  const usaSSD=base.some(i=>i._spec&&i._spec.ssdExpl);
+  let h='';
+  h+=grupo('cpu','Processador',v=>v);
+  h+=grupo('ram','Memória RAM',v=>v+'GB');
+  h+=grupo('armaz',usaSSD?'SSD':'Armazenam.',cpArmazLabel);
+  if(nAces){ h+=`<div class="filt-g"><button type="button" class="filt-chip aces${COT_FILT.aces?' on':''}" onclick="cotToggleFiltro('aces')">${COT_FILT.aces?'✓ ':''}Mostrar acessórios (${nAces})</button></div>`; }
+  return h?`<div class="filt-bar">${h}</div>`:'';
+}
+function cotAvisoTeto(){
+  // o site tem mais do que coube no teto de páginas? manda filtrar
+  if(COT_SITE_TOTAL && COT_SITE_TOTAL>COT_HITS.length+3)
+    return `<p class="cot-hint" style="text-align:center;margin-top:8px">São ${COT_SITE_TOTAL} no site; carreguei os ${COT_HITS.length} mais relevantes. Use os filtros acima pra achar o certo.</p>`;
+  return '';
+}
+function cotPaginador(nFilt){
+  const tot=Math.ceil(nFilt/COT_PORPAG);
+  if(tot<=1) return cotAvisoTeto();
+  if(COT_PAGE>tot)COT_PAGE=tot;
+  const btn=(p,txt,cls)=>`<button type="button" class="pg-btn${cls||''}${p===COT_PAGE?' on':''}" ${p<1||p>tot?'disabled':''} onclick="cotIrPagina(${p})">${txt}</button>`;
+  let nums=''; const jan=2;
+  const ini=Math.max(1,COT_PAGE-jan), fim=Math.min(tot,COT_PAGE+jan);
+  if(ini>1) nums+=btn(1,'1')+(ini>2?'<span class="pg-el">…</span>':'');
+  for(let p=ini;p<=fim;p++) nums+=btn(p,String(p));
+  if(fim<tot) nums+=(fim<tot-1?'<span class="pg-el">…</span>':'')+btn(tot,String(tot));
+  return `<div class="pg-bar">${btn(COT_PAGE-1,'‹')}${nums}${btn(COT_PAGE+1,'›')}</div>`+cotAvisoTeto();
+}
 function renderProdutos(){
-  document.getElementById('cotBuscaMsg').textContent=`✔ ${COT_HITS.length} produto(s) — toque para ver cor, loja e preço:`;
-  document.getElementById('cotResultados').innerHTML=COT_HITS.map(htmlProdHit).join('');
+  const filt=cotItensFiltrados();
+  const tot=Math.max(1,Math.ceil(filt.length/COT_PORPAG));
+  if(COT_PAGE>tot)COT_PAGE=tot;
+  const ini=(COT_PAGE-1)*COT_PORPAG, pagina=filt.slice(ini,ini+COT_PORPAG);
+  const totalTxt = COT_HITS.length>filt.length ? `${filt.length} de ${COT_HITS.length}` : `${filt.length}`;
+  document.getElementById('cotBuscaMsg').textContent=`✔ ${totalTxt} produto(s) — toque para ver cor, loja e preço:`;
+  // htmlProdHit usa o índice em COT_HITS; passo o índice real
+  document.getElementById('cotResultados').innerHTML=
+    cotBarraFiltros()+
+    (pagina.length?pagina.map(i=>htmlProdHit(i,COT_HITS.indexOf(i))).join(''):`<p class="cot-fallback">Nenhum produto com esse filtro. Toque nos chips pra afrouxar.</p>`)+
+    cotPaginador(filt.length);
 }
 async function pesquisarProdutos(){
   const q=(document.getElementById('cotBusca').value||'').trim();
   const msg=document.getElementById('cotBuscaMsg');
   const box=document.getElementById('cotResultados');
   if(!q){ msg.textContent='Digite o que quer pesquisar (ex.: placa mãe B550).'; return; }
-  box.innerHTML='';
+  box.innerHTML=''; cotFiltraReset();
   try{
     if(COT_CEL){
       // 📱 modo celular: SÓ importados (celular não se compra de fornecedor BR)
       msg.textContent='🔄 Buscando nos importados...'; dolarInit();
-      COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
+      COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD',_spec:cpSpecs(i.nome)},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo (ex.: "iPhone 15 128").'; return; }
       renderProdutos();
       return;
@@ -4483,7 +4605,7 @@ async function pesquisarProdutos(){
       if(COT_FORN_ERROS.length){ renderProdutos(); document.getElementById('cotBuscaMsg').textContent='✔ '+COT_HITS.length+' resultado(s) · ⚠️ '+COT_FORN_ERROS.join(' · '); return; }
     } else {
       msg.textContent='🔄 Buscando produtos importados...'; dolarInit();
-      COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD'},i));
+      COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD',_spec:cpSpecs(i.nome)},i));
       if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
     }
     renderProdutos();
@@ -4807,7 +4929,8 @@ function renderCart(){
   html+=`<button class="btn ghost cart-send2" onclick="gerarCotacaoImagem()">🖼️ Compartilhar imagem</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="copiarTexto()">📋 Copiar texto</button>`;
   html+=`<button class="btn ghost cart-send2" onclick="anexarAoDiagnostico('cot')">📎 Anexar ao diagnóstico</button>`;
-  html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar</button>`;
+  html+=`<button class="btn primary cart-save" onclick="salvarOrcamento()">💾 Salvar orçamento e começar novo</button>`;
+  html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar sem salvar</button>`;
   el.innerHTML=html;
 }
 /* ---- PDF do orçamento (logo, foto, preços de venda, validade 7 dias) ---- */
@@ -4946,6 +5069,29 @@ function salvarNoHistorico(itens){
   const arr=histLoad();
   arr.unshift({id:Date.now(),data:new Date().toISOString(),cliente,status:'enviado',vendedor:usuarioAtual(),modulo:(COT_CEL?'celular':COT_BUILD?'pc':'cotacao'),itens:itens.map(i=>({...i})),totalVista:itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0)});
   histSave(arr);
+}
+/* botão "Salvar orçamento": grava no histórico e limpa tudo pro próximo cliente */
+function salvarOrcamento(){
+  const itens=cotItens();
+  if(!itens.length){ toast('Cote um produto antes de salvar'); return; }
+  salvarNoHistorico(itens);
+  novoOrcamento(true);   // limpa os campos
+  toast('💾 Orçamento salvo — comece o próximo (veja em 🕘 Histórico)');
+}
+/* zera o orçamento em construção (carrinho, produto cotado e dados do cliente) */
+function novoOrcamento(silencioso){
+  if(!silencioso && (COT_CART.length||itemAtual()) && !confirm('Começar um orçamento novo? O atual será descartado.')) return;
+  COT_CART=[]; COT_SEL=null; COT_PROD=null; COT_CALC=null; COT_VIS=[]; COT_OFS=[];
+  const lim=['cotBusca','cotLink','cotPreco','cotNomePdf','cotGrade','cotCor','cotCliente','cotClienteTel','cotObs','cotPrazo'];
+  lim.forEach(id=>{const e=document.getElementById(id); if(e)e.value='';});
+  const q=document.getElementById('cotQtd'); if(q)q.value=1;
+  const v=document.getElementById('cotValidade'); if(v)v.value=7;
+  const res=document.getElementById('cotResultados'); if(res)res.innerHTML='';
+  const msg=document.getElementById('cotBuscaMsg'); if(msg)msg.textContent='';
+  if(typeof cotFiltraReset==='function')cotFiltraReset();
+  if(typeof COT_HITS!=='undefined')COT_HITS=[];
+  renderCart(); cotCalc();
+  const wrap=document.querySelector('#cotacaoScreen .cot-wrap'); if(wrap)wrap.scrollIntoView({block:'start'});
 }
 /* histórico do módulo de câmeras — guarda o croqui (sem fotos, pra caber na nuvem) e reabre depois */
 function slimCam(){

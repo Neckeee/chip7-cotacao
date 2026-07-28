@@ -15,7 +15,7 @@ Leia `CONTEXTO.md` para quem usa e por quê. Este arquivo é o mapa do código.
 - PWA instalável, roda no Netlify. Deploy = subir os arquivos no GitHub (repo
   `chip7-cotacao`); o Netlify auto-deploya.
 - **`sw.js` tem a versão do cache (`chip7-diag-vN`) — suba o N a cada release**,
-  senão o celular da equipe continua com a versão velha. Hoje: **v74**.
+  senão o celular da equipe continua com a versão velha. Hoje: **v76**.
 - Dados em `localStorage`, com sync opcional no Firebase (conta compartilhada).
 - PDF com jsPDF + jsPDF-autotable, **já embarcados**. Não adicionar biblioteca nova.
 - Funções Netlify em `netlify/functions/`: `buscar.js` (comprasparaguai),
@@ -129,6 +129,26 @@ Os apelidos têm que bater com o texto **exato** que o comprasparaguai imprime e
 > A tabela `LOJAS` do `buscar.js` **está sem uso** — o filtro é no cliente desde que
 > `parseDetalhe` passou a devolver todas as ofertas. Mantida em sincronia por
 > segurança, mas quem manda é o `LOJAS_TERMOS`.
+
+### 5. Busca de importados: paginação + filtros por spec
+
+- **Paginação do comprasparaguai**: o site devolve **20 por página**.
+  ⚠️ **Termo de categoria (ex.: "notebook") REDIRECIONA** pra `/notebook/` e pagina
+  por `/notebook/?page=N` — o `&page` no `/busca/?q=` é **ignorado** (volta pág. 1).
+  A **`canonical`** da pág. 1 dá a base certa. Isso vale nos DOIS lados: `buscar.js`
+  (servidor, puxa até 10 pág = 200 itens em paralelo) e o fallback do `cpPesquisa`
+  (navegador via proxy, até 5 pág = 100). Sempre **dedup por link**.
+- **Filtros vêm do NOME do produto** (`cpSpecs`): RAM (`Memória NGB`), SSD/armazenam.
+  (`SSD/HD/UFS NGB|TB`, ou o GB solto do celular), processador. `renderProdutos`
+  monta os chips só pras dimensões que **variam** no resultado (`cotBarraFiltros`),
+  aplica em `cotItensFiltrados` e **pagina no cliente** 20/página (`cotPaginador`).
+- **Acessório escondido por padrão** (`CP_RE_ACES`: capa, película, cabo, peça de
+  reposição, speaker, estuche…). Toggle "Mostrar acessórios (N)" liga. Foi o que
+  resolveu "coloco iphone 13 pro e vem coisa que não quero".
+- `COT_SITE_TOTAL` guarda o total do site; se for maior que o baixado, aparece o
+  aviso "São X no site; use os filtros".
+- ⚠️ `htmlProdHit(i, COT_HITS.indexOf(i))` — o índice do onclick é a posição REAL em
+  `COT_HITS` (não na página filtrada), senão `verOfertas`/`toggleFav` abrem o errado.
 
 ## O que foi feito agora (jul/2026)
 

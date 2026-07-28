@@ -54,7 +54,7 @@ function parseBusca(html) {
     const pm = c.match(PRICE);
     const lk = c.match(/href="(\/[^"]+_\d+\/)"/i);
     const of = c.match(/(\d+)\s*OFERTAS?/i);
-    const im = c.match(/data-src="(https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i) || c.match(/data-src="([^"]+)"/i);
+    const im = c.match(/data-src="(https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp|avif)[^"]*)"/i) || c.match(/data-src="([^"]+)"/i);
     const preco = pm ? precoNum(pm[1]) : null;
     if (nm && preco) {
       out.push({
@@ -68,6 +68,12 @@ function parseBusca(html) {
   }
   return out;
 }
+// "182 Resultados" no topo da busca -> quantos itens existem no total
+function totalBusca(html) {
+  const m = html.match(/([\d.]+)\s*resultados?/i);
+  return m ? parseInt(m[1].replace(/\./g, ''), 10) || 0 : 0;
+}
+const POR_PAGINA = 20, MAX_PAGINAS = 10;   // o site pagina de 20 em 20; teto de 200 itens
 
 const CORES = /(deep\s*blue|cosmic\s*orange|space\s*black|space\s*gray|sierra\s*blue|alpine\s*green|jet\s*black|rose\s*gold|product\s*red|natural\s*titanium|desert\s*titanium|preto|branco|azul|verde|vermelho|rosa|roxo|dourado|prateado|prata|cinza|chumbo|grafite|tit[âa]nio|meia.?noite|estelar|natural|deserto?|areia|coral|menta|lil[áa]s|bege|marrom|laranja|amarelo|midnight|starlight|graphite|black|white|blue|green|red|pink|purple|violet|golden|gold|silver|gray|grey|teal|orange|yellow|cosmic|titanium|space|sierra|jet|ultramarine|sky)/i;
 function extrairGrade(nome) { const m = (nome || '').match(/(?:grad[eo]?|swap)\s*([a-cA-C][+\-]?)(?![a-z])/i); return m ? ('Grade ' + m[1].toUpperCase()) : ''; }
@@ -134,13 +140,41 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body };
     }
 
-    // ---- MODO BUSCA: lista de produtos ----
+    // ---- MODO BUSCA: lista de produtos (com paginação) ----
     const q = (p.q || '').trim();
     if (!q) return { statusCode: 400, headers, body: JSON.stringify({ erro: 'Informe o que pesquisar (q).' }) };
-    const urlBusca = 'https://www.comprasparaguai.com.br/busca/?q=' + encodeURIComponent(q);
-    const html = await baixar(urlBusca);
-    const itens = parseBusca(html).slice(0, 30);   // ordem de relevância do site
-    const body = JSON.stringify({ itens, urlBusca });
+    const alvo = 'https://www.comprasparaguai.com.br/busca/?q=' + encodeURIComponent(q);
+
+    // pág. 1 primeiro, pra saber o total e quantas páginas puxar
+    const html1 = await baixar(alvo);
+    const total = totalBusca(html1);
+    const itens = parseBusca(html1);
+
+    // ⚠️ busca de categoria (ex.: "notebook") REDIRECIONA p/ /notebook/ e pagina como
+    // /notebook/?page=N — o &page no /busca/ é ignorado. A canonical dá a base certa.
+    const canon = (html1.match(/rel=["']canonical["'][^>]*href=["']([^"']+)["']/i) || [])[1] || '';
+    const usaCanon = canon && !/\/busca/i.test(canon);
+    const pagUrl = (n) => usaCanon ? (canon + (canon.includes('?') ? '&' : '?') + 'page=' + n) : (alvo + '&page=' + n);
+
+    const nPag = Math.min(MAX_PAGINAS, Math.max(1, Math.ceil((total || itens.length) / POR_PAGINA)));
+    // resto das páginas em paralelo (rápido; o site devolve 20 por página)
+    if (nPag > 1) {
+      const resto = await Promise.all(
+        Array.from({ length: nPag - 1 }, (_, i) =>
+          baixar(pagUrl(i + 2)).then(parseBusca).catch(() => []))
+      );
+      for (const arr of resto) itens.push(...arr);
+    }
+
+    // dedup por link (páginas podem repetir a última linha), mantendo a ordem de relevância
+    const visto = new Set(), unicos = [];
+    for (const it of itens) {
+      const k = it.link || it.nome;
+      if (visto.has(k)) continue;
+      visto.add(k); unicos.push(it);
+    }
+
+    const body = JSON.stringify({ itens: unicos, total: total || unicos.length, paginas: nPag, urlBusca: alvo });
     cachePut(ck, body);
     return { statusCode: 200, headers, body };
 
