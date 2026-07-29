@@ -347,11 +347,25 @@ body.dark .rep-foto,body.dark .repcfg-row{background:var(--card);border-color:va
 .gp-txt p{margin:0 0 4px}
 .gp-imp{font-weight:800;margin-top:7px!important}
 .gp-ac{margin-top:11px!important;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.gp-cb{padding:8px;text-align:center;border-bottom:1px solid #000}   /* no modelo isto é o cabeçalho do Word */
-.gp-cb span{display:block;font-size:7.5px;color:#000}
-.gp-cb span:first-child{font-weight:700;font-size:9.5px}
-.gp-logo{display:block;width:114px;max-width:45%;height:auto;margin:0 auto 4px}
-.gar-pagos{display:flex;flex-wrap:wrap;gap:7px}
+.gp-cb{display:flex;align-items:center;gap:12px;padding:7px 10px;border-bottom:1px solid #000}   /* logo à esquerda, loja ao lado */
+.gp-logo{width:92px;max-width:32%;height:auto;flex:none;display:block}
+.gp-cb-txt{display:flex;flex-direction:column;gap:1px;text-align:left;min-width:0}
+.gp-cb-txt span{font-size:7.5px;color:#000;line-height:1.25}
+.gp-cb-nome{font-weight:700;font-size:10px}
+/* formulário: produtos e pagamento */
+.gar-prod{padding:8px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fafcff}
+.gar-prod>input{width:100%}
+.gar-prod-r{display:flex;gap:6px;margin-top:6px;align-items:center}
+.gar-prod-r input{min-width:0}
+.gar-prod-r input[type=number]{flex:0 0 56px;text-align:center}
+.gar-prod-r input[type=text]{flex:1}
+.gar-prod-tot{flex:0 0 auto;font-weight:800;font-size:12.5px;white-space:nowrap;color:var(--brand)}
+body.dark .gar-prod{background:var(--card);border-color:var(--line)}
+.gar-pagos{display:flex;flex-direction:column;gap:6px}
+.gar-pago{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text)}
+.gar-pago>span{flex:1}
+.gar-pago-v{flex:0 0 108px;max-width:108px}
+.gar-pago-v:disabled{opacity:.4}
 body.dark .gp-doc{background:#fff}   /* papel é papel: continua branco no modo escuro */
 body.dark .rep-prev{background:#12233f;border-color:#2b4a80}
 body.dark .rep-aviso{background:#3a2e10;border-color:#8a6d1f;color:#fcd34d}
@@ -1106,7 +1120,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
   <div class="cot-wrap" style="max-width:860px">
     <div class="cot-head">
       <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
-      <h2 style="margin:0;color:#fff">🛡️ Recibo / Garantia</h2>
+      <h2 style="margin:0;color:#fff">🛡️ Venda / Garantia</h2>
       <button class="btn ghost" style="margin-left:auto" onclick="garAbrirHist()">🕘 Emitidas</button>
     </div>
     <div class="cot-cols">
@@ -1115,22 +1129,25 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
           <div class="cot-sep">cliente</div>
           <input id="garCliente" type="text" placeholder="Nome / razão social" oninput="garPreview()">
           <input id="garEndereco" type="text" placeholder="Endereço" oninput="garPreview()" style="margin-top:8px">
-          <input id="garDoc" type="text" placeholder="CPF / CNPJ" oninput="garPreview()" style="margin-top:8px">
+          <input id="garDoc" type="text" inputmode="numeric" placeholder="CPF / CNPJ" oninput="this.value=formatDocMask(this.value);garPreview()" style="margin-top:8px">
           <div class="cot-row" style="margin-top:8px">
             <input id="garMunicipio" type="text" placeholder="Município" value="São Mateus do Sul" oninput="garPreview()">
             <input id="garUF" type="text" placeholder="UF" value="PR" maxlength="2" style="max-width:70px" oninput="garPreview()">
           </div>
-          <input id="garTel" type="text" placeholder="Telefone" oninput="garPreview()" style="margin-top:8px">
-          <div class="cot-sep">produto</div>
-          <textarea id="garEquip" rows="3" placeholder="Descrição / modelo / número de série" oninput="garPreview()"></textarea>
+          <input id="garTel" type="text" inputmode="tel" placeholder="Telefone" oninput="this.value=formatPhoneBR(this.value);garPreview()" style="margin-top:8px">
+          <div class="cot-sep">produtos</div>
+          <div id="garProdBox"></div>
+          <button class="btn ghost" style="width:100%;margin-top:8px" onclick="garProdAdd()">➕ Adicionar produto</button>
           <div class="cot-sep">forma de pagamento</div>
           <div id="garPagoBox" class="gar-pagos"></div>
-          <p class="cot-hint">Pode marcar mais de uma (ex.: entrada no Débito + resto no Crédito).</p>
+          <p class="cot-hint">Marque a(s) forma(s) e diga quanto entrou em cada uma.</p>
           <div id="garTrocaBox" class="hide">
             <div class="cot-sep">o que entrou na troca</div>
             <input id="garTroca" type="text" placeholder="Aparelho que o cliente deu (modelo, estado)" oninput="garPreview()">
             <input id="garTrocaValor" type="text" inputmode="decimal" placeholder="Quanto foi avaliado (R$)" oninput="garPreview()" style="margin-top:8px">
           </div>
+          <div class="cot-sep">vendedor responsável</div>
+          <input id="garVendedor" type="text" placeholder="Nome do vendedor" oninput="garPreview()">
           <div class="cot-sep">garantia e data</div>
           <div class="cot-row">
             <input id="garMeses" type="number" min="1" step="1" value="6" placeholder="Meses" oninput="garPreview()">
@@ -2072,6 +2089,19 @@ function formatCnpjMask(v){
   return out;
 }
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+/* máscara ao vivo de CPF (11 díg → 000.000.000-00) ou CNPJ (14 → 00.000.000/0000-00) */
+function formatDocMask(v){
+  let d=String(v).replace(/\D/g,'').slice(0,14);
+  if(!d) return '';
+  if(d.length<=11){   // CPF
+    let o=d.slice(0,3);
+    if(d.length>3)o+='.'+d.slice(3,6);
+    if(d.length>6)o+='.'+d.slice(6,9);
+    if(d.length>9)o+='-'+d.slice(9,11);
+    return o;
+  }
+  return formatCnpjMask(d);   // CNPJ
+}
 function formatPhoneBR(v){
   let d=String(v).replace(/\D/g,'').slice(0,11);
   if(!d) return '';
@@ -3440,15 +3470,18 @@ function maqRestaurar(){
   maqRenderCfg();
   toast('♻️ Taxas de fábrica restauradas');
 }
-/* ================= 🛡️ RECIBO / GARANTIA =================
-   Cópia 1:1 do modelo da loja (o .doc "CERTIFICADO DE GARANTIA"): mesmos quadros,
-   mesma ordem, mesmos textos. A loja decidiu (jul/2026):
-   - O formulário só edita CLIENTE, DATA, PRODUTO e TEMPO DE GARANTIA.
-   - Loja (EMITENTE) e termos são fixos aqui embaixo — não vão pra tela.
-   - Nº, vendedor, PAGO via, troca, valor, quantidade: os quadros SAEM no papel
-     igual ao modelo, mas em branco — "não quero nada de recibo".
+/* ================= 🛡️ VENDA / GARANTIA =================
+   Baseado no modelo da loja (o .doc). A loja pediu (jul/2026):
+   - Título "VENDA" (não "recibo"). Logo À ESQUERDA, dados da loja ao lado.
+   - Edita: cliente (com CPF/CNPJ e telefone MASCARADOS), PRODUTOS com valor
+     unitário/total (lista), FORMA(S) DE PAGAMENTO com o valor de cada uma,
+     VENDEDOR responsável, troca, prazo e data. Sai em UMA folha só.
+   - Removidos do lado do cliente: inscrição estadual e "Fatura". O EMITENTE
+     mantém a inscrição estadual dele.
+   - EMITENTE e termos são fixos aqui embaixo.
    ⚠️ NÃO reescrever a redação das cláusulas nem "arrumar" o typo "sendo está
-   contada" — é documento assinado pelo cliente. Só {MESES} é variável. */
+   contada" — é documento assinado pelo cliente. Só {MESES} é variável.
+   ⚠️ preview (HTML) e PDF (jsPDF) são DOIS renderizadores — mexeu num, confira o outro. */
 const GAR_LOJA={
   razao:'GABRIEL CORDEIRO DA SILVA EIRELI',
   cnpj:'27.768.371/0001-74',
@@ -3479,8 +3512,9 @@ function escolherGarantia(){
   document.getElementById('chooser').classList.remove('show');
   document.getElementById('garantiaScreen').classList.add('show');
   marcarTela();
-  garPagoBox(); garLogoCarrega();
+  garPagoBox(); garProdRender(); garLogoCarrega();
   const d=document.getElementById('garData'); if(d&&!d.value)d.value=garISOHoje();
+  const vd=document.getElementById('garVendedor'); if(vd&&!vd.value&&typeof usuarioAtual==='function')vd.value=usuarioAtual();
   garPreview(); window.scrollTo(0,0);
   const c=document.getElementById('garCliente'); if(c&&!c.value)c.focus();
 }
@@ -3488,19 +3522,57 @@ function garISOHoje(){ const d=new Date(); return `${d.getFullYear()}-${String(d
 function garDataObj(iso){ const p=String(iso||'').split('-'); if(p.length!==3)return null; const d=new Date(+p[0],+p[1]-1,+p[2]); return isNaN(d)?null:d; }
 function garBR(d){ return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`:''; }
 function garMesesTexto(n){ n=parseInt(n,10)||0; return n===1?'1 MÊS':n+' MESES'; }
-/* marca (X) nas formas escolhidas (pode ser mais de uma); o resto fica ( ) */
-function garPagoTexto(escolhidas,sep){
-  const on=new Set(escolhidas||[]);
-  return 'PAGO via '+GAR_LOJA.pagoVia.map(p=>(on.has(p)?'(X) ':'( ) ')+p).join(sep||'   ');
+/* ---- produtos (lista com valor unitário e total) ---- */
+let GAR_PRODS=[{desc:'',qtd:1,unit:''}];
+function garMoedaNum(v){ return (typeof parsePrecoBR==='function')?parsePrecoBR(v):(parseFloat(String(v).replace(/[^\d,.-]/g,'').replace(',','.'))||0); }
+function garProdTotal(p){ return (parseInt(p.qtd,10)||0)*garMoedaNum(p.unit); }
+function garProdRender(){
+  const box=document.getElementById('garProdBox'); if(!box)return;
+  if(!GAR_PRODS.length)GAR_PRODS=[{desc:'',qtd:1,unit:''}];
+  box.innerHTML=GAR_PRODS.map((p,i)=>`<div class="gar-prod">
+    <input type="text" placeholder="Descrição / modelo / nº de série" value="${esc(p.desc)}" oninput="garProdSet(${i},'desc',this.value)">
+    <div class="gar-prod-r">
+      <input type="number" min="1" step="1" value="${p.qtd||1}" title="Quantidade" oninput="garProdSet(${i},'qtd',this.value)">
+      <input type="text" inputmode="decimal" placeholder="Valor unit. (R$)" value="${esc(p.unit)}" oninput="garProdSet(${i},'unit',this.value)">
+      <span class="gar-prod-tot">${fmtMoney(garProdTotal(p))}</span>
+      ${GAR_PRODS.length>1?`<button type="button" class="ci-del" onclick="garProdDel(${i})" title="Remover">✕</button>`:''}
+    </div></div>`).join('');
 }
+function garProdSet(i,k,v){   // não re-renderiza (perderia o foco); só atualiza o total da linha + preview
+  if(!GAR_PRODS[i])return; GAR_PRODS[i][k]=v;
+  const box=document.getElementById('garProdBox');
+  if(box){ const tot=box.querySelectorAll('.gar-prod-tot')[i]; if(tot)tot.textContent=fmtMoney(garProdTotal(GAR_PRODS[i])); }
+  garPreview();
+}
+function garProdAdd(){ GAR_PRODS.push({desc:'',qtd:1,unit:''}); garProdRender(); garPreview(); }
+function garProdDel(i){ GAR_PRODS.splice(i,1); if(!GAR_PRODS.length)GAR_PRODS=[{desc:'',qtd:1,unit:''}]; garProdRender(); garPreview(); }
+/* ---- forma de pagamento: marca + quanto entrou em cada uma ---- */
 function garPagoBox(){
   const box=document.getElementById('garPagoBox'); if(!box||box.dataset.done)return;
-  box.innerHTML=GAR_LOJA.pagoVia.map(p=>
-    `<label class="loja-chip"><input type="checkbox" value="${p}" onchange="garPreview()"> ${p}</label>`).join('');
+  box.innerHTML=GAR_LOJA.pagoVia.map((p,i)=>`<label class="gar-pago">
+    <input type="checkbox" value="${p}" onchange="garPagoToggle(${i});garPreview()"><span>${p}</span>
+    <input type="text" inputmode="decimal" class="gar-pago-v" placeholder="R$" disabled oninput="garPreview()"></label>`).join('');
   box.dataset.done='1';
 }
-function garPagoSel(){ return [...document.querySelectorAll('#garPagoBox input:checked')].map(i=>i.value); }
-function garTemTroca(sel){ return (sel||[]).some(p=>p.indexOf('Troca')===0); }
+function garPagoToggle(i){
+  const r=document.querySelectorAll('#garPagoBox .gar-pago')[i]; if(!r)return;
+  const cb=r.querySelector('input[type=checkbox]'), v=r.querySelector('.gar-pago-v');
+  v.disabled=!cb.checked; if(cb.checked)v.focus(); else v.value='';
+}
+function garPagoSel(){
+  return [...document.querySelectorAll('#garPagoBox .gar-pago')]
+    .filter(r=>r.querySelector('input[type=checkbox]').checked)
+    .map(r=>({m:r.querySelector('input[type=checkbox]').value, v:(r.querySelector('.gar-pago-v').value||'').trim()}));
+}
+/* marca (X) nas formas escolhidas + o valor de cada uma; o resto fica ( ) */
+function garPagoTexto(escolhidas,sep){
+  const on={}; (escolhidas||[]).forEach(p=>{ const m=(p&&p.m)||p; on[m]=(p&&p.v)||''; });
+  return 'PAGO via '+GAR_LOJA.pagoVia.map(p=>{
+    const marc=Object.prototype.hasOwnProperty.call(on,p);
+    return (marc?'(X) ':'( ) ')+p+((marc&&on[p])?(' '+garValorTxt(on[p])):'');
+  }).join(sep||'   ');
+}
+function garTemTroca(sel){ return (sel||[]).some(p=>String((p&&p.m)||p).indexOf('Troca')===0); }
 /* número vira R$; texto livre passa direto (às vezes o valor não é só número) */
 function garValorTxt(v){
   v=String(v||'').trim(); if(!v)return '';
@@ -3510,10 +3582,12 @@ function garValorTxt(v){
 function garDados(){
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   const emissao=garDataObj(g('garData'))||new Date();
+  const produtos=GAR_PRODS.map(p=>({desc:(p.desc||'').trim(), qtd:parseInt(p.qtd,10)||1, unit:garMoedaNum(p.unit)})).filter(p=>p.desc||p.unit>0);
   return {cliente:g('garCliente'), endereco:g('garEndereco'), doc:g('garDoc'),
           municipio:g('garMunicipio'), uf:g('garUF').toUpperCase(), tel:g('garTel'),
-          equip:g('garEquip'), meses:parseInt(g('garMeses'),10)||0, pago:garPagoSel(),
-          troca:g('garTroca'), trocaValor:g('garTrocaValor'),
+          produtos, total:produtos.reduce((s,p)=>s+p.qtd*p.unit,0),
+          meses:parseInt(g('garMeses'),10)||0, pago:garPagoSel(),
+          troca:g('garTroca'), trocaValor:g('garTrocaValor'), vendedor:g('garVendedor'),
           data:g('garData')||garISOHoje(), emissao};
 }
 function garSlug(s){
@@ -3526,7 +3600,7 @@ function garNomeArquivo(d){
 }
 function garFalta(d){
   if(!d.cliente) return 'Preencha o nome do cliente';
-  if(!d.equip)   return 'Preencha o produto';
+  if(!d.produtos.length || !d.produtos.some(p=>p.desc)) return 'Adicione ao menos um produto';
   if(!d.meses)   return 'Preencha o prazo em meses';
   return '';
 }
@@ -3539,10 +3613,12 @@ function garPreview(){
   if(tb)tb.classList.toggle('hide',!garTemTroca(d.pago));
   const c=(lb,v,f)=>`<div class="gp-c" style="flex:${f||1}"><i>${lb}</i><b>${esc(v)||'&nbsp;'}</b></div>`;
   const t=(v,f,cls)=>`<div class="gp-c ${cls||''}" style="flex:${f||1}"><b>${v}</b></div>`;
+  const prods = d.produtos.length ? d.produtos : [{desc:'',qtd:1,unit:0}];
+  const linhasProd = prods.map(p=>`<div class="gp-row">${t(esc(p.desc)||'&nbsp;',2.6)}${t(String(p.qtd||1),1,'gp-ctr')}${t(p.unit?fmtMoney(p.unit):'R$',1,'gp-ctr')}${t(p.unit?fmtMoney((p.qtd||1)*p.unit):'R$',1,'gp-ctr')}</div>`).join('');
   el.innerHTML=`<div class="gp-doc">
-    <div class="gp-cb"><img src="logo-garantia.png" alt="Chip7" class="gp-logo">${L.cabecalho.map(r=>`<span>${esc(r)}</span>`).join('')}</div>
+    <div class="gp-cb"><img src="logo-garantia.png" alt="Chip7" class="gp-logo"><div class="gp-cb-txt">${L.cabecalho.map((r,i)=>`<span${i===0?' class="gp-cb-nome"':''}>${esc(r)}</span>`).join('')}</div></div>
     <div class="gp-row gp-top">
-      ${t('RECIBO/ GARANTIA Nº ______',3)}${t('X',.35,'gp-ctr')}${t('SAÍDA',.9,'gp-ctr')}${t('&nbsp;',.35,'gp-ctr')}${t('ENTRADA',1,'gp-ctr')}
+      ${t('VENDA/ GARANTIA Nº ______',3)}${t('X',.35,'gp-ctr')}${t('SAÍDA',.9,'gp-ctr')}${t('&nbsp;',.35,'gp-ctr')}${t('ENTRADA',1,'gp-ctr')}
     </div>
     <div class="gp-sec">EMITENTE</div>
     <div class="gp-row">${c('NOME RAZÃO SOCIAL',L.razao,2)}${c('CPF/CNPJ',L.cnpj,1.1)}${c('INSCRIÇÃO ESTADUAL',L.ie,1)}</div>
@@ -3550,13 +3626,13 @@ function garPreview(){
     <div class="gp-sec">CLIENTE</div>
     <div class="gp-row">${c('NOME RAZÃO SOCIAL',d.cliente,1.7)}${c('ENDEREÇO',d.endereco,1.5)}${c('CPF/ CNPJ',d.doc,1)}</div>
     <div class="gp-row">${c('MUNICIPIO',d.municipio,1.5)}${c('UF',d.uf,.4)}${c('TELEFONE',d.tel,1.5)}</div>
-    <div class="gp-row">${c('NATUREZA DA OPERAÇÃO',L.natureza,1.2)}${c('CFOP',L.cfop,.6)}${c('INSCRIÇÃO ESTADUAL DO SUBSTITUTO TRIBUTARIOS','',1.7)}${c('INSCRIÇÃO ESTADUAL','',1)}</div>
-    <div class="gp-row">${c('Fatura','',.7)}${c('Vendedor responsável:','',3)}</div>
+    <div class="gp-row">${c('NATUREZA DA OPERAÇÃO',L.natureza,1.3)}${c('CFOP',L.cfop,.6)}${c('VENDEDOR RESPONSÁVEL',d.vendedor,2)}</div>
     <div class="gp-pg">${esc(garPagoTexto(d.pago)).replace(/\(X\)/g,'<b>(X)</b>')}</div>
     <div class="gp-row">${c('INFORMAÇÕES TROCA',d.troca,2)}${c('VALOR',garValorTxt(d.trocaValor),1)}</div>
     <div class="gp-sec">DADOS DO PRODUTO</div>
     <div class="gp-row gp-th">${t('DESCRIÇÃO DOS PRODUTOS',2.6)}${t('QUANTIDADE',1,'gp-ctr')}${t('VALOR UNITÁRIO',1,'gp-ctr')}${t('VALOR TOTAL',1,'gp-ctr')}</div>
-    <div class="gp-row">${t(esc(d.equip)||'&nbsp;',2.6)}${t('&nbsp;',1)}${t('R$',1)}${t('R$',1)}</div>
+    ${linhasProd}
+    <div class="gp-row"><div class="gp-c" style="flex:4.6;text-align:right"><b>TOTAL</b></div><div class="gp-c gp-ctr" style="flex:1"><b>${fmtMoney(d.total)}</b></div></div>
     <div class="gp-sec">INFORMAÇÕES COMPLEMENTARES</div>
     <div class="gp-txt">
       ${L.clausulas.map(cl=>`<p>${esc(cl.replace('{MESES}',garMesesTexto(d.meses)||'___'))}</p>`).join('')}
@@ -3568,12 +3644,13 @@ function garPreview(){
   </div>`;
 }
 function garLimpar(){
-  ['garCliente','garDoc','garTel','garEquip','garTroca','garTrocaValor'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  document.querySelectorAll('#garPagoBox input:checked').forEach(i=>{i.checked=false;});
+  ['garCliente','garDoc','garTel','garTroca','garTrocaValor'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('#garPagoBox .gar-pago').forEach(r=>{ const cb=r.querySelector('input[type=checkbox]'); cb.checked=false; const v=r.querySelector('.gar-pago-v'); v.value=''; v.disabled=true; });
+  GAR_PRODS=[{desc:'',qtd:1,unit:''}]; garProdRender();
   const p=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
   // o modelo em branco já vem com estes preenchidos
   p('garEndereco','São Mateus do Sul'); p('garMunicipio','São Mateus do Sul'); p('garUF','PR');
-  p('garMeses',6); p('garData',garISOHoje());
+  p('garVendedor',(typeof usuarioAtual==='function'?usuarioAtual():'')); p('garMeses',6); p('garData',garISOHoje());
   garPreview();
 }
 /* ---- PDF: redesenha o formulário quadriculado do modelo, linha por linha ----
@@ -3597,8 +3674,9 @@ function garLinhaPDF(doc,x,y,LW,h,cells){
       doc.setFont('helvetica','bold'); doc.setFontSize(c.size||9);
       doc.setTextColor(0,0,0);
       const ls=doc.splitTextToSize(String(c.valor||''),w-7);
-      // 1 linha centraliza na célula; várias linhas começam do topo, senão vaza
-      doc.text(ls,c.center?cx+w/2:cx+3.5,ls.length>1?y+11:y+h/2+2.6,{align:c.center?'center':'left'});
+      const ax=c.center?cx+w/2:(c.right?cx+w-3.5:cx+3.5), al=c.center?'center':(c.right?'right':'left');
+      // 1 linha centraliza na vertical; várias linhas começam do topo, senão vaza
+      doc.text(ls,ax,ls.length>1?y+11:y+h/2+2.6,{align:al});
     }
     cx+=w;
   });
@@ -3632,19 +3710,18 @@ function garMontarPDF(d){
   const {jsPDF}=window.jspdf, doc=new jsPDF({unit:'pt',format:'a4'});
   const L=GAR_LOJA, W=doc.internal.pageSize.getWidth(), M=28, LW=W-M*2;   // margens do .doc
   let y=M;
-  // cabeçalho do modelo: logo + endereço da loja, centralizados no TOPO
-  if(GAR_LOGO){
-    try{ doc.addImage(GAR_LOGO,'JPEG',M+LW/2-57,y,114,64); y+=64+4; }catch(e){}
-  }
+  // cabeçalho: logo À ESQUERDA, dados da loja ao lado (mesma linha)
+  const logoW=92, logoH=52;
+  if(GAR_LOGO){ try{ doc.addImage(GAR_LOGO,'JPEG',M,y,logoW,logoH); }catch(e){} }
+  let hy=y+12;
   L.cabecalho.forEach((r,i)=>{
-    doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(i===0?10:7.6);
-    doc.setTextColor(0,0,0);
-    doc.text(r,M+LW/2,y+8,{align:'center'}); y+=i===0?13:9.6;
+    doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(i===0?10.5:7.8); doc.setTextColor(0,0,0);
+    doc.text(r,M+logoW+12,hy); hy+=i===0?12.5:9.6;
   });
-  y+=8;
-  // RECIBO/GARANTIA Nº | X | SAÍDA | | ENTRADA
+  y+=logoH+6;
+  // VENDA/GARANTIA Nº | X | SAÍDA | | ENTRADA
   y+=garLinhaPDF(doc,M,y,LW,20,[
-    {f:3,valor:'RECIBO/ GARANTIA Nº ______'},{f:.35,valor:'X',center:1},{f:.9,valor:'SAÍDA',center:1},
+    {f:3,valor:'VENDA/ GARANTIA Nº ______'},{f:.35,valor:'X',center:1},{f:.9,valor:'SAÍDA',center:1},
     {f:.35,valor:'',center:1},{f:1,valor:'ENTRADA',center:1}]);
   y+=garSecaoPDF(doc,M,y,LW,'EMITENTE');
   y+=garLinhaPDF(doc,M,y,LW,24,[
@@ -3657,19 +3734,26 @@ function garMontarPDF(d){
     {f:1.7,label:'NOME RAZÃO SOCIAL',valor:d.cliente},{f:1.5,label:'ENDEREÇO',valor:d.endereco},{f:1,label:'CPF/ CNPJ',valor:d.doc}]);
   y+=garLinhaPDF(doc,M,y,LW,24,[
     {f:1.5,label:'MUNICIPIO',valor:d.municipio},{f:.4,label:'UF',valor:d.uf},{f:1.5,label:'TELEFONE',valor:d.tel}]);
-  y+=garLinhaPDF(doc,M,y,LW,24,[
-    {f:1.2,label:'NATUREZA DA OPERAÇÃO',valor:L.natureza},{f:.6,label:'CFOP',valor:L.cfop},
-    {f:1.7,label:'INSCRIÇÃO ESTADUAL DO SUBSTITUTO TRIBUTARIOS',valor:''},{f:1,label:'INSCRIÇÃO ESTADUAL',valor:''}]);
-  y+=garLinhaPDF(doc,M,y,LW,22,[{f:.7,label:'Fatura',valor:''},{f:3,label:'Vendedor responsável:',valor:''}]);
-  y+=garLinhaPDF(doc,M,y,LW,16,[{f:1,valor:garPagoTexto(d.pago),size:7.4}]);
+  // (removidas as inscrições estaduais e a fatura do lado do cliente; vendedor entra aqui)
+  y+=garLinhaPDF(doc,M,y,LW,22,[
+    {f:1.3,label:'NATUREZA DA OPERAÇÃO',valor:L.natureza},{f:.6,label:'CFOP',valor:L.cfop},
+    {f:2,label:'VENDEDOR RESPONSÁVEL',valor:d.vendedor}]);
+  y+=garLinhaPDF(doc,M,y,LW,16,[{f:1,valor:garPagoTexto(d.pago),size:7.2}]);
   y+=garLinhaPDF(doc,M,y,LW,22,[{f:2,label:'INFORMAÇÕES TROCA',valor:d.troca},{f:1,label:'VALOR',valor:garValorTxt(d.trocaValor)}]);
   y+=garSecaoPDF(doc,M,y,LW,'DADOS DO PRODUTO');
   y+=garLinhaPDF(doc,M,y,LW,12,[
     {f:2.6,valor:'DESCRIÇÃO DOS PRODUTOS',size:6.8},{f:1,valor:'QUANTIDADE',size:6.8,center:1},
     {f:1,valor:'VALOR UNITÁRIO',size:6.8,center:1},{f:1,valor:'VALOR TOTAL',size:6.8,center:1}]);
-  const eqLin=doc.splitTextToSize(d.equip,LW*(2.6/5.6)-7);
-  y+=garLinhaPDF(doc,M,y,LW,Math.max(24,10+eqLin.length*11),[
-    {f:2.6,valor:d.equip,size:8.5},{f:1,valor:''},{f:1,valor:'R$',size:8.5},{f:1,valor:'R$',size:8.5}]);
+  const prods = d.produtos.length ? d.produtos : [{desc:'',qtd:1,unit:0}];
+  prods.forEach(p=>{
+    const dLin=doc.splitTextToSize(p.desc||'',LW*(2.6/5.6)-7);
+    y+=garLinhaPDF(doc,M,y,LW,Math.max(18,8+dLin.length*10),[
+      {f:2.6,valor:p.desc||'',size:8.5},{f:1,valor:String(p.qtd||1),size:8.5,center:1},
+      {f:1,valor:p.unit?fmtMoney(p.unit):'R$',size:8.5,center:1},{f:1,valor:p.unit?fmtMoney((p.qtd||1)*p.unit):'R$',size:8.5,center:1}]);
+  });
+  // linha de TOTAL
+  y+=garLinhaPDF(doc,M,y,LW,16,[
+    {f:4.6,valor:'TOTAL',size:8.5,right:1},{f:1,valor:fmtMoney(d.total),size:9,center:1}]);
   // bloco de texto
   y+=garSecaoPDF(doc,M,y,LW,'INFORMAÇÕES COMPLEMENTARES');
   const topo=y; let ty=y+11;
@@ -3718,9 +3802,9 @@ function garHistSave(a){ if(typeof marcaLocal==='function')marcaLocal('garhist')
 function garHistAdd(d){
   const h=garHistLoad();
   h.unshift({ts:Date.now(), cliente:d.cliente, endereco:d.endereco, doc:d.doc, municipio:d.municipio, uf:d.uf,
-             tel:d.tel, equip:d.equip, meses:d.meses, pago:d.pago,
+             tel:d.tel, produtos:d.produtos, total:d.total, meses:d.meses, pago:d.pago,
              troca:d.troca, trocaValor:d.trocaValor, data:d.data,
-             vendedor:(typeof usuarioAtual==='function'?usuarioAtual():'')});
+             vendedor:d.vendedor||(typeof usuarioAtual==='function'?usuarioAtual():'')});
   garHistSave(h.slice(0,200));
 }
 function garAbrirHist(){
@@ -3728,10 +3812,11 @@ function garAbrirHist(){
   if(box.dataset.on==='1'){ box.dataset.on=''; box.innerHTML=''; return; }
   box.dataset.on='1';
   const h=garHistLoad();
+  const resumo=g=>{ if(g.produtos&&g.produtos.length) return g.produtos.map(p=>p.desc).filter(Boolean).join(', '); return g.equip||''; };
   box.innerHTML=`<div class="cot-card" style="margin-top:14px"><div class="cot-sep">garantias emitidas</div>`+
     (h.length?h.map((g,i)=>`<div class="repcfg-row" style="cursor:pointer" onclick="garReabrir(${i})">
         <b style="min-width:0;flex:1">${esc(g.cliente)}</b>
-        <span class="cot-hint" style="margin:0">${esc(g.equip).slice(0,38)}</span>
+        <span class="cot-hint" style="margin:0">${esc(resumo(g)).slice(0,38)}</span>
         <span class="cot-hint" style="margin:0">${garBR(garDataObj(g.data))} · ${g.meses}m</span>
       </div>`).join('')
       :'<p class="cot-hint">Nenhuma garantia emitida ainda.</p>')+
@@ -3741,12 +3826,21 @@ function garReabrir(i){
   const g=garHistLoad()[i]; if(!g)return;
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v==null?'':v;};
   s('garCliente',g.cliente); s('garEndereco',g.endereco); s('garDoc',g.doc); s('garMunicipio',g.municipio);
-  s('garUF',g.uf); s('garTel',g.tel); s('garEquip',g.equip); s('garMeses',g.meses);
+  s('garUF',g.uf); s('garTel',g.tel); s('garMeses',g.meses); s('garVendedor',g.vendedor);
   s('garTroca',g.troca); s('garTrocaValor',g.trocaValor); s('garData',g.data);
-  // pago virou lista; histórico antigo guardava texto — aceita os dois
+  // produtos: formato novo (lista) ou antigo (equip texto)
+  GAR_PRODS = (g.produtos&&g.produtos.length) ? g.produtos.map(p=>({desc:p.desc||'',qtd:p.qtd||1,unit:p.unit?String(p.unit):''}))
+            : [{desc:g.equip||'',qtd:1,unit:''}];
+  garProdRender();
+  // pago: novo [{m,v}] ou antigo [strings]
   const pg=Array.isArray(g.pago)?g.pago:(g.pago?[g.pago]:[]);
+  const mapPg={}; pg.forEach(p=>{ const m=(p&&p.m)||p; mapPg[m]=(p&&p.v)||''; });
   garPagoBox();
-  document.querySelectorAll('#garPagoBox input').forEach(i=>{i.checked=pg.indexOf(i.value)>=0;});
+  document.querySelectorAll('#garPagoBox .gar-pago').forEach(r=>{
+    const cb=r.querySelector('input[type=checkbox]'), v=r.querySelector('.gar-pago-v');
+    const on=Object.prototype.hasOwnProperty.call(mapPg,cb.value);
+    cb.checked=on; v.disabled=!on; v.value=on?mapPg[cb.value]:'';
+  });
   garAbrirHist(); garPreview(); window.scrollTo(0,0);
   toast('Carregado — é só gerar de novo');
 }

@@ -15,7 +15,7 @@ Leia `CONTEXTO.md` para quem usa e por quê. Este arquivo é o mapa do código.
 - PWA instalável, roda no Netlify. Deploy = subir os arquivos no GitHub (repo
   `chip7-cotacao`); o Netlify auto-deploya.
 - **`sw.js` tem a versão do cache (`chip7-diag-vN`) — suba o N a cada release**,
-  senão o celular da equipe continua com a versão velha. Hoje: **v76**.
+  senão o celular da equipe continua com a versão velha. Hoje: **v77**.
 - Dados em `localStorage`, com sync opcional no Firebase (conta compartilhada).
 - PDF com jsPDF + jsPDF-autotable, **já embarcados**. Não adicionar biblioteca nova.
 - Funções Netlify em `netlify/functions/`: `buscar.js` (comprasparaguai),
@@ -185,6 +185,21 @@ Os apelidos têm que bater com o texto **exato** que o comprasparaguai imprime e
    que na verdade é um RECIBO/GARANTIA): mesmos quadros, mesma ordem, mesmos
    textos. `garMontarPDF()` redesenha o formulário linha por linha com
    `garLinhaPDF()`.
+
+   **Lote jul/2026 (2ª rodada de pedidos da loja):**
+   - Título virou **VENDA** (era "RECIBO"). Logo **à esquerda**, dados da loja ao
+     lado na mesma linha (`gp-cb` é flex; no PDF a logo é 92×52pt em x=M).
+   - **Produtos viraram lista** (`GAR_PRODS`, `garProdRender/Add/Del/Set`): cada um
+     com descrição, quantidade e valor unitário; total por linha e **TOTAL geral**
+     calculados. Cabe ~15 produtos numa folha.
+   - **Pagamento com valor por forma**: `garPagoBox` = checkbox + input de R$ por
+     método; `garPagoSel` devolve `[{m,v}]`; `garPagoTexto` imprime `(X) Débito R$ …`.
+   - **Vendedor responsável** editável (`garVendedor`), default = usuário logado.
+   - **Removidos do lado do cliente**: as duas inscrições estaduais e a "Fatura".
+     A linha virou NATUREZA | CFOP | VENDEDOR. O EMITENTE mantém a IE dele.
+   - **CPF/CNPJ e telefone com máscara ao vivo** (`formatDocMask`, `formatPhoneBR`).
+   - **Uma folha só** — verificado; o `garLinhaPDF` ganhou `right:1` pro TOTAL.
+   - Histórico/`garReabrir` aceitam o formato antigo (equip string, pago string[]).
 
    **Decisões da loja (jul/2026 — não mudar sem perguntar):**
    - **O formulário só edita CLIENTE, DATA, PRODUTO, TEMPO DE GARANTIA e
