@@ -91,21 +91,21 @@ function extrairCor(nome) {
   if (parts.length > 1) { const last = parts[parts.length - 1].trim(); if (last.length <= 28 && CORES.test(last)) return corCanon(last); }
   const m = nome.match(CORES); return m ? corCanon(m[1]) : '';
 }
+// ⚠️ NÃO parsear por `promocao-produtos-item` (= PRODUTOS RELACIONADOS: acessórios,
+// gomas de US$0,25 que furavam o menor preço) nem por `'advertiser'` solto (aparece
+// em todo botão). A oferta REAL é o botão "ver na loja": gtag `external_website_advertiser`
+// com advertiser + product, e o 1º US$ que segue é o preço daquela loja.
 function parseDetalhe(html) {
-  const blocks = html.split(/<div class="promocao-produtos-item"/i).slice(1);
   const map = {};                                    // loja|variante -> oferta mais barata
-  for (const b of blocks) {
-    const adv = b.match(/'advertiser':\s*'([^']+)'/);
-    const pm = b.match(PRICE);
-    const nm = b.match(/promocao-item-nome[\s\S]*?<a[^>]*>\s*([\s\S]*?)\s*<\/a>/i);
-    const preco = pm ? precoNum(pm[1]) : null;
-    if (adv && preco) {
-      const loja = decode(adv[1]);
-      const nome = nm ? decode(nm[1].replace(/<[^>]+>/g, '')) : '';
-      const grade = extrairGrade(nome), cor = extrairCor(nome), va = grade || cor;
-      const k = loja.toLowerCase() + '|' + va.toLowerCase();
-      if (!map[k] || preco < map[k].precoUSD) map[k] = { loja, precoUSD: preco, variante: va, grade, cor, nome };
-    }
+  const re = /external_website_advertiser[\s\S]{0,200}?'advertiser':\s*'([^']*)'[\s\S]{0,120}?'product':\s*'([^']*)'[\s\S]{0,1200}?US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/gi;
+  let m;
+  while ((m = re.exec(html))) {
+    const loja = decode(m[1]), preco = precoNum(m[3]);
+    if (!loja || !preco) continue;
+    const nome = decode(m[2]);
+    const grade = extrairGrade(nome), cor = extrairCor(nome), va = grade || cor;
+    const k = loja.toLowerCase() + '|' + va.toLowerCase();
+    if (!map[k] || preco < map[k].precoUSD) map[k] = { loja, precoUSD: preco, variante: va, grade, cor, nome };
   }
   return Object.values(map);
 }
@@ -120,10 +120,20 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json; charset=utf-8'
   };
   const p = event.queryStringParameters || {};
-  const ck = (p.detalhe ? 'd:' + p.detalhe : 'q:' + (p.q || '').trim().toLowerCase());
+  const ck = (p.dolar ? 'dolar' : p.detalhe ? 'd:' + p.detalhe : 'q:' + (p.q || '').trim().toLowerCase());
   const hit = cacheGet(ck); if (hit) return { statusCode: 200, headers, body: hit };
 
   try {
+    // ---- MODO DÓLAR: a cotação que o próprio comprasparaguai usa nos preços ----
+    if (p.dolar) {
+      const home = await baixar('https://www.comprasparaguai.com.br/');
+      const m = home.match(/D[óo]lar\s*hoje[\s\S]{0,200}?R\$\s*([\d.]+,\d{2})/i);
+      const dolar = m ? precoNum(m[1]) : null;
+      const body = JSON.stringify({ dolar: dolar || 0, fonte: 'comprasparaguai' });
+      if (dolar) cachePut(ck, body);
+      return { statusCode: 200, headers, body };
+    }
+
     // ---- MODO DETALHE: ofertas por loja ----
     if (p.detalhe) {
       let path = p.detalhe;

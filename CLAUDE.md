@@ -15,21 +15,38 @@ Leia `CONTEXTO.md` para quem usa e por quê. Este arquivo é o mapa do código.
 - PWA instalável, roda no Netlify. Deploy = subir os arquivos no GitHub (repo
   `chip7-cotacao`); o Netlify auto-deploya.
 - **`sw.js` tem a versão do cache (`chip7-diag-vN`) — suba o N a cada release**,
-  senão o celular da equipe continua com a versão velha. Hoje: **v77**.
+  senão o celular da equipe continua com a versão velha. Hoje: **v85**.
 - Dados em `localStorage`, com sync opcional no Firebase (conta compartilhada).
 - PDF com jsPDF + jsPDF-autotable, **já embarcados**. Não adicionar biblioteca nova.
+- **Cabeçalho dos PDFs = `pdfCabecalho()`** (orçamento, câmera, reparo, taxas; a
+  garantia tem o seu, que copia o `.doc`). ⚠️ **Usa a logo RETANGULAR
+  (`logo-garantia.png`) sobre fundo BRANCO.** Antes cada PDF desenhava uma faixa
+  azul-escura com a `logo-chip7.png` (redonda, **fundo azul-escuro**): o círculo se
+  fundia na faixa e virava uma mancha com borda verde — era o "PDF esquisito" que a
+  loja reclamou (ago/2026). Bônus: o orçamento caiu de **108 KB → 19 KB**.
+  **Nunca pôr logo redonda em faixa escura de novo.**
 - Funções Netlify em `netlify/functions/`: `buscar.js` (comprasparaguai),
   `mazer.js` e `guarapuava.js` (fornecedores BR, login em env var **no Netlify**,
   nunca no código).
 - O botão "Resumo feito por IA" **não chama IA nenhuma** — é texto montado por regra
   em `resumoIAtexto()`. Não existe chamada de LLM no app e não é pra existir agora.
 - **Dólar — atualiza sozinho.** `dolarInit()` roda ao abrir a cotação e a cada
-  pesquisa; `DOLAR_CACHE` segura 10 min pra não martelar a API. O ↻ força
-  (`buscarDolar(true)`).
-  - **Dois tipos, escolhidos por chip** (`chip7_dolar_tipo`, sincronizado):
-    `com` = **comercial** (USD-BRL *bid*, o valor cotado) · `tur` = **turismo**
-    (USD-BRLT ***ask***, a venda na casa de câmbio — é o que se paga de verdade pra
-    ter dólar na mão). Os dois aparecem na tela com o valor, então dá pra comparar.
+  pesquisa; `DOLAR_CACHE` segura 10 min pra não martelar a API. O ↻ (`dolarForcar`)
+  força a busca **e sai do modo manual**.
+  - **O PADRÃO é o dólar do COMPRAS PARAGUAI** (`dolarCP`, tipo `cp`) — é a cotação
+    que o próprio site usa pra converter os preços, então é a que faz o orçamento
+    bater com o que a loja paga. Sai na home: `Dólar hoje: <strong>R$ 5,28</strong>`.
+    Vem da função Netlify (`?dolar=1`) e cai no proxy CORS se ela não existir.
+    ⚠️ **Comercial e turismo NÃO servem de padrão** — dão valores diferentes
+    (em ago/2026: CP 5,28 · comercial 5,18 · turismo 5,55). Ficam só de comparação.
+  - **Tipos, escolhidos por chip** (`chip7_dolar_tipo`, sincronizado): `cp` (padrão)
+    · `com` = comercial (USD-BRL *bid*) · `tur` = turismo (USD-BRLT ***ask***).
+    Os três aparecem na tela com o valor, então dá pra comparar.
+  - ⚠️ **O ↻ tinha DOIS defeitos** (relatados ago/2026, ambos corrigidos): o
+    `onclick` chamava `buscarDolar()` **sem argumento**, então `forcar` era
+    `undefined` e o cache de 10 min segurava; e `dolarAplica()` sobrescrevia com o
+    valor manual, então quem digitasse uma vez ficava preso pra sempre. **Botão que
+    "não faz nada" = confira se ele está furando o cache E saindo do modo manual.**
   - `manual` = alguém digitou. Fica salvo em `chip7_dolar` (com quem e quando),
     **sincroniza pra equipe** e o automático **para de sobrescrever** até tocarem
     num chip. Foi pedido explícito: o dono às vezes tem um dólar que nenhum feed dá.
@@ -44,7 +61,53 @@ Leia `CONTEXTO.md` para quem usa e por quê. Este arquivo é o mapa do código.
 ## Módulos (tela `chooser`, função `irModulo`)
 
 Cotação (importados PY) · Diagnóstico · Montar PC · Celulares · Câmeras ·
-Reparo de celular · Calcular Taxas · **Garantia** · Histórico.
+Reparo de celular · Calcular Taxas · **Garantia** · **Etiquetas** · **Pedidos** · **Licenças** · Histórico.
+
+### 🏷️ Etiquetas de OS (`etiquetasScreen`)
+Folha de numeração de OS, **medida do `MODELO ETIQUETAS OS.docx` da loja**
+(twips ÷ 20 = pt): A4 · margem sup **38,25pt**, lateral **22,7pt** · **7 colunas**
+de 78,6pt · linha **42,55pt** (`hRule=exact`) · fonte **14pt** · **sem borda**
+(`tblBorders` todas `none`) → **126 por folha** (18×7). O modelo ia de `OS 16754`
+a `OS 16879` — o app reproduz isso exatamente (conferido: 126 células, mesmos
+extremos, mesmas coordenadas). Passou de 126, abre outra folha.
+`chip7_etq_ultima` guarda a última impressa pro botão "continuar de onde parei".
+
+### 🛍️ Pedido a fornecedor (`pedidosScreen`)
+"Tela de consulta maior no computador" (pedido da loja, ago/2026): **foto grande à
+esquerda (sticky) + grade de miniaturas à direita**, filtrando por fornecedor. A
+partir de 900px vira 2 colunas com a grade rolando sozinha; no celular empilha.
+- Reaproveita `fornecedorPesquisa()` (catálogo + Mazer + Guarapuava) — **não** tem
+  busca própria. Os fornecedores do chip saem de `catLoad()` + Mazer/Guarapuava.
+- As fotos entram **depois** da grade aparecer (`pedBuscarFotos`, teto de 25) pra
+  não travar a lista esperando a rede.
+- Fecha nos dois lados que a loja pediu: **`pedWhatsApp`/`pedCopiar`** manda a lista
+  pro fornecedor (agrupada por fornecedor) e **`pedParaOrcamento`** joga os itens no
+  `COT_CART` já com lucro de 30% e parcelamento. Item **sem preço não vai** pro
+  orçamento (não dá pra calcular venda sem custo) — e o toast diz quantos ficaram.
+
+### 🔑 Licenças de antivírus (`licencasScreen`)
+Caso real: a loja compra **30 licenças = 3 chaves de 10 ativações**. Cada **lote**
+tem chave, tipo (predefinições Kaspersky em `LIC_TIPOS`), nº de vagas e validade em
+meses; cada **vaga** anota cliente, OS e a data em que foi instalada.
+- ⚠️ **O vencimento é DO LOTE e conta da PRIMEIRA ativação** (`licPrimeiraAtivacao`
+  pega a menor data preenchida) — é assim que chave multi-dispositivo do Kaspersky
+  funciona: o relógio começa quando a primeira máquina ativa, **não** na compra nem
+  em cada instalação. Se alguém preencher uma data mais antiga depois, o vencimento
+  **recalcula** (testado). `venceManual` sobrepõe, pra licença que conte diferente.
+- `licSomaMeses` tem trava de fim de mês: 29/02/2024 +12m = 28/02/2025, 31/03 +1m =
+  30/04 (não escorrega pro mês seguinte).
+- Reduzir o nº de vagas **avisa** antes de apagar linha já preenchida.
+- `licSetAtiv` re-renderiza **só o resumo e o cabeçalho**, não a lista inteira —
+  re-render completo a cada tecla tirava o foco do campo enquanto se digitava.
+- Sincroniza (`cloudSaveLic` + `cloudSubscribeRep`, doc `cotacoes/licencas`): sem
+  isso dois vendedores usariam a mesma ativação sem saber.
+
+### Menu agrupado (`#chooser`)
+Os 9 módulos ficam em **3 grupos** com título (`.wel-grupo`), a pedido da loja
+(ago/2026): **💰 Cotação de valores** (cotar, montar PC, celulares, câmeras, taxas)
+· **🩺 Atendimento** (diagnóstico, reparos) · **📋 Operacional** (garantia, etiquetas).
+⚠️ Os títulos são **só do `#chooser`** — a tela `#welcome` (2 botões, Funcionário /
+Cliente) compartilha `.wel-choice`/`.wel-card` e **não pode** ganhar título nenhum.
 
 **Quem vê o quê:** funcionário vê tudo; cliente tem acesso só de leitura ao
 relatório do diagnóstico dele. **Se a tela tem custo, margem, taxa ou fornecedor,
@@ -72,6 +135,33 @@ relatório do diagnóstico dele. **Se a tela tem custo, margem, taxa ou forneced
 | `LOJAS_TERMOS` — **apelidos que filtram as lojas de verdade** | ~4132 |
 | Firebase (config, sync, `PREF_KEYS`, `marcaLocal`) | ~5530–5715 |
 | `USUARIOS` — login (gate client-side) | ~5808 |
+
+## Fornecedores — o que cada um deixa fazer (medido em ago/2026)
+
+| Fornecedor | Preço | Foto | Como |
+|---|---|---|---|
+| Mazer | login | via função | `mazer.js` (env var no Netlify) |
+| Guarapuava | login | via função | `guarapuava.js` (env var) |
+| Fagundez | público | **público** ✅ | Magento, `catalogsearch/result/?q=` |
+| **FAM Brasil** | login | **público** ✅ | OpenCart, `index.php?route=product/search&search=` |
+| **BringIT** | **planilha** ✅ | — | tabela de preço `.xlsx` → importador do catálogo |
+| **HPrime** | login | ❌ | **SPA**: o HTML vem com 2,7 KB e zero produto |
+
+- **FAM Brasil** (`mrcheckout.or01.futurasistemas.com.br`): o preço exige login, mas
+  **busca, nome e foto são públicos** → flag `fotoPublica:true` no `SUPPLIER_SITES`
+  libera o `buscarFotoFornecedor` mesmo com `login:true`.
+  ⚠️ A foto vem em **`data-src`** (lazy load) e o `src` do `<img>` vem **vazio** —
+  parser que só olha `src` volta de mãos abanando. O `parseFotoHTML` procura
+  `Img_ftr_rp_<id>` primeiro, de propósito.
+- ⚠️⚠️ **`fotoEhLogo()` — busca sem resultado devolve 200 com a página do site**, e o
+  fallback do `parseFotoHTML` pegava o **LOGO** achando que era o produto. O catálogo
+  encheria de logo e ninguém veria, porque "tem imagem". Conferido: `pelicula` (que a
+  FAM não vende) devolvia o logo; agora devolve vazio. **Voltar vazio > voltar errado.**
+- **BringIT**: entra pela **planilha de preço**. O `mapearPlanilha` já acerta as
+  colunas dela sozinho (`Produto`→nome, `Valor`→preço) — conferido com a tabela real
+  de 2.389 itens. Não precisa de função nova.
+- **HPrime**: é aplicativo JavaScript (Meus Pedidos). Raspar HTML **não funciona** —
+  precisaria da API da plataforma ou navegador headless. Não tentar com `fetch`.
 
 ## Convenções — quebrar isso quebra o app
 
@@ -149,6 +239,26 @@ Os apelidos têm que bater com o texto **exato** que o comprasparaguai imprime e
   aviso "São X no site; use os filtros".
 - ⚠️ `htmlProdHit(i, COT_HITS.indexOf(i))` — o índice do onclick é a posição REAL em
   `COT_HITS` (não na página filtrada), senão `verOfertas`/`toggleFav` abrem o errado.
+- **Mercado Livre = link, NÃO API.** ⚠️ Testado em ago/2026 com credencial oficial
+  do ML (app criada, `client_credentials`, **token válido de 6h**): `/sites/MLB/search`
+  **403** · `/products/search` **403** · `/users/me` **403** · `/items/{id}` **403**.
+  Só `/categories/{id}` (estático) responde 200. **O ML fechou a busca de propósito**,
+  pra impedir coleta de preço — a `search_products` foi descontinuada. Scraping também
+  não vai: `lista.mercadolivre.com.br` devolve a página `suspicious-traffic` pra proxy.
+  **Não perca tempo tentando de novo sem aprovação comercial do ML.**
+  O que existe é `COT_ML` (chip "🛒 Comparar no Mercado Livre", padrão DESLIGADO,
+  sincronizado): ligado, põe um botão `🛒 ML` em cada produto que **abre a busca do ML
+  numa aba**, já ordenada do mais barato (`_OrderId_PRICE` no fim da URL).
+- ⚠️ **Preço por loja (detalhe) — NÃO usar `promocao-produtos-item` nem `'advertiser'`
+  solto.** Esses são os **PRODUTOS RELACIONADOS** (acessórios, "goma" de US$ 0,25) e
+  o `'advertiser'` aparece em todo botão (100+/página). Isso puxava o preço de OUTRO
+  produto como "menor preço" (bug relatado ago/2026: iPhone colava por sorte porque
+  os relacionados eram outros iPhones; "Fonte Psvita" virava US$ 0,25 de uma goma).
+  A oferta REAL é o botão "ver na loja": gtag **`external_website_advertiser`** com
+  `'advertiser'`+`'product'`, e o **1º `US$` que segue** é o preço. É o que
+  `cpParseDetalhe` (cliente) e `parseDetalhe` (`buscar.js`) usam agora — mesmo regex
+  nos dois. Se o site mudar o nome do evento, o parser devolve 0 ofertas (degrada
+  limpo) em vez de valor errado.
 
 ## O que foi feito agora (jul/2026)
 
@@ -198,7 +308,14 @@ Os apelidos têm que bater com o texto **exato** que o comprasparaguai imprime e
    - **Removidos do lado do cliente**: as duas inscrições estaduais e a "Fatura".
      A linha virou NATUREZA | CFOP | VENDEDOR. O EMITENTE mantém a IE dele.
    - **CPF/CNPJ e telefone com máscara ao vivo** (`formatDocMask`, `formatPhoneBR`).
-   - **Uma folha só** — verificado; o `garLinhaPDF` ganhou `right:1` pro TOTAL.
+   - **Uma folha só, e agora OCUPANDO a folha** (`garMontarPDFCheio`, ago/2026):
+     desenha, mede onde terminou e redesenha na escala certa (`GAR_ESC`; a fonte
+     cresce só ~55% do que a altura cresce). Antes usava 66% da página e sobravam
+     ~10cm em branco; agora fica em 92–98% de 1 a 25 produtos.
+     ⚠️ **Também ENCOLHE quando não cabe** — o jsPDF **não quebra página sozinho**:
+     antes, com ~18 produtos, o rodapé saía pra fora do papel e o cliente recebia o
+     documento cortado, sem erro nenhum. `getNumberOfPages()` continuava dizendo 1.
+     **Pra saber se cabe, meça o Y final (`doc.__fim`), não conte páginas.**
    - Histórico/`garReabrir` aceitam o formato antigo (equip string, pago string[]).
 
    **Decisões da loja (jul/2026 — não mudar sem perguntar):**

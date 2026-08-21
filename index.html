@@ -191,6 +191,12 @@ textarea{min-height:60px;resize:vertical}
 .wel-btn small{opacity:.78;font-size:11.5px}
 .wel-btn.func{border-color:var(--accent)}
 .wel-btn.cli{border-color:var(--accent2)}
+.wel-btn.oper{border-color:#f0a13c}
+/* títulos que separam os grupos do menu (cotação / atendimento / operacional) */
+.wel-grupo{display:flex;align-items:center;gap:9px;margin:16px 2px 8px;font-size:12px;font-weight:800;
+  letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.72);animation:upFade .6s .4s both}
+.wel-grupo::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.22)}
+.wel-choice+.wel-grupo{margin-top:18px}
 .wel-wa{margin:16px 0 2px;width:100%;background:#25D366;color:#fff;border:0;border-radius:12px;padding:13px;font-weight:700;font-size:15px;cursor:pointer;animation:upFade .6s .55s both}
 .wel-wa:hover{filter:brightness(1.06)}
 .wel-info{margin-top:18px;font-size:12px;opacity:.9;line-height:1.7;text-align:left;background:rgba(0,0,0,.2);border-radius:12px;padding:12px 14px;animation:upFade .6s .65s both}
@@ -366,6 +372,76 @@ body.dark .gar-prod{background:var(--card);border-color:var(--line)}
 .gar-pago>span{flex:1}
 .gar-pago-v{flex:0 0 108px;max-width:108px}
 .gar-pago-v:disabled{opacity:.4}
+/* ---------- Tela de PEDIDOS: foto grande à esquerda, grade à direita ----------
+   É pra usar no computador (o dono pediu "tela de consulta maior"); no celular
+   as duas colunas viram uma só. */
+.ped-wrap{width:100%;max-width:1500px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom))}
+.ped-busca{display:flex;gap:8px;margin:4px 0 10px}
+.ped-busca input{flex:1}
+.ped-forn{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.ped-cols{display:flex;flex-direction:column;gap:14px}
+.ped-foco{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:120px}
+.ped-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-content:start}
+@media(min-width:900px){
+  .ped-cols{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:18px;align-items:start}
+  .ped-foco{position:sticky;top:14px}
+  .ped-grade{max-height:calc(100vh - 230px);overflow-y:auto;padding-right:4px}
+}
+.ped-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;transition:.12s;position:relative}
+.ped-card:hover{border-color:var(--brand);transform:translateY(-2px)}
+.ped-card.on{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2) inset}
+.ped-card img,.ped-card .ph{width:100%;height:104px;object-fit:contain;background:#fff;border-radius:8px;display:block}
+.ped-card .ph{background:#eef2f7}
+.ped-card b{display:block;font-size:11.5px;line-height:1.3;margin-top:6px;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ped-card small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.ped-card .pc-preco{font-weight:800;color:var(--brand);font-size:12.5px}
+.ped-card .pc-add{position:absolute;top:6px;right:6px;background:var(--accent2);color:#06301a;border:0;
+  border-radius:8px;width:26px;height:26px;font-size:16px;font-weight:800;cursor:pointer;line-height:1}
+.ped-foco img{width:100%;max-height:330px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid var(--line)}
+.ped-foco h3{margin:10px 0 4px;font-size:15px;color:var(--text);line-height:1.3}
+.ped-foco .pf-preco{font-size:22px;font-weight:800;color:var(--brand);margin:6px 0}
+.ped-foco .pf-vazio{color:var(--muted);font-size:13px;text-align:center;padding:30px 8px}
+.ped-qtd{display:flex;align-items:center;gap:8px;margin:10px 0}
+.ped-qtd input{width:74px;text-align:center}
+.ped-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.ped-item img{width:40px;height:40px;object-fit:contain;flex:none;border-radius:6px;border:1px solid var(--line)}
+.ped-item .pi-i{flex:1;min-width:0}
+.ped-item .pi-i b{display:block;font-size:12.5px;line-height:1.25}
+.ped-item .pi-i small{color:var(--muted);font-size:11.5px}
+body.dark .ped-foco,body.dark .ped-card,body.dark .ped-item{background:var(--card);border-color:var(--line);color:var(--text)}
+/* ---------- Licenças de antivírus ---------- */
+.lic-resumo{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 4px}
+.lic-bloco{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:11px;padding:8px 13px;color:#fff}
+.lic-bloco b{display:block;font-size:19px;line-height:1.1}
+.lic-bloco small{font-size:11px;opacity:.82}
+.lic-bloco.alerta{background:rgba(240,161,60,.25);border-color:#f0a13c}
+.lic-lote{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.lic-cab{display:flex;flex-wrap:wrap;align-items:center;gap:9px;cursor:pointer}
+.lic-cab b{font-size:14.5px;color:var(--text)}
+.lic-chave{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#eef2f8;border-radius:6px;padding:2px 7px;color:var(--brand);letter-spacing:.4px}
+.lic-tag{font-size:11px;font-weight:800;border-radius:20px;padding:3px 10px}
+.lic-tag.ok{background:#eafaef;color:#15803d;border:1px solid #c7ebd2}
+.lic-tag.vence{background:#fff4e5;color:#9a5b06;border:1px solid #f3d5aa}
+.lic-tag.venceu{background:#fdeaea;color:#b3261e;border:1px solid #f3c0bd}
+.lic-vagas{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
+.lic-linhas{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.lic-linha{display:grid;grid-template-columns:26px 1fr 1fr 130px 30px;gap:7px;align-items:center;margin-bottom:6px}
+.lic-linha .lic-n{font-size:11.5px;font-weight:800;color:var(--muted);text-align:center}
+.lic-linha input{min-width:0;font-size:13px;padding:7px 9px}
+.lic-linha.usada .lic-n{color:var(--accent2)}
+@media(max-width:700px){ .lic-linha{grid-template-columns:22px 1fr 1fr;gap:5px} .lic-linha input[type=date]{grid-column:2/4} .lic-linha .lic-x{grid-column:3;justify-self:end} }
+.lic-x{background:none;border:0;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 5px}
+.lic-x:hover{color:#b3261e}
+.lic-acoes{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+body.dark .lic-lote{background:var(--card);border-color:var(--line)}
+body.dark .lic-chave{background:#1d2a47;color:#dbe7ff}
+/* prévia da folha de etiquetas — 7 por linha, sem borda, igual ao modelo */
+.etq-prev{overflow-x:auto}
+.etq-folha{background:#fff;border:1px solid #788498;border-radius:4px;padding:6px 4px;
+  display:grid;grid-template-columns:repeat(7,1fr);gap:0;min-width:300px}
+.etq-cel{font-size:8px;color:#000;padding:5px 3px;white-space:nowrap;font-family:Calibri,Carlito,"Segoe UI",sans-serif}
+body.dark .etq-folha{background:#fff}
 body.dark .gp-doc{background:#fff}   /* papel é papel: continua branco no modo escuro */
 body.dark .rep-prev{background:#12233f;border-color:#2b4a80}
 body.dark .rep-aviso{background:#3a2e10;border-color:#8a6d1f;color:#fcd34d}
@@ -436,6 +512,9 @@ body.dark .cam-canvas{border-color:var(--line)} /* o papel do croqui continua br
 .src-tag.py{background:#eafaef;color:#15803d;border:1px solid #c7ebd2}
 .diag-ok{color:#15803d!important;font-weight:700}
 .diag-err{color:#c0392b!important;font-weight:700}
+.ml-btn{flex:none;font-size:11px;font-weight:800;background:#fff159;color:#2d3277;border:1px solid #e0d84a;
+  border-radius:6px;padding:3px 7px;cursor:pointer;white-space:nowrap;line-height:1.3}
+.ml-btn:hover{filter:brightness(.95)}
 .fav-star{flex:none;font-size:20px;color:#cbd3df;cursor:pointer;line-height:1;padding:0 2px}
 .fav-star.on{color:#f5b301}
 .fav-star:hover{color:#f5b301}
@@ -788,15 +867,25 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
     <img src="logo-chip7.png" alt="Chip7" class="wel-logo">
     <h1 class="wel-title">Chip7 Informática</h1>
     <p class="wel-tag">O que você quer fazer?</p>
+    <div class="wel-grupo">💰 Cotação de valores</div>
     <div class="wel-choice">
       <button class="wel-btn func" onclick="irModulo('cotacao')"><span>💰</span><b>Cotar valores</b><small>Importados e fornecedores</small></button>
-      <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
       <button class="wel-btn func" onclick="irModulo('montar')"><span>🖥️</span><b>Montar PC</b><small>Orçamento de computador</small></button>
-      <button class="wel-btn cli" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
-      <button class="wel-btn cli" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca nos importados</small></button>
-      <button class="wel-btn func" onclick="irModulo('reparo')"><span>🔧</span><b>Reparos</b><small>Peça + serviço de celular</small></button>
+      <button class="wel-btn func" onclick="escolherCelular()"><span>📱</span><b>Celulares</b><small>Busca nos importados</small></button>
+      <button class="wel-btn func" onclick="escolherCamera()"><span>📹</span><b>Câmeras</b><small>Orçamento de CFTV</small></button>
       <button class="wel-btn func" onclick="escolherTaxas()"><span>🧮</span><b>Calcular Taxas</b><small>Parcelas da maquininha</small></button>
-      <button class="wel-btn cli" onclick="irModulo('garantia')"><span>🛡️</span><b>Garantia</b><small>Certificado pro cliente</small></button>
+    </div>
+    <div class="wel-grupo">🩺 Atendimento</div>
+    <div class="wel-choice">
+      <button class="wel-btn cli" onclick="escolherDiagnostico()"><span>🩺</span><b>Diagnóstico</b><small>Visita técnica</small></button>
+      <button class="wel-btn cli" onclick="irModulo('reparo')"><span>🔧</span><b>Reparos</b><small>Peça + serviço de celular</small></button>
+    </div>
+    <div class="wel-grupo">📋 Operacional</div>
+    <div class="wel-choice">
+      <button class="wel-btn oper" onclick="irModulo('garantia')"><span>🛡️</span><b>Garantia</b><small>Venda / garantia do cliente</small></button>
+      <button class="wel-btn oper" onclick="irModulo('etiquetas')"><span>🏷️</span><b>Etiquetas</b><small>Numeração de OS</small></button>
+      <button class="wel-btn oper" onclick="irModulo('pedidos')"><span>🛍️</span><b>Pedidos</b><small>Comprar do fornecedor</small></button>
+      <button class="wel-btn oper" onclick="irModulo('licencas')"><span>🔑</span><b>Licenças</b><small>Antivírus por cliente</small></button>
     </div>
     <button class="wel-wa dark-btn" onclick="toggleDark()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🌙 Modo escuro: desligado</button>
     <button class="wel-wa" onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.35)">🔒 Sair</button>
@@ -847,8 +936,8 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div class="cel-chips" id="celChips"></div>
       </div>
       <div id="lojasWrap">
-        <label class="cot-lbl lbl-tgl" onclick="toggleLojas('cotLojas',this)">Lojas (importados) <span>▾ minimizar</span></label>
-        <div class="cot-lojas" id="cotLojas"></div>
+        <label class="cot-lbl lbl-tgl" onclick="toggleLojas('cotLojas',this)">Lojas (importados) <span>▸ mostrar</span></label>
+        <div class="cot-lojas" id="cotLojas" style="display:none"></div>
       </div>
       <div id="fornLojasWrap" style="display:none">
         <label class="cot-lbl lbl-tgl" onclick="toggleLojas('fornLojas',this)">Fornecedores a buscar <span>▾ minimizar</span></label>
@@ -878,7 +967,7 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
       <div class="cot-grid">
         <div><label class="cot-lbl" id="lblPreco">Custo importado (US$)</label><input id="cotPreco" type="number" inputmode="decimal" placeholder="0.00" oninput="cotCalc()"></div>
         <div id="colDolar"><label class="cot-lbl">Cotação do dólar (R$)</label>
-          <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="dolarManual()"><button class="btn ghost" onclick="buscarDolar()" title="Buscar o dólar do dia">↻</button></div>
+          <div class="cot-row"><input id="cotDolar" type="number" inputmode="decimal" placeholder="5.50" oninput="dolarManual()"><button class="btn ghost" onclick="dolarForcar()" title="Buscar o dólar do dia (Compras Paraguai)">↻</button></div>
           <div class="cot-hint dolar-fonte" id="cotDolarFonte"></div></div>
       </div>
       <div id="rowTrazer">
@@ -1166,6 +1255,87 @@ input.invalid{border-color:var(--red)!important;background:#fff5f5}
         <div class="cot-card">
           <div class="cot-sep">como vai sair no papel</div>
           <div id="garPrev" class="gar-prev"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE PEDIDOS (consulta grande no computador: foto ampliada + grade) -->
+<div class="welcome cot-screen" id="pedidosScreen">
+  <div class="ped-wrap">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🛍️ Pedido a fornecedor</h2>
+      <button class="btn ghost" style="margin-left:auto" onclick="pedAbrirLista()">🧾 <span id="pedQtdBtn">0</span> no pedido</button>
+    </div>
+    <div class="ped-busca">
+      <input id="pedBusca" placeholder="Buscar peça, modelo ou código…" onkeydown="if(event.key==='Enter')pedPesquisar()">
+      <button class="btn primary" onclick="pedPesquisar()">🔎 Buscar</button>
+    </div>
+    <div class="ped-forn" id="pedForn"></div>
+    <p class="cot-msg" id="pedMsg"></p>
+    <div class="ped-cols">
+      <div class="ped-foco" id="pedFoco"></div>
+      <div class="ped-grade" id="pedGrade"></div>
+    </div>
+    <div id="pedListaBox"></div>
+  </div>
+</div>
+
+<!-- TELA DE LICENÇAS DE ANTIVÍRUS (lote de chaves + quem usou cada ativação) -->
+<div class="welcome cot-screen" id="licencasScreen">
+  <div class="cot-wrap" style="max-width:1100px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🔑 Licenças de antivírus</h2>
+      <button class="btn ghost" style="margin-left:auto" onclick="licNovoLote()">➕ Novo lote</button>
+    </div>
+    <div class="lic-resumo" id="licResumo"></div>
+    <div class="cot-row" style="margin:8px 0 12px">
+      <input id="licBusca" placeholder="Buscar por cliente, OS ou chave…" oninput="licRender()">
+    </div>
+    <div id="licLotes"></div>
+  </div>
+</div>
+
+<!-- TELA DE ETIQUETAS DE OS (folha igual ao MODELO ETIQUETAS OS.docx) -->
+<div class="welcome cot-screen" id="etiquetasScreen">
+  <div class="cot-wrap" style="max-width:860px">
+    <div class="cot-head">
+      <button class="btn ghost" onclick="voltarChooser()">← Voltar</button>
+      <h2 style="margin:0;color:#fff">🏷️ Etiquetas de OS</h2>
+    </div>
+    <div class="cot-cols">
+      <div class="cot-col-l">
+        <div class="cot-card">
+          <div class="cot-sep">numeração</div>
+          <div class="cot-grid">
+            <div><label class="cot-lbl">Primeira OS</label>
+              <input id="etqDe" type="number" inputmode="numeric" placeholder="16754" oninput="etqPreview()"></div>
+            <div><label class="cot-lbl">Última OS</label>
+              <input id="etqAte" type="number" inputmode="numeric" placeholder="16879" oninput="etqPreview()"></div>
+          </div>
+          <p class="cot-hint" id="etqResumo"></p>
+          <div class="cot-row" style="margin-top:8px">
+            <button class="btn ghost" style="flex:1" onclick="etqFolhaCheia()">📄 Completar 1 folha (126)</button>
+            <button class="btn ghost" style="flex:1" onclick="etqProxima()">⏭️ Continuar de onde parei</button>
+          </div>
+          <div class="cot-sep">texto</div>
+          <div class="cot-row">
+            <input id="etqPrefixo" type="text" value="OS " placeholder="Prefixo (ex.: OS )" oninput="etqPreview()">
+          </div>
+          <p class="cot-hint">Sai igual ao modelo: 7 por linha, 18 linhas, 126 por folha. Sem bordas.</p>
+          <div class="ab-actions" style="margin-top:12px">
+            <button class="btn primary" onclick="etqPDF()">📄 Gerar PDF</button>
+            <button class="btn ghost" onclick="etqImprimir()">🖨️ Imprimir</button>
+          </div>
+        </div>
+      </div>
+      <div class="cot-col-r">
+        <div class="cot-card">
+          <div class="cot-sep">como vai sair no papel</div>
+          <div id="etqPrev" class="etq-prev"></div>
         </div>
       </div>
     </div>
@@ -3117,15 +3287,15 @@ function voltarInicio(){
 }
 /* ---------- escolha do módulo (Cotar / Diagnóstico) ---------- */
 function showChooser(){
-  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['welcome','loginScreen','cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen','etiquetasScreen','pedidosScreen','licencasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   const cl=document.getElementById('clientLogin');if(cl)cl.remove();
   const tag=document.querySelector('#chooser .wel-tag'); if(tag)tag.textContent='👤 '+usuarioAtual()+' — o que você quer fazer?';
   document.getElementById('chooser').classList.add('show');
 }
-function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
+function escolherDiagnostico(){ ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen','etiquetasScreen','pedidosScreen','licencasScreen','chooser'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');}); marcarTela(); window.scrollTo(0,0); }
 /* ---- navegação integrada entre os 4 módulos ---- */
 function irModulo(m){
-  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
+  ['cotacaoScreen','cameraScreen','taxasScreen','histScreen','reparoScreen','garantiaScreen','etiquetasScreen','pedidosScreen','licencasScreen'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('show');});
   if(m==='cotacao'){ COT_BUILD=false; COT_CEL=false; escolherCotacao(); }
   else if(m==='montar'){ COT_CEL=false; escolherMontarPC(); }
   else if(m==='celular'){ escolherCelular(); }
@@ -3133,6 +3303,9 @@ function irModulo(m){
   else if(m==='taxas'){ escolherTaxas(); }
   else if(m==='reparo'){ escolherReparo(); }
   else if(m==='garantia'){ escolherGarantia(); }
+  else if(m==='etiquetas'){ escolherEtiquetas(); }
+  else if(m==='pedidos'){ escolherPedidos(); }
+  else if(m==='licencas'){ escolherLicencas(); }
   else if(m==='diagnostico'){ escolherDiagnostico(); }
   else showChooser();
 }
@@ -3159,7 +3332,7 @@ window.addEventListener('popstate',()=>{
   if(w && w.classList.contains('fs')){ camFull(); marcarTela(); return; }   // 1º: fecha a tela cheia do croqui
   const hs=document.getElementById('histScreen');
   if(hs && hs.classList.contains('show')){ fecharHistorico(); marcarTela(); return; }   // voltar fecha os orçamentos primeiro
-  const overlay=['cotacaoScreen','cameraScreen','taxasScreen','reparoScreen','garantiaScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
+  const overlay=['cotacaoScreen','cameraScreen','taxasScreen','reparoScreen','garantiaScreen','etiquetasScreen','pedidosScreen','licencasScreen'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('show');});
   const chooserOn=document.getElementById('chooser').classList.contains('show');
   const welcomeOn=document.getElementById('welcome').classList.contains('show');
   const loginOn=document.getElementById('loginScreen').classList.contains('show');
@@ -3207,7 +3380,33 @@ function lucroDeReais(){
   cotCalc();
 }
 function buscarNaInternet(){ const q=(document.getElementById('cotBusca').value||(COT_SEL&&COT_SEL.nome)||'').trim(); if(!q){toast('Digite o que quer pesquisar');return;} window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); }
-function compararBrasil(){ const q=((COT_SEL&&COT_SEL.nome)||document.getElementById('cotBusca').value||'').trim(); if(!q){toast('Pesquise/escolha um produto primeiro');return;} window.open('https://lista.mercadolivre.com.br/'+encodeURIComponent(q),'_blank'); }
+/* ⚠️ NÃO existe API pra puxar preço do Mercado Livre pra dentro do app.
+   Testado em ago/2026 com credencial oficial (client_credentials, token válido):
+   /sites/MLB/search e /products/search devolvem 403; /users/me e /items/ID também.
+   Só endpoint estático (categorias) responde. O ML fechou a busca de propósito,
+   justamente pra impedir coleta de preço. Então o caminho é ABRIR a busca numa aba.
+   Se um dia for tentar de novo: precisa de aprovação comercial do ML, não é escopo. */
+function mlURL(q,ordenarPorPreco){
+  let u='https://lista.mercadolivre.com.br/'+encodeURIComponent(String(q).trim().replace(/\s+/g,'-'));
+  if(ordenarPorPreco) u+='_OrderId_PRICE';          // menor preço primeiro
+  return u;
+}
+function mlTermo(){
+  // nome do produto cotado; se não tiver, o que está na busca
+  const lim=s=>String(s||'').replace(/\s*[-–]\s*(Grade|Swap)[\s\S]*$/i,'').replace(/\s+/g,' ').trim();
+  return lim((COT_SEL&&(COT_SEL.nomePdf||COT_SEL.nome))||document.getElementById('cotBusca').value||'');
+}
+function compararBrasil(){
+  const q=mlTermo();
+  if(!q){toast('Pesquise/escolha um produto primeiro');return;}
+  window.open(mlURL(q,true),'_blank');              // já abre do mais barato pro mais caro
+}
+/* link do ML por produto, direto na lista de resultados (não abre a tela) */
+function abrirMLproduto(n,ev){
+  if(ev){ev.stopPropagation();}
+  const i=COT_HITS[n]; if(!i)return;
+  window.open(mlURL(i.nome,true),'_blank');
+}
 /* ================= DÓLAR (atualiza sozinho) =================
    Abriu a cotação, ele busca. Cache de 10 min pra não martelar a API.
    Dois tipos, porque são preços diferentes e os dois importam pra loja:
@@ -3231,21 +3430,40 @@ async function dolarPTAX(){
   const v=parseFloat(c.cotacaoVenda)||parseFloat(c.cotacaoCompra);   // venda: é o que se paga pra comprar dólar
   return v?{valor:v, data:new Date(c.dataHoraCotacao.replace(' ','T')), fonte:'BC'}:null;
 }
+/* ===== dólar do COMPRAS PARAGUAI — é o PADRÃO =====
+   É a cotação que o próprio site usa pra converter os preços, então é a que faz o
+   orçamento bater com o que a loja realmente paga. Sai no topo da home:
+   <span class="cotacao-label">Dólar hoje:</span> <strong>R$ 5,28</strong>
+   Comercial/turismo ficam só como comparação (costumam ser MENORES). */
+async function dolarCP(){
+  const pega=h=>{ const m=String(h||'').match(/D[óo]lar\s*hoje[\s\S]{0,200}?R\$\s*([\d.]+,\d{2})/i);
+    if(!m)return null; const v=parseFloat(m[1].replace(/\./g,'').replace(',','.')); return v>0?v:null; };
+  // 1) função do Netlify (server-side, sem proxy); 2) proxy CORS
+  try{ const r=await fetch('/.netlify/functions/buscar?dolar=1'); if(r.ok){ const d=await r.json(); if(d&&d.dolar>0) return d.dolar; } }catch(_){}
+  try{ return pega(await cpProxy(CP_BASE+'/')); }catch(_){}
+  return null;
+}
 /* ⚠️ NÃO voltar pro /last/USD-BRL (sem "json"): em jul/2026 ele estava CONGELADO
    (devolvia 16/07 no dia 22, 5,11 com o mercado em 5,07). O /json/last/ do MESMO
    provedor responde ao vivo. Trocou de endpoint? Confira o create_date. */
-let DOLAR_CACHE=null;   // {com,tur,data,em} — evita bater na API a cada tela
+let DOLAR_CACHE=null;   // {cp,com,tur,data,em} — evita bater na rede a cada tela
 async function dolarBuscarPar(){
   if(DOLAR_CACHE && Date.now()-DOLAR_CACHE.em < 6e5) return DOLAR_CACHE;   // 10 min
-  const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,USD-BRLT',{cache:'no-store'});
-  const j=await r.json(); const c=j.USDBRL, t=j.USDBRLT;
-  const com=parseFloat(c&&c.bid);                       // comercial: é o valor cotado
-  const tur=parseFloat((t&&t.ask)||(t&&t.bid));         // turismo: a VENDA, o que se paga na casa de câmbio
-  if(!com) throw new Error('sem cotação');
-  DOLAR_CACHE={com, tur:tur||0, data:new Date(String((c&&c.create_date)||'').replace(' ','T')), em:Date.now()};
+  let cp=null, com=0, tur=0, data=new Date();
+  const [rcp,rapi]=await Promise.all([
+    dolarCP().catch(()=>null),
+    fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,USD-BRLT',{cache:'no-store'}).then(r=>r.json()).catch(()=>null)
+  ]);
+  cp=rcp;
+  if(rapi){ const c=rapi.USDBRL, t=rapi.USDBRLT;
+    com=parseFloat(c&&c.bid)||0; tur=parseFloat((t&&t.ask)||(t&&t.bid))||0;
+    if(c&&c.create_date) data=new Date(String(c.create_date).replace(' ','T'));
+  }
+  if(!cp && !com) throw new Error('sem cotação');
+  DOLAR_CACHE={cp:cp||0, com, tur, data, em:Date.now()};
   return DOLAR_CACHE;
 }
-function dolarTipo(){ const t=localStorage.getItem('chip7_dolar_tipo'); return (t==='tur'||t==='manual')?t:'com'; }
+function dolarTipo(){ const t=localStorage.getItem('chip7_dolar_tipo'); return (t==='com'||t==='tur'||t==='manual')?t:'cp'; }
 function dolarSetTipo(t,silencioso){
   try{ localStorage.setItem('chip7_dolar_tipo',t); }catch(e){}
   if(typeof marcaLocal==='function')marcaLocal('prefs');
@@ -3268,7 +3486,7 @@ function dolarPinta(){
   const tipo=dolarTipo(), c=DOLAR_CACHE;
   const n=v=>(+v).toFixed(2).replace('.',',');
   const chip=(t,rot,val)=>`<button type="button" class="dl-chip${tipo===t?' on':''}" onclick="dolarSetTipo('${t}')">${rot}${val?` <b>${n(val)}</b>`:''}</button>`;
-  let h=chip('com','comercial',c&&c.com)+chip('tur','turismo',c&&c.tur);
+  let h=chip('cp','🇵🇾 Compras Paraguai',c&&c.cp)+chip('com','comercial',c&&c.com)+chip('tur','turismo',c&&c.tur);
   if(tipo==='manual'){
     const m=dolarManualSalvo();
     h+=`<button type="button" class="dl-chip on">na mão <b>${m?n(m.v):'—'}</b></button>`;
@@ -3277,7 +3495,7 @@ function dolarPinta(){
   if(tipo==='manual'){
     const m=dolarManualSalvo(), dias=m?Math.floor((Date.now()-m.ts)/864e5):0;
     nota=`digitado por ${(m&&m.quem)||'alguém'} ${dias===0?'hoje':(dias===1?'ontem':dias+' dias atrás')}`
-       +(dias>=1?' · ⚠️ confira se ainda vale':'')+' — toque em comercial/turismo pra voltar ao automático';
+       +(dias>=1?' · ⚠️ confira se ainda vale':'')+' — toque num chip ou no ↻ pra voltar ao automático';
     el.classList.toggle('velho',dias>=1);
   }else if(c){
     const min=Math.round((Date.now()-c.em)/6e4);
@@ -3287,11 +3505,17 @@ function dolarPinta(){
   }
   el.innerHTML=`<span class="dl-chips">${h}</span>${nota?`<span class="dl-nota">${nota}</span>`:''}`;
 }
+function dolarValorDoTipo(tipo){
+  if(!DOLAR_CACHE) return 0;
+  if(tipo==='tur') return DOLAR_CACHE.tur||DOLAR_CACHE.cp||DOLAR_CACHE.com;
+  if(tipo==='com') return DOLAR_CACHE.com||DOLAR_CACHE.cp;
+  return DOLAR_CACHE.cp||DOLAR_CACHE.com;      // 'cp' é o padrão
+}
 function dolarAplica(){
   const inp=dolarSel(); if(!inp)return;
   const tipo=dolarTipo();
   if(tipo==='manual'){ const m=dolarManualSalvo(); if(m&&m.v>0)inp.value=(+m.v).toFixed(2); }
-  else if(DOLAR_CACHE){ const v=tipo==='tur'?DOLAR_CACHE.tur:DOLAR_CACHE.com; if(v>0)inp.value=(+v).toFixed(2); }
+  else { const v=dolarValorDoTipo(tipo); if(v>0)inp.value=(+v).toFixed(2); }
   dolarPinta(); cotCalc();
 }
 /* forcar=true ignora o cache (é o botão ↻ e a troca de tipo) */
@@ -3302,13 +3526,22 @@ async function buscarDolar(forcar){
   if(el && !DOLAR_CACHE) el.innerHTML='<span class="dl-nota">buscando o dólar…</span>';
   try{ await dolarBuscarPar(); }
   catch(e){
-    try{ const p=await dolarPTAX(); if(p&&p.valor) DOLAR_CACHE={com:p.valor, tur:0, data:p.data, em:Date.now()}; }catch(e2){}
+    try{ const p=await dolarPTAX(); if(p&&p.valor) DOLAR_CACHE={cp:0, com:p.valor, tur:0, data:p.data, em:Date.now()}; }catch(e2){}
   }
   if(!DOLAR_CACHE && dolarTipo()!=='manual'){
     if(el)el.innerHTML='<span class="dl-nota">não consegui buscar — digite o dólar do dia</span>';
     el&&el.classList.add('velho'); return;
   }
   dolarAplica();
+}
+/* o botão ↻: força a busca E tira do modo "na mão" — senão quem digitou uma vez
+   fica preso no valor antigo e o botão parece quebrado (era o defeito relatado). */
+async function dolarForcar(){
+  if(dolarTipo()==='manual'){ try{ localStorage.setItem('chip7_dolar_tipo','cp'); }catch(e){}
+    if(typeof marcaLocal==='function')marcaLocal('prefs');
+    if(typeof cloudSavePrefs==='function')cloudSavePrefs(); }
+  await buscarDolar(true);
+  toast('💵 Dólar atualizado: '+((dolarSel()||{}).value||'—'));
 }
 /* abre a cotação: busca sozinho, sempre (o cache de 10 min segura o excesso) */
 function dolarInit(){ if(dolarSel()) buscarDolar(false); }
@@ -3658,6 +3891,11 @@ function garLimpar(){
    NENHUM sombreado (Shading = wdColorAutomatic). Nada de azul da marca aqui —
    isto é papel de cartório, não tela do app. */
 const GAR_LINHA=[0,0,0];
+/* GAR_ESC estica o documento pra ele OCUPAR A FOLHA INTEIRA (pedido da loja: antes
+   sobravam ~10cm em branco embaixo). garMontarPDF mede com 1 e redesenha com a escala
+   certa. A fonte cresce só ~metade do que a altura cresce, senão fica desproporcional. */
+let GAR_ESC=1;
+function garFS(v){ return v*(1+(GAR_ESC-1)*0.55); }
 /* cells: [{f:peso, label:'', valor:'', center:bool, size:n, fill:bool}] — sem label = texto solto na célula */
 function garLinhaPDF(doc,x,y,LW,h,cells){
   const tot=cells.reduce((a,c)=>a+c.f,0); let cx=x;
@@ -3666,27 +3904,27 @@ function garLinhaPDF(doc,x,y,LW,h,cells){
     doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5);
     if(c.fill){ doc.setFillColor(238,242,249); doc.rect(cx,y,w,h,'FD'); } else doc.rect(cx,y,w,h);
     if(c.label!=null){
-      doc.setFont('helvetica','normal'); doc.setFontSize(5.8); doc.setTextColor(0,0,0);
-      doc.text(doc.splitTextToSize(String(c.label),w-6).slice(0,1),cx+3.5,y+7.5);
-      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(0,0,0);
-      doc.text(doc.splitTextToSize(String(c.valor||''),w-7).slice(0,2),cx+3.5,y+18);
+      doc.setFont('helvetica','normal'); doc.setFontSize(garFS(5.8)); doc.setTextColor(0,0,0);
+      doc.text(doc.splitTextToSize(String(c.label),w-6).slice(0,1),cx+3.5,y+garFS(7.5));
+      doc.setFont('helvetica','bold'); doc.setFontSize(garFS(8.5)); doc.setTextColor(0,0,0);
+      doc.text(doc.splitTextToSize(String(c.valor||''),w-7).slice(0,2),cx+3.5,y+garFS(8.5)+h*0.42);
     }else{
-      doc.setFont('helvetica','bold'); doc.setFontSize(c.size||9);
+      doc.setFont('helvetica','bold'); doc.setFontSize(garFS(c.size||9));
       doc.setTextColor(0,0,0);
       const ls=doc.splitTextToSize(String(c.valor||''),w-7);
       const ax=c.center?cx+w/2:(c.right?cx+w-3.5:cx+3.5), al=c.center?'center':(c.right?'right':'left');
       // 1 linha centraliza na vertical; várias linhas começam do topo, senão vaza
-      doc.text(ls,ax,ls.length>1?y+11:y+h/2+2.6,{align:al});
+      doc.text(ls,ax,ls.length>1?y+garFS(11):y+h/2+garFS(2.6),{align:al});
     }
     cx+=w;
   });
   return h;
 }
 function garSecaoPDF(doc,x,y,w,txt){
-  const h=13; doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5);
+  const h=13*GAR_ESC; doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5);
   doc.rect(x,y,w,h);
-  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(0,0,0);
-  doc.text(String(txt),x+3.5,y+9);
+  doc.setFont('helvetica','bold'); doc.setFontSize(garFS(7.5)); doc.setTextColor(0,0,0);
+  doc.text(String(txt),x+3.5,y+h*0.69);
   return h;
 }
 /* logo do cabeçalho — extraída do próprio .doc da loja (1280x720, 114x64pt no Word) */
@@ -3706,72 +3944,96 @@ function garLogoCarrega(){
     im.src='logo-garantia.png';
   });
 }
-function garMontarPDF(d){
+function garMontarPDF(d,escala){
+  GAR_ESC=escala||1;
   const {jsPDF}=window.jspdf, doc=new jsPDF({unit:'pt',format:'a4'});
   const L=GAR_LOJA, W=doc.internal.pageSize.getWidth(), M=28, LW=W-M*2;   // margens do .doc
+  const E=GAR_ESC;
   let y=M;
   // cabeçalho: logo À ESQUERDA, dados da loja ao lado (mesma linha)
-  const logoW=92, logoH=52;
+  const logoW=92*Math.min(E,1.35), logoH=52*Math.min(E,1.35);
   if(GAR_LOGO){ try{ doc.addImage(GAR_LOGO,'JPEG',M,y,logoW,logoH); }catch(e){} }
-  let hy=y+12;
+  let hy=y+12*E;
   L.cabecalho.forEach((r,i)=>{
-    doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(i===0?10.5:7.8); doc.setTextColor(0,0,0);
-    doc.text(r,M+logoW+12,hy); hy+=i===0?12.5:9.6;
+    doc.setFont('helvetica',i===0?'bold':'normal'); doc.setFontSize(garFS(i===0?10.5:7.8)); doc.setTextColor(0,0,0);
+    doc.text(r,M+logoW+12,hy); hy+=garFS(i===0?12.5:9.6);
   });
-  y+=logoH+6;
+  y+=logoH+6*E;
   // VENDA/GARANTIA Nº | X | SAÍDA | | ENTRADA
-  y+=garLinhaPDF(doc,M,y,LW,20,[
+  y+=garLinhaPDF(doc,M,y,LW,20*E,[
     {f:3,valor:'VENDA/ GARANTIA Nº ______'},{f:.35,valor:'X',center:1},{f:.9,valor:'SAÍDA',center:1},
     {f:.35,valor:'',center:1},{f:1,valor:'ENTRADA',center:1}]);
   y+=garSecaoPDF(doc,M,y,LW,'EMITENTE');
-  y+=garLinhaPDF(doc,M,y,LW,24,[
+  y+=garLinhaPDF(doc,M,y,LW,24*E,[
     {f:2,label:'NOME RAZÃO SOCIAL',valor:L.razao},{f:1.1,label:'CPF/CNPJ',valor:L.cnpj},{f:1,label:'INSCRIÇÃO ESTADUAL',valor:L.ie}]);
-  y+=garLinhaPDF(doc,M,y,LW,24,[
+  y+=garLinhaPDF(doc,M,y,LW,24*E,[
     {f:1.4,label:'MUNICÍPIO',valor:L.municipio},{f:.4,label:'UF',valor:L.uf},
     {f:1.2,label:'TELEFONE',valor:L.tel},{f:1.2,label:'DATA DA EMISSÃO',valor:garBR(d.emissao)}]);
   y+=garSecaoPDF(doc,M,y,LW,'CLIENTE');
-  y+=garLinhaPDF(doc,M,y,LW,24,[
+  y+=garLinhaPDF(doc,M,y,LW,24*E,[
     {f:1.7,label:'NOME RAZÃO SOCIAL',valor:d.cliente},{f:1.5,label:'ENDEREÇO',valor:d.endereco},{f:1,label:'CPF/ CNPJ',valor:d.doc}]);
-  y+=garLinhaPDF(doc,M,y,LW,24,[
+  y+=garLinhaPDF(doc,M,y,LW,24*E,[
     {f:1.5,label:'MUNICIPIO',valor:d.municipio},{f:.4,label:'UF',valor:d.uf},{f:1.5,label:'TELEFONE',valor:d.tel}]);
   // (removidas as inscrições estaduais e a fatura do lado do cliente; vendedor entra aqui)
-  y+=garLinhaPDF(doc,M,y,LW,22,[
+  y+=garLinhaPDF(doc,M,y,LW,22*E,[
     {f:1.3,label:'NATUREZA DA OPERAÇÃO',valor:L.natureza},{f:.6,label:'CFOP',valor:L.cfop},
     {f:2,label:'VENDEDOR RESPONSÁVEL',valor:d.vendedor}]);
-  y+=garLinhaPDF(doc,M,y,LW,16,[{f:1,valor:garPagoTexto(d.pago),size:7.2}]);
-  y+=garLinhaPDF(doc,M,y,LW,22,[{f:2,label:'INFORMAÇÕES TROCA',valor:d.troca},{f:1,label:'VALOR',valor:garValorTxt(d.trocaValor)}]);
+  y+=garLinhaPDF(doc,M,y,LW,16*E,[{f:1,valor:garPagoTexto(d.pago),size:7.2}]);
+  y+=garLinhaPDF(doc,M,y,LW,22*E,[{f:2,label:'INFORMAÇÕES TROCA',valor:d.troca},{f:1,label:'VALOR',valor:garValorTxt(d.trocaValor)}]);
   y+=garSecaoPDF(doc,M,y,LW,'DADOS DO PRODUTO');
-  y+=garLinhaPDF(doc,M,y,LW,12,[
+  y+=garLinhaPDF(doc,M,y,LW,12*E,[
     {f:2.6,valor:'DESCRIÇÃO DOS PRODUTOS',size:6.8},{f:1,valor:'QUANTIDADE',size:6.8,center:1},
     {f:1,valor:'VALOR UNITÁRIO',size:6.8,center:1},{f:1,valor:'VALOR TOTAL',size:6.8,center:1}]);
   const prods = d.produtos.length ? d.produtos : [{desc:'',qtd:1,unit:0}];
   prods.forEach(p=>{
+    doc.setFontSize(garFS(8.5));
     const dLin=doc.splitTextToSize(p.desc||'',LW*(2.6/5.6)-7);
-    y+=garLinhaPDF(doc,M,y,LW,Math.max(18,8+dLin.length*10),[
+    y+=garLinhaPDF(doc,M,y,LW,Math.max(18*E,8*E+dLin.length*garFS(10)),[
       {f:2.6,valor:p.desc||'',size:8.5},{f:1,valor:String(p.qtd||1),size:8.5,center:1},
       {f:1,valor:p.unit?fmtMoney(p.unit):'R$',size:8.5,center:1},{f:1,valor:p.unit?fmtMoney((p.qtd||1)*p.unit):'R$',size:8.5,center:1}]);
   });
   // linha de TOTAL
-  y+=garLinhaPDF(doc,M,y,LW,16,[
+  y+=garLinhaPDF(doc,M,y,LW,16*E,[
     {f:4.6,valor:'TOTAL',size:8.5,right:1},{f:1,valor:fmtMoney(d.total),size:9,center:1}]);
   // bloco de texto
   y+=garSecaoPDF(doc,M,y,LW,'INFORMAÇÕES COMPLEMENTARES');
-  const topo=y; let ty=y+11;
+  const topo=y; let ty=y+garFS(11);
   const par=(txt,bold)=>{
-    doc.setFont('helvetica',bold?'bold':'normal'); doc.setFontSize(7.6); doc.setTextColor(0,0,0);
+    doc.setFont('helvetica',bold?'bold':'normal'); doc.setFontSize(garFS(7.6)); doc.setTextColor(0,0,0);
     const ls=doc.splitTextToSize(txt,LW-14);
-    doc.text(ls,M+7,ty); ty+=ls.length*9.4+5.5;
+    doc.text(ls,M+7,ty); ty+=ls.length*garFS(9.4)+5.5*E;
   };
   L.clausulas.forEach(cl=>par(cl.replace('{MESES}',garMesesTexto(d.meses))));
-  ty+=1; par('IMPORTANTE',true);
+  ty+=1*E; par('IMPORTANTE',true);
   L.importante.forEach(i=>par('* '+i));
   par(L.cdc);
-  ty+=12;
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.6); doc.setTextColor(0,0,0);
+  ty+=12*E;
+  doc.setFont('helvetica','normal'); doc.setFontSize(garFS(7.6)); doc.setTextColor(0,0,0);
   doc.text(L.aceite,M+7,ty);
   doc.text('DATA '+garBR(d.emissao),M+LW-7,ty,{align:'right'});
-  ty+=10;
+  ty+=10*E;
   doc.setDrawColor(...GAR_LINHA); doc.setLineWidth(.5); doc.rect(M,topo,LW,ty-topo);
+  doc.__fim=ty;   // onde o conteúdo terminou — usado pra calcular a escala da 2ª passada
+  return doc;
+}
+/* Desenha, mede e redesenha na escala que faz o documento OCUPAR A FOLHA INTEIRA
+   (pedido da loja: sobravam ~10cm em branco). Também ENCOLHE quando não cabe —
+   ⚠️ o jsPDF não quebra página sozinho: sem isso, muitos produtos empurravam o
+   rodapé pra fora do papel e o cliente recebia o documento cortado, calado. */
+function garMontarPDFCheio(d){
+  const A4=841.89, M=28, disponivel=A4-M*2;
+  const doc1=garMontarPDF(d,1);
+  const usado=(doc1.__fim||0)-M;
+  if(!usado || usado<=0){ GAR_ESC=1; return doc1; }
+  let esc=Math.max(0.62, Math.min(1.6, disponivel/usado));
+  if(Math.abs(esc-1)<=0.02){ GAR_ESC=1; return doc1; }        // já está na medida
+  let doc=garMontarPDF(d,esc);
+  // a fonte maior/menor muda a quebra de linha, então confere e ajusta até caber
+  for(let i=0;i<8 && (doc.__fim||0)>A4-M; i++){
+    esc=Math.max(0.62, esc-0.05);
+    doc=garMontarPDF(d,esc);
+  }
+  GAR_ESC=1;
   return doc;
 }
 async function garGerar(){
@@ -3780,7 +4042,7 @@ async function garGerar(){
   if(!window.jspdf){ toast('PDF indisponível'); return null; }
   await garLogoCarrega();   // sem isso o cabeçalho sai sem a logo
   garHistAdd(d);
-  return {doc:garMontarPDF(d), d};
+  return {doc:garMontarPDFCheio(d), d};
 }
 async function gerarGarantiaPDF(){
   const r=await garGerar(); if(!r)return;
@@ -3843,6 +4105,436 @@ function garReabrir(i){
   });
   garAbrirHist(); garPreview(); window.scrollTo(0,0);
   toast('Carregado — é só gerar de novo');
+}
+/* ================= 🔑 LICENÇAS DE ANTIVÍRUS =================
+   O caso real da loja: comprou 30 licenças = 3 chaves de 10 ativações cada.
+   Cada LOTE tem uma chave e N vagas; cada vaga registra cliente, OS e a data em
+   que foi instalada.
+   ⚠️ O vencimento é DO LOTE e conta da PRIMEIRA ativação (é assim que a chave
+   multi-dispositivo do Kaspersky funciona — o relógio começa quando a primeira
+   máquina ativa, não na compra e não em cada instalação). Fica editável mesmo
+   assim: se o fornecedor vender licença que conta por ativação, dá pra corrigir. */
+const LIC_TIPOS=['Kaspersky Standard','Kaspersky Plus','Kaspersky Premium',
+  'Kaspersky Small Office Security','Kaspersky Anti-Virus','Kaspersky Internet Security',
+  'Kaspersky Total Security','Outro'];
+function licLoad(){ try{ return JSON.parse(localStorage.getItem('chip7_licencas')||'[]'); }catch(e){ return []; } }
+function licSave(a){
+  if(typeof marcaLocal==='function')marcaLocal('lic');
+  try{ localStorage.setItem('chip7_licencas',JSON.stringify(a)); }catch(e){}
+  if(typeof cloudSaveLic==='function')cloudSaveLic(a);
+}
+function licHoje(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function licData(iso){ const p=String(iso||'').split('-'); if(p.length!==3)return null; const d=new Date(+p[0],+p[1]-1,+p[2]); return isNaN(d)?null:d; }
+function licBR(iso){ const d=licData(iso); return d?String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear():'—'; }
+/* soma meses com trava de fim de mês (31/01 + 1 mês = 28/02, não 03/03) */
+function licSomaMeses(iso,meses){
+  const d=licData(iso); meses=parseInt(meses,10)||0; if(!d||!meses)return '';
+  const alvo=new Date(d.getFullYear(), d.getMonth()+meses, 1);
+  const ult=new Date(alvo.getFullYear(), alvo.getMonth()+1, 0).getDate();
+  alvo.setDate(Math.min(d.getDate(), ult));
+  return alvo.getFullYear()+'-'+String(alvo.getMonth()+1).padStart(2,'0')+'-'+String(alvo.getDate()).padStart(2,'0');
+}
+function licPrimeiraAtivacao(l){
+  const ds=(l.ativacoes||[]).map(a=>a.instalado).filter(Boolean).sort();
+  return ds[0]||'';
+}
+function licVence(l){
+  if(l.venceManual) return l.venceManual;          // corrigido à mão
+  const p=licPrimeiraAtivacao(l);
+  return p?licSomaMeses(p,l.meses||12):'';
+}
+function licDiasPara(iso){
+  const d=licData(iso); if(!d)return null;
+  return Math.ceil((d-licData(licHoje()))/864e5);
+}
+function licUsadas(l){ return (l.ativacoes||[]).filter(a=>a.cliente||a.os||a.instalado).length; }
+function licNovoLote(){
+  const arr=licLoad();
+  arr.unshift({id:Date.now(), tipo:LIC_TIPOS[0], chave:'', vagas:10, meses:12,
+    compra:licHoje(), ativacoes:Array.from({length:10},()=>({cliente:'',os:'',instalado:''})), aberto:true});
+  licSave(arr); licRender();
+  setTimeout(()=>{ const e=document.querySelector('.lic-lote input[data-c="chave"]'); if(e)e.focus(); },60);
+}
+function licSet(id,campo,valor){
+  const arr=licLoad(), l=arr.find(x=>x.id===id); if(!l)return;
+  if(campo==='vagas'){
+    const n=Math.max(1,Math.min(500,parseInt(valor,10)||1));
+    l.ativacoes=l.ativacoes||[];
+    while(l.ativacoes.length<n) l.ativacoes.push({cliente:'',os:'',instalado:''});
+    if(l.ativacoes.length>n){
+      // não apaga linha já preenchida sem avisar
+      const sobra=l.ativacoes.slice(n).filter(a=>a.cliente||a.os||a.instalado).length;
+      if(sobra && !confirm(`Reduzir para ${n} apaga ${sobra} licença(s) já anotada(s). Continuar?`)){ licRender(); return; }
+      l.ativacoes=l.ativacoes.slice(0,n);
+    }
+    l.vagas=n;
+  } else l[campo]=valor;
+  licSave(arr); licRender();
+}
+function licSetAtiv(id,i,campo,valor){
+  const arr=licLoad(), l=arr.find(x=>x.id===id); if(!l||!l.ativacoes[i])return;
+  l.ativacoes[i][campo]=valor;
+  licSave(arr);
+  licRenderResumo();                       // só o resumo: re-render inteiro tiraria o foco
+  const lote=document.querySelector('.lic-lote[data-id="'+id+'"] .lic-cab');
+  if(lote) lote.outerHTML=licCabHTML(l);
+}
+function licUsarHoje(id,i){ licSetAtiv(id,i,'instalado',licHoje()); licRender(); }
+function licLimparLinha(id,i){
+  const arr=licLoad(), l=arr.find(x=>x.id===id); if(!l||!l.ativacoes[i])return;
+  l.ativacoes[i]={cliente:'',os:'',instalado:''};
+  licSave(arr); licRender();
+}
+function licRemoverLote(id){
+  const arr=licLoad(), l=arr.find(x=>x.id===id); if(!l)return;
+  if(licUsadas(l) && !confirm('Esse lote tem '+licUsadas(l)+' licença(s) anotada(s). Apagar mesmo assim?'))return;
+  licSave(arr.filter(x=>x.id!==id)); licRender();
+}
+function licToggle(id){
+  const arr=licLoad(), l=arr.find(x=>x.id===id); if(!l)return;
+  l.aberto=!l.aberto; licSave(arr); licRender();
+}
+function licStatus(l){
+  const v=licVence(l);
+  if(!v) return {cls:'ok', txt:'não ativada'};
+  const d=licDiasPara(v);
+  if(d<0) return {cls:'venceu', txt:'venceu em '+licBR(v)};
+  if(d<=30) return {cls:'vence', txt:'vence em '+d+' dia'+(d===1?'':'s')};
+  return {cls:'ok', txt:'vence '+licBR(v)};
+}
+function licCabHTML(l){
+  const st=licStatus(l), us=licUsadas(l), vg=l.vagas||(l.ativacoes||[]).length;
+  return `<div class="lic-cab" onclick="licToggle(${l.id})">
+    <b>${esc(l.tipo||'Licença')}</b>
+    ${l.chave?`<span class="lic-chave">${esc(l.chave)}</span>`:'<span class="cot-hint" style="margin:0">sem chave</span>'}
+    <span class="lic-tag ${st.cls}">${st.txt}</span>
+    <span class="lic-vagas">${us}/${vg} usadas${us<vg?' · '+(vg-us)+' livre'+((vg-us)===1?'':'s'):''} ${l.aberto?'▾':'▸'}</span>
+  </div>`;
+}
+function licRenderResumo(){
+  const box=document.getElementById('licResumo'); if(!box)return;
+  const arr=licLoad();
+  let total=0, usadas=0, vencendo=0, vencidas=0;
+  arr.forEach(l=>{
+    const vg=l.vagas||(l.ativacoes||[]).length;
+    total+=vg; usadas+=licUsadas(l);
+    const v=licVence(l); if(v){ const d=licDiasPara(v); if(d<0)vencidas++; else if(d<=30)vencendo++; }
+  });
+  const bl=(n,t,alerta)=>`<div class="lic-bloco${alerta?' alerta':''}"><b>${n}</b><small>${t}</small></div>`;
+  box.innerHTML = arr.length
+    ? bl(total,'licenças')+bl(usadas,'usadas')+bl(total-usadas,'livres')
+      +(vencendo?bl(vencendo,'vencendo em 30 dias',1):'')+(vencidas?bl(vencidas,'lote(s) vencido(s)',1):'')
+    : '';
+}
+function licRender(){
+  licRenderResumo();
+  const box=document.getElementById('licLotes'); if(!box)return;
+  const q=((document.getElementById('licBusca')||{}).value||'').trim().toLowerCase();
+  const arr=licLoad();
+  if(!arr.length){ box.innerHTML='<div class="cot-card"><p class="cot-hint">Nenhum lote ainda. Toque em <b>➕ Novo lote</b> — ele já vem com 10 licenças pra preencher.</p></div>'; return; }
+  const bate=l=>{
+    if(!q) return true;
+    if((l.chave||'').toLowerCase().includes(q)||(l.tipo||'').toLowerCase().includes(q)) return true;
+    return (l.ativacoes||[]).some(a=>(a.cliente||'').toLowerCase().includes(q)||(a.os||'').toLowerCase().includes(q));
+  };
+  const lista=arr.filter(bate);
+  if(!lista.length){ box.innerHTML='<div class="cot-card"><p class="cot-hint">Nada encontrado para "'+esc(q)+'".</p></div>'; return; }
+  box.innerHTML=lista.map(l=>{
+    const vg=l.vagas||(l.ativacoes||[]).length;
+    const prim=licPrimeiraAtivacao(l);
+    let corpo='';
+    if(l.aberto){
+      corpo=`<div class="lic-linhas">
+        <div class="cot-grid" style="margin-bottom:8px">
+          <div><label class="cot-lbl">Tipo de licença</label>
+            <select onchange="licSet(${l.id},'tipo',this.value)">
+              ${LIC_TIPOS.map(t=>`<option${t===l.tipo?' selected':''}>${t}</option>`).join('')}
+            </select></div>
+          <div><label class="cot-lbl">Chave / código</label>
+            <input type="text" data-c="chave" value="${esc(l.chave)}" placeholder="XXXXX-XXXXX-XXXXX-XXXXX"
+              onchange="licSet(${l.id},'chave',this.value)"></div>
+        </div>
+        <div class="cot-grid">
+          <div><label class="cot-lbl">Quantas licenças</label>
+            <input type="number" min="1" value="${vg}" onchange="licSet(${l.id},'vagas',this.value)"></div>
+          <div><label class="cot-lbl">Validade (meses)</label>
+            <input type="number" min="1" value="${l.meses||12}" onchange="licSet(${l.id},'meses',this.value)"></div>
+        </div>
+        <div class="cot-grid">
+          <div><label class="cot-lbl">Data da compra</label>
+            <input type="date" value="${esc(l.compra||'')}" onchange="licSet(${l.id},'compra',this.value)"></div>
+          <div><label class="cot-lbl">Vence em (deixe vazio = automático)</label>
+            <input type="date" value="${esc(l.venceManual||'')}" onchange="licSet(${l.id},'venceManual',this.value)"></div>
+        </div>
+        <p class="cot-hint">${prim
+          ? 'Primeira ativação em <b>'+licBR(prim)+'</b> → vence <b>'+licBR(licVence(l))+'</b> (conta desde a primeira).'
+          : 'O prazo começa a contar quando você preencher a <b>primeira</b> data de instalação.'}</p>
+        <div class="cot-sep">quem usou cada licença</div>
+        ${(l.ativacoes||[]).map((a,i)=>{
+          const usada=!!(a.cliente||a.os||a.instalado);
+          return `<div class="lic-linha${usada?' usada':''}">
+            <span class="lic-n">${i+1}</span>
+            <input type="text" placeholder="Cliente" value="${esc(a.cliente)}" oninput="licSetAtiv(${l.id},${i},'cliente',this.value)">
+            <input type="text" placeholder="OS" value="${esc(a.os)}" oninput="licSetAtiv(${l.id},${i},'os',this.value)">
+            <input type="date" value="${esc(a.instalado)}" title="Instalada em" onchange="licSetAtiv(${l.id},${i},'instalado',this.value);licRender()">
+            <button class="lic-x" onclick="${usada?`licLimparLinha(${l.id},${i})`:`licUsarHoje(${l.id},${i})`}"
+              title="${usada?'Limpar esta linha':'Marcar instalada hoje'}">${usada?'✕':'📅'}</button>
+          </div>`;
+        }).join('')}
+        <div class="lic-acoes">
+          <button class="btn ghost" onclick="licCopiar(${l.id})">📋 Copiar relação</button>
+          <button class="btn ghost" onclick="licRemoverLote(${l.id})" style="color:var(--muted)">Apagar lote</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="lic-lote" data-id="${l.id}">${licCabHTML(l)}${corpo}</div>`;
+  }).join('');
+}
+function licCopiar(id){
+  const l=licLoad().find(x=>x.id===id); if(!l)return;
+  let t=`*${l.tipo}*${l.chave?('\nChave: '+l.chave):''}\nValidade: ${l.meses||12} meses`;
+  const v=licVence(l); if(v)t+=`\nVence: ${licBR(v)}`;
+  t+=`\n\n`;
+  (l.ativacoes||[]).forEach((a,i)=>{
+    if(!(a.cliente||a.os||a.instalado))return;
+    t+=`${i+1}. ${a.cliente||'—'}${a.os?(' · OS '+a.os):''}${a.instalado?(' · instalada '+licBR(a.instalado)):''}\n`;
+  });
+  const us=licUsadas(l), vg=l.vagas||(l.ativacoes||[]).length;
+  t+=`\n${us}/${vg} usadas · ${vg-us} livre(s)`;
+  navigator.clipboard.writeText(t).then(()=>toast('📋 Relação copiada')).catch(()=>toast('Não consegui copiar'));
+}
+function escolherLicencas(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('licencasScreen').classList.add('show');
+  marcarTela(); licRender(); window.scrollTo(0,0);
+}
+/* ================= 🛍️ PEDIDO A FORNECEDOR =================
+   "Tela de consulta maior no computador": foto grande à esquerda, grade de
+   miniaturas à direita, filtrando por fornecedor. No fim dá pra mandar a lista
+   pro fornecedor E jogar os mesmos itens no orçamento do cliente.
+   As fotos vêm do `buscarFotoFornecedor` (Fagundez e FAM são públicas). */
+let PED_HITS=[], PED_SEL=null, PED_CART=[], PED_FORN=new Set();
+function pedFontes(){
+  const doCat=[...new Set(catLoad().map(c=>c.fornecedor).filter(Boolean))];
+  return [...new Set(['Mazer','Guarapuava',...doCat])];
+}
+function pedRenderForn(){
+  const box=document.getElementById('pedForn'); if(!box)return;
+  const fs=pedFontes();
+  box.innerHTML=fs.length?fs.map(f=>`<label class="loja-chip"><input type="checkbox" value="${esc(f)}" ${(!PED_FORN.size||PED_FORN.has(f))?'checked':''} onchange="pedToggleForn(this.value,this.checked)"> ${esc(f)}</label>`).join('')
+    : '<p class="cot-hint">Nenhum fornecedor ainda — importe a planilha em Cotar valores → 📒 Catálogo.</p>';
+}
+function pedToggleForn(f,on){ if(on)PED_FORN.add(f); else PED_FORN.delete(f); }
+async function pedPesquisar(){
+  const q=(document.getElementById('pedBusca').value||'').trim();
+  const msg=document.getElementById('pedMsg'), grade=document.getElementById('pedGrade');
+  if(!q){ msg.textContent='Digite o que procurar.'; return; }
+  msg.textContent='🔄 Buscando nos fornecedores…'; grade.innerHTML='';
+  try{
+    const sel=[...PED_FORN];
+    let itens=await fornecedorPesquisa(q);
+    if(sel.length) itens=itens.filter(i=>sel.includes(i.fonte));
+    PED_HITS=itens.slice(0,120); PED_SEL=null;
+    if(!PED_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo.'; pedRenderGrade(); pedRenderFoco(); return; }
+    msg.textContent=`✔ ${PED_HITS.length} produto(s) — toque pra ver grande`;
+    pedRenderGrade(); pedRenderFoco();
+    pedBuscarFotos();          // fotos entram depois, sem travar a lista
+  }catch(e){ msg.textContent='⚠ Não consegui buscar agora.'; }
+}
+/* fotos em segundo plano: a grade já aparece e as imagens vão preenchendo */
+async function pedBuscarFotos(){
+  for(let i=0;i<Math.min(PED_HITS.length,25);i++){
+    const it=PED_HITS[i];
+    if(it.img||it._semFoto) continue;
+    try{ const u=await buscarFotoFornecedor(it.fonte,it.nome);
+      if(u){ it.img=u; pedPintaFoto(i,u); } else it._semFoto=true;
+    }catch(e){ it._semFoto=true; }
+  }
+}
+function pedPintaFoto(i,u){
+  const c=document.querySelector('#pedGrade .ped-card[data-i="'+i+'"]');
+  if(c){ const ph=c.querySelector('.ph'); if(ph) ph.outerHTML='<img src="'+imgThumb(u)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'; }
+  if(PED_SEL===i) pedRenderFoco();
+}
+function pedPreco(it){ return +(it.preco||it.aVista||0); }
+function pedRenderGrade(){
+  const g=document.getElementById('pedGrade'); if(!g)return;
+  g.innerHTML=PED_HITS.map((i,n)=>`<div class="ped-card${PED_SEL===n?' on':''}" data-i="${n}" onclick="pedSelecionar(${n})">
+    <button class="pc-add" onclick="event.stopPropagation();pedAdd(${n})" title="Adicionar ao pedido">+</button>
+    ${i.img?`<img src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:'<div class="ph"></div>'}
+    <b>${esc(i.nome)}</b><small>${esc(i.fonte||'')}</small>
+    <small class="pc-preco">${pedPreco(i)?fmtMoney(pedPreco(i)):'sem preço'}</small></div>`).join('');
+}
+function pedSelecionar(n){ PED_SEL=n; pedRenderGrade(); pedRenderFoco(); }
+function pedRenderFoco(){
+  const f=document.getElementById('pedFoco'); if(!f)return;
+  const i=PED_HITS[PED_SEL];
+  if(!i){ f.innerHTML='<p class="pf-vazio">Busque e toque num produto pra ver a foto grande aqui.</p>'; return; }
+  f.innerHTML=`${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<p class="pf-vazio">Sem foto no catálogo do fornecedor</p>'}
+    <h3>${esc(i.nome)}</h3>
+    <small class="cot-hint" style="margin:0">${esc(i.fonte||'')}</small>
+    <div class="pf-preco">${pedPreco(i)?fmtMoney(pedPreco(i)):'sem preço'}</div>
+    <div class="ped-qtd"><label class="cot-lbl" style="margin:0">Quantidade</label>
+      <input id="pedQtd" type="number" min="1" value="1"></div>
+    <button class="btn primary" style="width:100%" onclick="pedAdd(${PED_SEL},true)">➕ Adicionar ao pedido</button>`;
+}
+function pedAdd(n,usarCampo){
+  const i=PED_HITS[n]; if(!i)return;
+  let q=1;
+  if(usarCampo){ const e=document.getElementById('pedQtd'); q=Math.max(1,parseInt(e&&e.value,10)||1); }
+  const k=(i.nome||'').toLowerCase()+'|'+(i.fonte||'');
+  const ja=PED_CART.find(x=>x._k===k);
+  if(ja) ja.qtd+=q; else PED_CART.push({_k:k,nome:i.nome,fonte:i.fonte,preco:pedPreco(i),img:i.img||'',qtd:q});
+  pedAtualizaBotao(); pedRenderLista();
+  toast('🛍️ '+(q>1?q+'x ':'')+'no pedido');
+}
+function pedAtualizaBotao(){ const b=document.getElementById('pedQtdBtn'); if(b)b.textContent=PED_CART.reduce((s,i)=>s+i.qtd,0); }
+function pedAbrirLista(){
+  const box=document.getElementById('pedListaBox'); if(!box)return;
+  if(box.dataset.on==='1'){ box.dataset.on=''; box.innerHTML=''; return; }
+  box.dataset.on='1'; pedRenderLista();
+}
+function pedRenderLista(){
+  const box=document.getElementById('pedListaBox'); if(!box||box.dataset.on!=='1')return;
+  if(!PED_CART.length){ box.innerHTML='<div class="cot-card" style="margin-top:14px"><p class="cot-hint">Pedido vazio. Toque no + de um produto.</p></div>'; return; }
+  const tot=PED_CART.reduce((s,i)=>s+i.preco*i.qtd,0);
+  box.innerHTML=`<div class="cot-card" style="margin-top:14px">
+    <div class="cot-sep">pedido — ${PED_CART.length} item(ns)</div>
+    ${PED_CART.map((i,k)=>`<div class="ped-item">
+      ${i.img?`<img src="${imgThumb(i.img)}" alt="">`:'<div style="width:40px;height:40px;background:#eef2f7;border-radius:6px;flex:none"></div>'}
+      <div class="pi-i"><b>${esc(i.nome)}</b><small>${esc(i.fonte||'')} · ${i.preco?fmtMoney(i.preco):'sem preço'}</small></div>
+      <div class="ci-qtd"><button onclick="pedQtd(${k},-1)">−</button><b>${i.qtd}</b><button onclick="pedQtd(${k},1)">+</button></div>
+      <button class="ci-del" onclick="pedRemover(${k})" title="Tirar">✕</button></div>`).join('')}
+    <div class="cart-total"><span>Total do pedido</span><b>${fmtMoney(tot)}</b></div>
+    <button class="btn primary cart-send" onclick="pedWhatsApp()">📲 Mandar pro fornecedor</button>
+    <button class="btn ghost cart-send2" onclick="pedCopiar()">📋 Copiar lista</button>
+    <button class="btn ghost cart-send2" onclick="pedParaOrcamento()">💰 Jogar no orçamento do cliente</button>
+    <button class="btn ghost cart-clear" onclick="pedLimpar()">Limpar pedido</button></div>`;
+}
+function pedQtd(k,d){ const i=PED_CART[k]; if(!i)return; i.qtd=Math.max(1,i.qtd+d); pedRenderLista(); pedAtualizaBotao(); }
+function pedRemover(k){ PED_CART.splice(k,1); pedRenderLista(); pedAtualizaBotao(); }
+function pedLimpar(){ if(PED_CART.length&&!confirm('Limpar o pedido?'))return; PED_CART=[]; pedRenderLista(); pedAtualizaBotao(); }
+function pedTexto(){
+  const porForn={};
+  PED_CART.forEach(i=>{ const f=i.fonte||'Sem fornecedor'; (porForn[f]=porForn[f]||[]).push(i); });
+  let t='*Pedido — '+CHIP7.nome+'*\n';
+  for(const f in porForn){ t+='\n*'+f+'*\n'; porForn[f].forEach(i=>{ t+='• '+i.qtd+'x '+i.nome+(i.preco?(' — '+fmtMoney(i.preco)+' un.'):'')+'\n'; }); }
+  const tot=PED_CART.reduce((s,i)=>s+i.preco*i.qtd,0);
+  if(tot>0) t+='\n*Total: '+fmtMoney(tot)+'*';
+  return t;
+}
+function pedWhatsApp(){ if(!PED_CART.length){toast('Pedido vazio');return;} window.open('https://wa.me/?text='+encodeURIComponent(pedTexto()),'_blank'); }
+async function pedCopiar(){ if(!PED_CART.length){toast('Pedido vazio');return;} try{ await navigator.clipboard.writeText(pedTexto()); toast('📋 Copiado'); }catch(e){ toast('Não consegui copiar'); } }
+/* leva os itens do pedido pro carrinho da cotação (custo → preço de venda) */
+function pedParaOrcamento(){
+  if(!PED_CART.length){ toast('Pedido vazio'); return; }
+  const semPreco=PED_CART.filter(i=>!i.preco).length; let n=0;
+  PED_CART.forEach(i=>{
+    if(!i.preco) return;                        // sem custo não dá pra calcular venda
+    const custo=i.preco, lucroPct=30;
+    const aVista=(typeof arredNice==='function')?arredNice(custo*(1+lucroPct/100)):custo*1.3;
+    const parcelas=Math.min(10,(typeof maqMax==='function')?maqMax():10);
+    const tx=(typeof maqTaxa==='function')?maqTaxa(parcelas):0;
+    const totalParc=(typeof precoComTaxa==='function')?precoComTaxa(aVista,tx):aVista;
+    COT_CART.push({nome:i.nome,img:i.img||'',loja:i.fonte||'',qtd:i.qtd,
+      custoBRL:custo,lucroPct,fonte:i.fonte,moeda:'BRL',aVista,parcelas,
+      parcela:(typeof arredCima5==='function')?arredCima5(totalParc/parcelas):(totalParc/parcelas),totalParc});
+    n++;
+  });
+  if(!n){ toast('Nenhum item tem preço — não dá pra montar o orçamento'); return; }
+  irModulo('cotacao'); renderCart();
+  toast('💰 '+n+' item(ns) no orçamento'+(semPreco?(' · '+semPreco+' sem preço ficaram de fora'):''));
+}
+function escolherPedidos(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('pedidosScreen').classList.add('show');
+  marcarTela();
+  pedRenderForn(); pedRenderGrade(); pedRenderFoco(); pedAtualizaBotao();
+  window.scrollTo(0,0);
+  const b=document.getElementById('pedBusca'); if(b&&!b.value)b.focus();
+}
+/* ================= 🏷️ ETIQUETAS DE OS =================
+   Medidas tiradas do próprio `MODELO ETIQUETAS OS.docx` (twips→pt = ÷20):
+     página 11906x16838tw = A4 · margem sup 765tw=38.25pt · lat 454tw=22.7pt
+     7 colunas de 1588tw · linha 851tw=42.55pt "exact" · fonte sz28 = 14pt
+     tblBorders todas "none" → etiqueta SEM borda, só o texto
+   126 por folha (18 linhas x 7). Passou disso, abre outra folha. */
+const ETQ={ cols:7, linhas:18, margTopo:38.25, margLado:22.7, alturaLinha:42.55, fonte:14, padLeft:5.4 };
+function etqPorFolha(){ return ETQ.cols*ETQ.linhas; }
+function etqDados(){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const de=parseInt(g('etqDe'),10), ate=parseInt(g('etqAte'),10);
+  const pre=(document.getElementById('etqPrefixo')||{}).value;
+  return {de:isNaN(de)?null:de, ate:isNaN(ate)?null:ate, prefixo:(pre==null?'OS ':pre)};
+}
+function etqLista(d){
+  if(d.de==null) return [];
+  const ate=(d.ate==null||d.ate<d.de)?d.de:d.ate;
+  const n=Math.min(ate-d.de+1, 2000);          // teto de segurança
+  return Array.from({length:n},(_,i)=>d.prefixo+(d.de+i));
+}
+function etqFolhaCheia(){   // completa 126 a partir da primeira
+  const d=etqDados(); if(d.de==null){ toast('Digite a primeira OS'); return; }
+  const e=document.getElementById('etqAte'); if(e)e.value=d.de+etqPorFolha()-1;
+  etqPreview();
+}
+function etqProxima(){      // continua da última que já foi impressa
+  const ult=parseInt(localStorage.getItem('chip7_etq_ultima')||'',10);
+  if(isNaN(ult)){ toast('Ainda não imprimi nenhuma etiqueta'); return; }
+  const de=document.getElementById('etqDe'), ate=document.getElementById('etqAte');
+  if(de)de.value=ult+1; if(ate)ate.value=ult+etqPorFolha();
+  etqPreview();
+}
+function etqPreview(){
+  const box=document.getElementById('etqPrev'); if(!box)return;
+  const d=etqDados(), lista=etqLista(d), res=document.getElementById('etqResumo');
+  const folhas=Math.ceil(lista.length/etqPorFolha())||0;
+  if(res) res.textContent = lista.length
+    ? `${lista.length} etiqueta(s) · ${folhas} folha(s) · ${etqPorFolha()} por folha`
+    : 'Digite a primeira e a última OS.';
+  if(!lista.length){ box.innerHTML='<p class="cot-hint">Nada pra mostrar ainda.</p>'; return; }
+  // desenha só a 1ª folha na prévia
+  const pag=lista.slice(0,etqPorFolha());
+  box.innerHTML=`<div class="etq-folha">`+pag.map(t=>`<span class="etq-cel">${esc(t)}</span>`).join('')+`</div>`
+    + (folhas>1?`<p class="cot-hint">Prévia da 1ª folha — o PDF sai com as ${folhas}.</p>`:'');
+}
+function etqMontarPDF(){
+  const d=etqDados(), lista=etqLista(d);
+  if(!lista.length){ toast('Digite a primeira OS'); return null; }
+  if(!window.jspdf){ toast('PDF indisponível'); return null; }
+  const {jsPDF}=window.jspdf, doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth();
+  const colW=(W-ETQ.margLado*2)/ETQ.cols;
+  doc.setFont('helvetica','normal'); doc.setFontSize(ETQ.fonte); doc.setTextColor(0,0,0);
+  lista.forEach((txt,i)=>{
+    const naPag=i%etqPorFolha();
+    if(i>0 && naPag===0){ doc.addPage(); doc.setFont('helvetica','normal'); doc.setFontSize(ETQ.fonte); doc.setTextColor(0,0,0); }
+    const lin=Math.floor(naPag/ETQ.cols), col=naPag%ETQ.cols;
+    const x=ETQ.margLado+col*colW+ETQ.padLeft;
+    // baseline: topo da célula + altura da fonte (o Word alinha o texto no topo)
+    const y=ETQ.margTopo+lin*ETQ.alturaLinha+ETQ.fonte;
+    doc.text(txt,x,y);
+  });
+  try{ localStorage.setItem('chip7_etq_ultima',String(d.de+lista.length-1)); }catch(e){}
+  return doc;
+}
+function etqNomeArquivo(){ const d=etqDados(), l=etqLista(d); return `Etiquetas_OS_${d.de}_a_${d.de+l.length-1}.pdf`; }
+function etqPDF(){ const doc=etqMontarPDF(); if(!doc)return; doc.save(etqNomeArquivo()); toast('🏷️ Etiquetas geradas'); }
+function etqImprimir(){
+  const doc=etqMontarPDF(); if(!doc)return;
+  try{ doc.autoPrint(); const w=window.open(doc.output('bloburl'),'_blank');
+    if(!w){ doc.save(etqNomeArquivo()); toast('Bloqueou a janela — baixei o PDF'); }
+  }catch(e){ doc.save(etqNomeArquivo()); toast('Não consegui imprimir — baixei o PDF'); }
+}
+function escolherEtiquetas(){
+  document.getElementById('chooser').classList.remove('show');
+  document.getElementById('etiquetasScreen').classList.add('show');
+  marcarTela();
+  const de=document.getElementById('etqDe');
+  if(de&&!de.value){ const ult=parseInt(localStorage.getItem('chip7_etq_ultima')||'',10);
+    if(!isNaN(ult)){ de.value=ult+1; const a=document.getElementById('etqAte'); if(a)a.value=ult+etqPorFolha(); } }
+  etqPreview(); window.scrollTo(0,0);
+  if(de&&!de.value)de.focus();
 }
 /* ================= 🔧 REPARO DE CELULAR (peça + serviço) ================= */
 const REP_MARCAS=['Apple','Samsung','Motorola','Xiaomi','LG','Outra'];
@@ -4122,13 +4814,8 @@ async function gerarReparoPDF(baixar){
   const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=48, hoje=new Date();
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
-  doc.setFillColor(10,37,80); doc.rect(0,0,W,84,'F');
-  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,18,48,48);}catch(e){}}
-  const hx=M+(logo?60:0);
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);doc.text('Orçamento de reparo de celular',hx,52);doc.text(CHIP7.endereco,hx,65);
-  doc.setFontSize(10);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
-  let y=112;
+  const logo=await garLogoCarrega();
+  let y=pdfCabecalho(doc,W,M,logo,'Orçamento de reparo de celular',hoje.toLocaleDateString('pt-BR'))+28;
   doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(13);
   doc.text((g('repCliente')?('Orçamento para '+g('repCliente')):'Orçamento de reparo'),M,y); y+=22;
   // foto do aparelho
@@ -4225,14 +4912,8 @@ async function txPDF(){
   if(!window.jspdf){toast('PDF indisponível');return;}
   const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=48, hoje=new Date();
-  doc.setFillColor(10,37,80); doc.rect(0,0,W,92,'F');
-  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,20,52,52);}catch(e){}}
-  const hx=M+(logo?64:0);
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text(CHIP7.nome,hx,40);
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(200,214,235);
-  doc.text('Simulação de parcelamento no cartão',hx,57);doc.text(CHIP7.endereco,hx,70);
-  doc.setFontSize(10);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,40,{align:'right'});
-  let y=126;
+  const logo=await garLogoCarrega();
+  let y=pdfCabecalho(doc,W,M,logo,'Simulação de parcelamento no cartão',hoje.toLocaleDateString('pt-BR'))+42;
   doc.setFillColor(240,245,252); doc.setDrawColor(10,37,80); doc.roundedRect(M,y-22,W-2*M,46,9,9,'FD');
   doc.setTextColor(20,28,40); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Valor à vista (dinheiro / PIX)',M+16,y+5);
   doc.setFontSize(19); doc.setTextColor(10,37,80); doc.text(fmtMoney(d.v),W-M-16,y+6,{align:'right'});
@@ -4506,19 +5187,22 @@ function extrairCor(nome){
 function extrairVariante(nome){ return extrairGrade(nome)||extrairCor(nome); }   // grade manda; senão cor
 const ORDEM_GRADE={'Grade A+':1,'Grade A':2,'Grade A-':3,'Grade B':4,'Grade B+':3.5,'Grade C':5};
 function ordenarVariantes(arr){ return arr.sort((a,b)=>((ORDEM_GRADE[a]||50)-(ORDEM_GRADE[b]||50))||a.localeCompare(b)); }
+/* ⚠️ NÃO parsear por `promocao-produtos-item` nem por `'advertiser'` solto:
+   - `'advertiser'` aparece em TODO botão (wishlist etc.), 100+ vezes por página;
+   - `promocao-produtos-item` são os PRODUTOS RELACIONADOS (acessórios, gomas de
+     US$0,25) — furavam o "menor preço" com valor de outro produto.
+   A oferta REAL é o botão "ver na loja": gtag `external_website_advertiser` com
+   `'advertiser'` + `'product'`, e o 1º `US$` que segue é o preço daquela loja. */
+function cpOfertaRegex(){ return /external_website_advertiser[\s\S]{0,200}?'advertiser':\s*'([^']*)'[\s\S]{0,120}?'product':\s*'([^']*)'[\s\S]{0,1200}?US\$(?:&nbsp;|[\s ])*([\d.]+,\d{2})/gi; }
 function cpParseDetalhe(html){
-  const blocks=html.split(/<div class="promocao-produtos-item"/i).slice(1);
-  const map={};                                   // loja|variante -> oferta mais barata
-  for(const b of blocks){
-    const adv=b.match(/'advertiser':\s*'([^']+)'/), pm=b.match(CP_PRICE);
-    const nm=b.match(/promocao-item-nome[\s\S]*?<a[^>]*>\s*([\s\S]*?)\s*<\/a>/i);
-    const preco=pm?cpPrecoNum(pm[1]):null;
-    if(adv&&preco){
-      const loja=cpDecode(adv[1]), nome=nm?cpDecode(nm[1].replace(/<[^>]+>/g,'')):'';
-      const grade=extrairGrade(nome), cor=extrairCor(nome), variante=grade||cor;
-      const k=loja.toLowerCase()+'|'+variante.toLowerCase();
-      if(!map[k]||preco<map[k].precoUSD) map[k]={loja,precoUSD:preco,variante,grade,cor,nome};
-    }
+  const map={}, re=cpOfertaRegex(); let m;   // loja|variante -> oferta mais barata
+  while((m=re.exec(html))){
+    const loja=cpDecode(m[1]), preco=cpPrecoNum(m[3]);
+    if(!loja||!preco) continue;
+    const nome=cpDecode(m[2]);
+    const grade=extrairGrade(nome), cor=extrairCor(nome), variante=grade||cor;
+    const k=loja.toLowerCase()+'|'+variante.toLowerCase();
+    if(!map[k]||preco<map[k].precoUSD) map[k]={loja,precoUSD:preco,variante,grade,cor,nome};
   }
   return Object.values(map).sort((a,b)=>a.precoUSD-b.precoUSD);  // todas; o filtro de loja é dinâmico no cliente
 }
@@ -4559,6 +5243,7 @@ function htmlProdHit(i,n){ const fav=isFav(i);
   return `<div class="prod-hit" onclick="verOfertas(${n})">
     ${i.img?`<img class="prod-thumb" src="${imgThumb(i.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:`<div class="prod-thumb ph"></div>`}
     <div class="ph-info"><b>${(i.nome||'Produto').replace(/</g,'&lt;')}</b><small>${sub}</small></div>
+    ${COT_ML?`<span class="ml-btn" onclick="abrirMLproduto(${n},event)" title="Ver este produto no Mercado Livre">🛒 ML</span>`:''}
     <span class="fav-star${fav?' on':''}" onclick="event.stopPropagation();toggleFav(${n})" title="Favoritar">${fav?'★':'☆'}</span>
     <span class="ph-go">›</span></div>`; }
 /* ====== favoritos de produtos ====== */
@@ -4601,6 +5286,17 @@ function cpSpecs(nome){
   s.aces=CP_RE_ACES.test(nome);
   return s;
 }
+/* comparar com o Mercado Livre: opção que se LIGA (pedido da loja). Ligado, cada
+   produto ganha um botão 🛒 ML que abre a busca de lá já do mais barato pro mais caro. */
+let COT_ML = localStorage.getItem('chip7_cot_ml')==='1';
+function cotToggleML(){
+  COT_ML=!COT_ML;
+  try{ localStorage.setItem('chip7_cot_ml',COT_ML?'1':'0'); }catch(e){}
+  if(typeof marcaLocal==='function')marcaLocal('prefs');
+  if(typeof cloudSavePrefs==='function')cloudSavePrefs();
+  renderProdutos();
+  toast(COT_ML?'🛒 Mercado Livre ligado — botão ML em cada produto':'Mercado Livre desligado');
+}
 /* ====== filtros + paginação da busca de importados ====== */
 let COT_FILT={aces:false, ram:new Set(), armaz:new Set(), cpu:new Set()};
 let COT_PAGE=1; const COT_PORPAG=20;
@@ -4636,7 +5332,10 @@ function cotBarraFiltros(){
   h+=grupo('cpu','Processador',v=>v);
   h+=grupo('ram','Memória RAM',v=>v+'GB');
   h+=grupo('armaz',usaSSD?'SSD':'Armazenam.',cpArmazLabel);
-  if(nAces){ h+=`<div class="filt-g"><button type="button" class="filt-chip aces${COT_FILT.aces?' on':''}" onclick="cotToggleFiltro('aces')">${COT_FILT.aces?'✓ ':''}Mostrar acessórios (${nAces})</button></div>`; }
+  let extras='';
+  if(nAces) extras+=`<button type="button" class="filt-chip aces${COT_FILT.aces?' on':''}" onclick="cotToggleFiltro('aces')">${COT_FILT.aces?'✓ ':''}Mostrar acessórios (${nAces})</button>`;
+  extras+=`<button type="button" class="filt-chip aces${COT_ML?' on':''}" onclick="cotToggleML()">${COT_ML?'✓ ':''}🛒 Comparar no Mercado Livre</button>`;
+  h+=`<div class="filt-g">${extras}</div>`;
   return h?`<div class="filt-bar">${h}</div>`:'';
 }
 function cotAvisoTeto(){
@@ -4782,21 +5481,41 @@ function parseFotoHTML(html){
   let m=html.match(/<img[^>]+class="[^"]*product-image-photo[^"]*"[^>]+src="([^"]+)"/i)
       || html.match(/<img[^>]+src="([^"]+)"[^>]+class="[^"]*product-image-photo[^"]*"/i);   // Magento (Fagundez/Guarapuava)
   if(m) return m[1];
-  m=html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i); if(m) return m[1];
-  m=html.match(/<img[^>]+src="([^"]+(?:media\/catalog|\/produto|\/product|\/fotos)[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i); if(m) return m[1];
+  // FAM Brasil (OpenCart): a foto do produto fica no data-src, e o src vem VAZIO.
+  // Pego o formato "Img_ftr_rp_<id>" primeiro pra não trazer o logo do site por engano.
+  m=html.match(/data-src="([^"]*Img_ftr_rp_[^"]+\.(?:jpe?g|png|webp)[^"]*)"/i); if(m) return m[1];
+  m=html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i); if(m && !fotoEhLogo(m[1])) return m[1];
+  m=html.match(/<img[^>]+src="([^"]+(?:media\/catalog|\/produto|\/product|\/fotos)[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
+  if(m && !fotoEhLogo(m[1])) return m[1];
   return '';
 }
+/* ⚠️ busca sem resultado devolve 200 com a PÁGINA do site — e o fallback acabava
+   pegando o LOGO como se fosse a foto do produto. Aí o catálogo enche de logo e
+   ninguém percebe, porque "tem imagem". Melhor voltar vazio do que voltar errado. */
+function fotoEhLogo(u){ return /(?:^|[\/_-])(?:logo|marca|brand|placeholder|no[-_]?image|sem[-_]?imagem)/i.test(String(u||'')); }
 /* fornecedores conhecidos (sites/buscas já configurados) */
 const SUPPLIER_SITES={
   mazer:{nome:'Mazer', url:'https://www.mazer.com.br', busca:'https://www.mazer.com.br/busca/%s', login:true},
   guarapuava:{nome:'Guarapuava', url:'https://distribuidoraguarapuava.com.br', busca:'https://distribuidoraguarapuava.com.br/catalogsearch/result/?q=%s', login:true},
-  fagundez:{nome:'Fagundez', url:'https://catalogo.fagundez.com', busca:'https://catalogo.fagundez.com/catalogsearch/result/?q=%s', login:false}
+  fagundez:{nome:'Fagundez', url:'https://catalogo.fagundez.com', busca:'https://catalogo.fagundez.com/catalogsearch/result/?q=%s', login:false},
+  // BringIT entra pela PLANILHA (tabela de preço .xlsx) — o importador já mapeia
+  // as colunas dela sozinho (Produto→nome, Valor→preço). Conferido com a tabela real.
+  bringit:{nome:'BringIT', url:'https://www.bringit.com.br', busca:'https://www.bringit.com.br/busca?q=%s', login:true, planilha:true},
+  hprime:{nome:'HPrime', url:'https://hprime.meuspedidos.com.br', busca:'', login:true},
+  /* FAM Brasil — OpenCart. O PREÇO exige login, mas a busca, o nome e a FOTO são
+     públicos: por isso `fotoPublica`. A foto vem em `data-src` (lazy load) —
+     o `src` do <img> vem VAZIO, então parser que só olha `src` volta de mãos vazias. */
+  fam:{nome:'FAM Brasil', url:'https://mrcheckout.or01.futurasistemas.com.br',
+       busca:'https://mrcheckout.or01.futurasistemas.com.br/index.php?route=product/search&search=%s',
+       login:true, fotoPublica:true}
 };
 function siteFornecedor(nome){ const k=(nome||'').toLowerCase().replace(/\s+/g,''); for(const key in SUPPLIER_SITES){ if(k.includes(key)) return SUPPLIER_SITES[key]; } return null; }
 async function buscarFotoFornecedor(fornecedor, nome){
   if(!nome) return '';
   const cfg=freteDoFornecedor(fornecedor), site=siteFornecedor(fornecedor);
-  if(site && site.login) return '';   // sites com login: a foto vem da função (proxy não loga)
+  // site com login: a foto vem da função (proxy não loga) — MENOS quando o catálogo
+  // é público e só o preço é fechado (FAM Brasil), aí dá pra pegar a foto direto
+  if(site && site.login && !site.fotoPublica) return '';
   const urls=[];
   if(cfg.busca && cfg.busca.indexOf('%s')>=0) urls.push(cfg.busca.replace('%s',encodeURIComponent(nome)));
   else if(site && site.busca) urls.push(site.busca.replace('%s',encodeURIComponent(nome)));
@@ -5027,6 +5746,25 @@ function renderCart(){
   html+=`<button class="btn ghost cart-clear" onclick="limparCart()">Limpar sem salvar</button>`;
   el.innerHTML=html;
 }
+/* ===== cabeçalho comum dos PDFs (orçamento, câmera, reparo, taxas) =====
+   ⚠️ usa a logo RETANGULAR (`logo-garantia.png`, fundo branco) e fundo CLARO.
+   Antes era a `logo-chip7.png` (redonda, fundo azul-escuro) sobre uma faixa
+   azul-escura: o círculo se fundia no fundo e virava uma mancha com borda verde —
+   era isso o "PDF esquisito". Não voltar a pôr logo redonda em faixa escura. */
+function pdfCabecalho(doc,W,M,logoData,subtitulo,dataTxt){
+  let x=M, hLogo=0;
+  if(logoData){ try{ doc.addImage(logoData,'JPEG',M,M-6,104,58); x=M+116; hLogo=58; }catch(e){} }
+  doc.setTextColor(16,28,48); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.text(CHIP7.nome,x,M+12);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(88,100,118);
+  if(subtitulo) doc.text(subtitulo,x,M+27);
+  doc.text(CHIP7.endereco,x,M+39);
+  if(dataTxt){ doc.setFontSize(9.5); doc.setTextColor(60,72,92); doc.text(dataTxt,W-M,M+12,{align:'right'}); }
+  const y=M+Math.max(hLogo,46);
+  doc.setDrawColor(10,37,80); doc.setLineWidth(1.8); doc.line(M,y,W-M,y);
+  doc.setLineWidth(.5);
+  return y;
+}
 /* ---- PDF do orçamento (logo, foto, preços de venda, validade 7 dias) ---- */
 async function logoPng(){
   return await new Promise(res=>{ const im=new Image();
@@ -5062,15 +5800,10 @@ async function gerarCotacaoPDF(baixar){
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=42, hoje=new Date();
   // pré-carrega as fotos (weserv) e a logo
   const fotos={}; for(const it of itens){ if(it.img&&!(it.img in fotos)) fotos[it.img]=await imgParaDataURL(it.img); }
-  const logo=await logoPng();
+  const logo=await garLogoCarrega();   // retangular, legível (ver pdfCabecalho)
+  let headerFim=0;
   function header(){
-    doc.setFillColor(10,37,80); doc.rect(0,0,W,84,'F');
-    if(logo){ try{ doc.addImage(logo,'PNG',M,18,48,48); }catch(e){} }
-    const hx=M+(logo?60:0);
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
-    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);
-    doc.text('Orçamento',hx,52);doc.text(CHIP7.endereco,hx,65);
-    doc.setFontSize(10);doc.setTextColor(220,230,245);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
+    headerFim=pdfCabecalho(doc,W,M,logo,COT_BUILD?'Orçamento de Computador':'Orçamento',hoje.toLocaleDateString('pt-BR'));
   }
   function footer(){
     const fy=H-66; doc.setDrawColor(225,230,238);doc.line(M,fy-14,W-M,fy-14);
@@ -5083,13 +5816,13 @@ async function gerarCotacaoPDF(baixar){
   const cliente=g('cotCliente'), obs=g('cotObs');
   const validade=Math.max(1,parseInt(g('cotValidade'),10)||7);
   const bottom=H-100, rowH=96;
-  header(); let y=100;
+  header(); let y=headerFim+26;
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);
   const titBase=COT_BUILD?'Orçamento de Computador':(itens.length>1?`Orçamento — ${itens.length} itens`:'Orçamento');
   doc.text(cliente?(titBase+' — '+cliente):titBase,M,y);
   y+=12;
   for(const it of itens){
-    if(y+rowH>bottom){ footer(); doc.addPage(); header(); y=100; }
+    if(y+rowH>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; }
     doc.setDrawColor(230,234,240);doc.setFillColor(252,253,255);doc.roundedRect(M,y,W-2*M,rowH-8,8,8,'FD');
     let tx=M+14; const foto=fotos[it.img];
     if(foto){ try{ doc.addImage(foto,'JPEG',M+8,y+8,72,72); tx=M+90; }catch(e){} }
@@ -5108,7 +5841,7 @@ async function gerarCotacaoPDF(baixar){
     y+=rowH;
   }
   if((itens.length>1 || itens.some(i=>(i.qtd||1)>1)) && COT_SOMAR){
-    if(y+60>bottom){ footer(); doc.addPage(); header(); y=100; }
+    if(y+60>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; }
     const tv=itens.reduce((s,i)=>s+i.aVista*(i.qtd||1),0), tp=itens.reduce((s,i)=>s+(i.totalParc||0)*(i.qtd||1),0);
     y+=6; doc.setDrawColor(10,37,80);doc.setFillColor(240,245,252);doc.roundedRect(M,y,W-2*M,54,8,8,'FD');
     doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(20,28,40);doc.text('Total à vista',M+14,y+23);
@@ -5120,7 +5853,7 @@ async function gerarCotacaoPDF(baixar){
   if(COT_BUILD){
     const an=pcAnaliseData();
     if(an&&an.jogos){
-      if(y+120>bottom){ footer(); doc.addPage(); header(); y=100; }
+      if(y+120>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; }
       y+=20; doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(10,37,80);doc.text('Desempenho estimado em jogos (1080p)',M,y); y+=8;
       const cw=(W-2*M-3*8)/4, ch=52;
       an.jogos.forEach((j,k)=>{ const x=M+k*(cw+8);
@@ -5137,13 +5870,13 @@ async function gerarCotacaoPDF(baixar){
   // observações / garantia
   if(obs){
     const ol=doc.splitTextToSize(obs,W-2*M);
-    if(y+18+ol.length*13>bottom){ footer(); doc.addPage(); header(); y=100; }
+    if(y+18+ol.length*13>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; }
     y+=22; doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40);doc.text('Observações',M,y);
     y+=15; doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(80,90,105);doc.text(ol,M,y); y+=ol.length*13;
   }
   const prazo=parseInt(g('cotPrazo'),10)||0;
-  if(prazo){ y+=20; if(y>bottom){ footer(); doc.addPage(); header(); y=100; } doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40); doc.text(`Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}.`,M,y); }
-  y+=24; if(y>bottom){ footer(); doc.addPage(); header(); y=100; }
+  if(prazo){ y+=20; if(y>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; } doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(20,28,40); doc.text(`Previsão de entrega: até ${prazo} ${prazo>1?'dias':'dia'}.`,M,y); }
+  y+=24; if(y>bottom){ footer(); doc.addPage(); header(); y=headerFim+26; }
   doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(196,84,28);
   doc.text(`Este orçamento é válido por ${validade} ${validade>1?'dias':'dia'}.`,M,y);
   footer();
@@ -5899,12 +6632,9 @@ async function gerarCameraPDF(baixar){
   const g=id=>((document.getElementById(id)||{}).value||'').trim();
   const cliente=g('camCliente'), data=g('camData'), cob=g('camCobertura'), obs=g('camObs');
   const endereco=g('camEndereco'), tecnico=g('camTecnico'), parede=g('camParede');
-  doc.setFillColor(10,37,80);doc.rect(0,0,W,84,'F');
-  const logo=await logoPng(); if(logo){try{doc.addImage(logo,'PNG',M,18,48,48);}catch(e){}}
-  const hx=M+(logo?60:0); doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(CHIP7.nome,hx,36);
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,214,235);doc.text('Orçamento de CFTV (câmeras)',hx,52);doc.text(CHIP7.endereco,hx,65);
-  doc.setFontSize(10);doc.setTextColor(220,230,245);doc.text(hoje.toLocaleDateString('pt-BR'),W-M,36,{align:'right'});
-  let y=100; doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(12);
+  const logo=await garLogoCarrega();
+  let y=pdfCabecalho(doc,W,M,logo,'Orçamento de CFTV (câmeras)',hoje.toLocaleDateString('pt-BR'))+26;
+  doc.setTextColor(20,28,40);doc.setFont('helvetica','bold');doc.setFontSize(12);
   doc.text(cliente?('Orçamento para '+cliente):'Orçamento de câmeras',M,y); y+=15;
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(95,105,120);
   const info=[]; if(data)info.push('Início: '+data.split('-').reverse().join('/')); info.push(CAM.cameras.length+' câmera(s)'); if(cob)info.push('Cobertura ~'+cob+'%'); if(parede)info.push('Parede: '+parede);
@@ -6166,7 +6896,7 @@ function cloudSubscribeFav(){
   }, err=>console.warn('Cloud fav sync',err));
 }
 /* preferências (maquininha, arredondamento, mostrar total) na nuvem */
-const PREF_KEYS=['chip7_maq','chip7_maq_cfg','chip7_dolar','chip7_dolar_tipo','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
+const PREF_KEYS=['chip7_maq','chip7_maq_cfg','chip7_dolar','chip7_dolar_tipo','chip7_cot_ml','chip7_cot_somar','chip7_cot_arred','chip7_cam_arred','chip7_dark'];
 let _prefCloudTimer=null;
 function cloudSavePrefs(){ marcaLocal('prefs'); if(!cloud.on)return; clearTimeout(_prefCloudTimer); _prefCloudTimer=setTimeout(()=>{ const p={}; PREF_KEYS.forEach(k=>{const v=localStorage.getItem(k); if(v!=null)p[k]=v;}); cloudSet(cloud.db.collection('cotacoes').doc('prefs'), {p,ts:Date.now()}, 'Preferências'); },800); }
 function cloudSubscribePrefs(){
@@ -6218,7 +6948,10 @@ function cloudSubscribeCart(){
   }, err=>console.warn('Cloud cart sync',err));
 }
 /* reparo de celular: catálogo de peças, margens e fornecedores na nuvem */
-let _repCatT=null,_repCfgT=null,_repFornT=null;
+let _repCatT=null,_repCfgT=null,_repFornT=null,_licT=null;
+/* licenças de antivírus vão pra nuvem: quem anota no balcão precisa aparecer
+   pra quem atende no celular, senão dois vendedores usam a mesma ativação */
+function cloudSaveLic(a){ if(!cloud.on)return; clearTimeout(_licT); _licT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('licencas'), {itens:a,ts:Date.now()}, 'Licenças de antivírus'); },800); }
 function cloudSaveRepCat(a){ if(!cloud.on)return; clearTimeout(_repCatT); _repCatT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_catalogo'), {itens:a,ts:Date.now()}, 'Catálogo de peças'); },800); }
 function cloudSaveRepCfg(o){ if(!cloud.on)return; clearTimeout(_repCfgT); _repCfgT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_config'), {cfg:o,ts:Date.now()}, 'Margens de reparo'); },800); }
 function cloudSaveRepForn(a){ if(!cloud.on)return; clearTimeout(_repFornT); _repFornT=setTimeout(()=>{ cloudSet(cloud.db.collection('cotacoes').doc('rep_fornecedores'), {itens:a,ts:Date.now()}, 'Fornecedores de peças'); },800); }
@@ -6226,7 +6959,8 @@ function cloudSubscribeRep(){
   if(!cloud.ready) return;
   [['rep_catalogo','chip7_rep_cat','repcat',()=>{ if(document.getElementById('reparoScreen').classList.contains('show')) repFiltrar(); }],
    ['rep_config','chip7_rep_cfg','repcfg',null],
-   ['rep_fornecedores','chip7_rep_forn','repforn',()=>{ if(document.getElementById('reparoScreen').classList.contains('show')) repRenderFornSelects(); }]
+   ['rep_fornecedores','chip7_rep_forn','repforn',()=>{ if(document.getElementById('reparoScreen').classList.contains('show')) repRenderFornSelects(); }],
+   ['licencas','chip7_licencas','lic',()=>{ const t=document.getElementById('licencasScreen'); if(t&&t.classList.contains('show')&&typeof licRender==='function') licRender(); }]
   ].forEach(([docId,lsKey,eco,onchg])=>{
     const un='_unsub_'+docId;
     if(cloud[un]){cloud[un]();cloud[un]=null;}
