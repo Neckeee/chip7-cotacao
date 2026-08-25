@@ -143,9 +143,9 @@ relatório do diagnóstico dele. **Se a tela tem custo, margem, taxa ou forneced
 | Mazer | login | via função | `mazer.js` (env var no Netlify) |
 | Guarapuava | login | via função | `guarapuava.js` (env var) |
 | Fagundez | público | **público** ✅ | Magento, `catalogsearch/result/?q=` |
-| **FAM Brasil** | login | **público** ✅ | OpenCart, `index.php?route=product/search&search=` |
+| **FAM Brasil** | ❌ login | **público** ✅ | OpenCart, `famPesquisa` — **nome+foto+código, SEM preço** |
 | **BringIT** | **planilha** ✅ | — | tabela de preço `.xlsx` → importador do catálogo |
-| **HPrime** | login | ❌ | **SPA**: o HTML vem com 2,7 KB e zero produto |
+| **HPrime** | login | ❌ | **SPA**: as URLs devolvem a MESMA casca de 2.708 bytes |
 
 - **FAM Brasil** (`mrcheckout.or01.futurasistemas.com.br`): o preço exige login, mas
   **busca, nome e foto são públicos** → flag `fotoPublica:true` no `SUPPLIER_SITES`
@@ -153,6 +153,20 @@ relatório do diagnóstico dele. **Se a tela tem custo, margem, taxa ou forneced
   ⚠️ A foto vem em **`data-src`** (lazy load) e o `src` do `<img>` vem **vazio** —
   parser que só olha `src` volta de mãos abanando. O `parseFotoHTML` procura
   `Img_ftr_rp_<id>` primeiro, de propósito.
+- **`famPesquisa` / `famParseBusca`** (v86): a FAM virou fornecedor **buscável**, não só
+  fonte de foto. Ligada nas **3 listas** — `fornecedorPesquisa`, `pedFontes` e
+  `renderFornLojas`. Estava registrada em `SUPPLIER_SITES` desde v85 mas **nenhuma
+  busca a chamava**: aparecia "incluída" no código e não existia pro usuário.
+  ▶ *Registrar um fornecedor não é ligá-lo* — depois de registrar, `grep` quem chama.
+  - `&limit=100` traz 100 itens numa requisição (o padrão são 12 → paginar custaria 8 idas).
+  - ⚠️ Os itens nascem com **`preco:0` DE PROPÓSITO**. Medido no HTML real: `itembox-price`
+    vem **vazio** e a página inteira tem **zero `R$`** sem login. A tela cai no
+    *"digite o custo (R$)"*, igual a um fornecedor sem site. **Nunca chutar preço aqui** —
+    preço inventado entra calado no orçamento e ninguém confere.
+- ⚠️ **Ao testar foto nesta máquina, `loading="lazy"` mente**: a Browser pane não compõe
+  frames, o lazy nunca dispara e as 41 fotos deram `naturalWidth===0` — parecia defeito e
+  não era. Separe as hipóteses: carregue a URL num `new Image()` (crua **e** via
+  `imgThumb`) e só então conclua. Com `loading='eager'`, 10/10 carregaram.
 - ⚠️⚠️ **`fotoEhLogo()` — busca sem resultado devolve 200 com a página do site**, e o
   fallback do `parseFotoHTML` pegava o **LOGO** achando que era o produto. O catálogo
   encheria de logo e ninguém veria, porque "tem imagem". Conferido: `pelicula` (que a
@@ -162,6 +176,66 @@ relatório do diagnóstico dele. **Se a tela tem custo, margem, taxa ou forneced
   de 2.389 itens. Não precisa de função nova.
 - **HPrime**: é aplicativo JavaScript (Meus Pedidos). Raspar HTML **não funciona** —
   precisaria da API da plataforma ou navegador headless. Não tentar com `fetch`.
+  **Prova (não repetir a sondagem):** `/entrar`, `/`, `/api/produtos` e `/catalogo`
+  devolvem os **mesmos 2.708 bytes**, com 0 `<img>` e 0 `R$`. Rota inexistente responder
+  igual à real é a assinatura de SPA — o roteamento é no JS, o servidor só serve a casca.
+  ⚠️ E é mais um **200 que diz "não tenho"**: `r.ok` é `true` nas quatro.
+
+## Assinatura de PDF (ago/2026) — carimbo visual, não ICP-Brasil
+
+`assinador-pdf.js` + `libs/` (pdf.js + pdf-lib) vieram do módulo genérico do PACS.
+**Não editar o módulo** — ele é compartilhado; tudo que é do app fica no `index.html`.
+
+- **As libs (1,9 MB) carregam SOB DEMANDA** (`assLibsProntas()`), na ordem
+  `pdf-lib → pdf → workerSrc → assinador`, com promessa memoizada. O app inteiro tem
+  500 KB: carregar no boot penalizaria a equipe toda por um recurso ocasional.
+  ⚠️ **De propósito FORA do `ASSETS` do `sw.js`** — `ASSETS` é baixado inteiro no
+  *install*. O handler `fetch` já é cache-first, então elas entram em cache no 1º uso.
+  **Custo aceito:** quem nunca assinou e está offline não assina; o erro diz isso.
+- **`pdfLinhaAssinatura(doc,x,y,largura,rotulo,esc)`** desenha o traço e devolve
+  `{largura,margemInferior,margemDireita}` — o formato que o módulo espera em `caixa`,
+  medido das bordas **inferior/direita**. Provado (5 casos + mutação): a caixa abre
+  **exatamente** sobre a linha, porque `canvasH/escala = pageH` faz o `y` colapsar em
+  `margemInferior`. Todos os 5 geradores devolvem isso em `res.ass`.
+- ⚠️⚠️ **Na Garantia a linha entra DENTRO do `garMontarPDF`, antes do `doc.__fim`.**
+  `garMontarPDFCheio` mede `__fim` e redesenha tudo noutra escala; linha desenhada
+  depois ficaria fora da conta. Como a última passada vence, `__ass` sai na escala final.
+- ⚠️ **O fundo branco é o risco real.** PNG opaco *cobre o texto* — falha silenciosa.
+  `assLimpaFundo()` faz fundo→transparente por luminância, recorta as bordas vazias e
+  reduz por **teto de BYTES (120 KB), não de pixels**. A prévia tem fundo quadriculado
+  pra transparência ser **vista** antes de salvar. Medido: JPEG opaco 400×200 → PNG
+  188×75, 12.735 px transparentes, traço preservado, 6 KB.
+  No PDF isso vira `/SMask` — é o que se afirma pra provar que a transparência sobreviveu.
+- `chip7_assinatura` no localStorage + doc próprio `cotacoes/assinatura` no Firestore.
+  ⚠️ **Não** em `PREF_KEYS`: aquilo vai num doc só (teto de 1 MB) e levaria as
+  preferências junto.
+- O **cadastro é modal**, não tela — não paga o custo das quatro listas. Já o
+  **módulo `assinaturaScreen` é tela** e está nas quatro (conferido: voltar cai no menu).
+
+### ⚠️ A Garantia transborda com ~35+ produtos (defeito ANTERIOR a isto)
+
+O piso de escala `0.62` do `garMontarPDFCheio` não dá conta: **medido contra o backup**,
+40 produtos passam **48pt** do limite e 80 passam **563pt** — e passavam **antes** da
+assinatura, saindo cortados em silêncio. Não é regressão; a assinatura só a herdou.
+Hoje `doc.__transbordou` marca e `garGerar` avisa. **A correção de verdade é quebrar em
+duas páginas**, que é redesenhar o formulário quadriculado — não feito.
+
+### Concluir uma Garantia LIMPA o formulário
+
+`garConcluida()` (= `garLimpar()`) roda em `gerarGarantiaPDF` e `garImprimir`. Antes os
+campos guardavam o cliente anterior e a venda seguinte começava com o nome de outra
+pessoa. Seguro porque `garGerar()` já faz `garHistAdd()` **antes** de montar o PDF.
+⚠️ Limpa só ao **concluir**, nunca ao entrar na tela — quem sai pra consultar um preço
+no meio do preenchimento e volta não pode perder o que digitou (isso é testado).
+
+### ⚠️ Testar assinatura nesta máquina: o pane oculto mente
+
+`requestAnimationFrame` congela → o `page.render` do pdf.js **não resolve** e o botão
+Confirmar fica travado; o decode de `Image` blob às vezes nem dispara, então o modal
+**às vezes abre e às vezes não** — e medição instável não é evidência. O que fazer:
+provar o miolo **em Node** (`pdf-lib` roda via `require`, **não** via `vm`: a lib usa
+`instanceof Array`, que falha entre realms). Foi assim que se provou fórmula, página
+certa, `/SMask` e as mutações.
 
 ## Convenções — quebrar isso quebra o app
 
