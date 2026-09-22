@@ -44,6 +44,22 @@ async function baixar(url) {
   return r.text();
 }
 
+/* ⚠️ Em set/2026 o comprasparaguai passou a usar proteção anti-robô (Cloudflare).
+   Medido: do IP da loja a página vem inteira (20 cards) mesmo sem User-Agent de
+   navegador; de datacenter — que é onde esta função roda — vem "Just a moment...",
+   com HTTP 200. Sem esta checagem o parser lê a página de desafio, não acha card
+   nenhum e a função devolve `itens: []` com 200: o app mostrava "Nada encontrado",
+   ou seja, respondia "não existe" quando a verdade é "não consegui perguntar".
+   Isto aqui não contorna o bloqueio — só o NOMEIA, para o app poder dizer a verdade. */
+const DESAFIO = /Just a moment|cf-browser-verification|challenge-platform|__cf_chl|Attention Required|Checking your browser/i;
+function pareceDesafio(html) {
+  return DESAFIO.test(html || '') && !/promocao-produtos-item/i.test(html || '');
+}
+const ERRO_BLOQUEIO = {
+  erro: 'O comprasparaguai está bloqueando consultas automáticas (proteção anti-robô). Os preços de importados não vêm por aqui.',
+  bloqueado: true
+};
+
 function parseBusca(html) {
   const m = html.match(/resultados-busca([\s\S]*?)(?:paginacao|<footer|rodape)/i);
   const area = m ? m[1] : html;
@@ -127,6 +143,7 @@ exports.handler = async (event) => {
     // ---- MODO DÓLAR: a cotação que o próprio comprasparaguai usa nos preços ----
     if (p.dolar) {
       const home = await baixar('https://www.comprasparaguai.com.br/');
+      if (pareceDesafio(home)) return { statusCode: 503, headers, body: JSON.stringify(ERRO_BLOQUEIO) };
       const m = home.match(/D[óo]lar\s*hoje[\s\S]{0,200}?R\$\s*([\d.]+,\d{2})/i);
       const dolar = m ? precoNum(m[1]) : null;
       const body = JSON.stringify({ dolar: dolar || 0, fonte: 'comprasparaguai' });
@@ -142,6 +159,7 @@ exports.handler = async (event) => {
         return { statusCode: 400, headers, body: JSON.stringify({ erro: 'Link inválido.' }) };
       }
       const html = await baixar(path);
+      if (pareceDesafio(html)) return { statusCode: 503, headers, body: JSON.stringify(ERRO_BLOQUEIO) };
       const ofertas = parseDetalhe(html).sort((a, b) => a.precoUSD - b.precoUSD);  // todas; filtro de loja é no cliente
       const nome = (html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) || [])[1] || '';
       const img = (html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) || [])[1] || '';
@@ -157,6 +175,7 @@ exports.handler = async (event) => {
 
     // pág. 1 primeiro, pra saber o total e quantas páginas puxar
     const html1 = await baixar(alvo);
+    if (pareceDesafio(html1)) return { statusCode: 503, headers, body: JSON.stringify(ERRO_BLOQUEIO) };
     const total = totalBusca(html1);
     const itens = parseBusca(html1);
 

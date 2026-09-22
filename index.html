@@ -5298,11 +5298,30 @@ function cpParseDetalhe(html){
 // tenta a função do Netlify (já pagina no servidor); se não existir (site arrastado),
 // pagina pelo navegador — até 5 páginas pra não ficar lento no proxy
 let COT_SITE_TOTAL=0;   // quantos o comprasparaguai diz ter (pode ser > baixado)
+/* Por que os importados podem não responder: ver COT_CP_BLOQUEIO. */
+let COT_CP_BLOQUEIO='';
 async function cpPesquisa(q){
-  COT_SITE_TOTAL=0;
-  try{ const r=await fetch('/.netlify/functions/buscar?q='+encodeURIComponent(q)); if(r.ok){const d=await r.json(); if(!d.erro&&d.itens){ COT_SITE_TOTAL=d.total||d.itens.length; return d.itens; }} }catch(_){}
+  COT_SITE_TOTAL=0; COT_CP_BLOQUEIO='';
+  try{
+    const r=await fetch('/.netlify/functions/buscar?q='+encodeURIComponent(q));
+    const d=await r.json().catch(()=>null);
+    if(d&&d.bloqueado){ COT_CP_BLOQUEIO=d.erro||'site bloqueando consulta automática'; return []; }
+    /* ⚠️ `d.itens` VAZIO é verdadeiro em JS: com `if(d.itens)` a lista vazia era aceita
+       como resposta boa e o app nunca tentava a reserva — e ainda dizia "Nada
+       encontrado", que é afirmar que o produto não existe. Exige item de verdade. */
+    if(r.ok && d && !d.erro && d.itens && d.itens.length){ COT_SITE_TOTAL=d.total||d.itens.length; return d.itens; }
+  }catch(_){}
+  /* Reserva pelo proxy CORS. ⚠️ Medido em set/2026: os dois proxies caíram
+     (corsproxy.io 401, allorigins 500) e, mesmo de pé, saem de datacenter — que é
+     exatamente o que o anti-robô barra. Fica como tentativa, não como promessa:
+     se falhar, o app tem de DIZER que não consultou, e não que nada existe. */
   const base=CP_BASE+'/busca/?q='+encodeURIComponent(q);
-  const html1=await cpProxy(base);
+  let html1;
+  try{ html1=await cpProxy(base); }
+  catch(_){ COT_CP_BLOQUEIO=COT_CP_BLOQUEIO||'não consegui acessar o site dos importados (bloqueio anti-robô ou proxy fora do ar)'; return []; }
+  if(/Just a moment|challenge-platform|__cf_chl/i.test(html1) && !/promocao-produtos-item/i.test(html1)){
+    COT_CP_BLOQUEIO='o comprasparaguai está bloqueando consultas automáticas.'; return [];
+  }
   let itens=cpParseBusca(html1);
   // categoria (ex.: "notebook") pagina pela canonical /notebook/?page=N, não pelo /busca/
   const canon=(html1.match(/rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)||[])[1]||'';
@@ -5469,7 +5488,7 @@ async function pesquisarProdutos(){
       // 📱 modo celular: SÓ importados (celular não se compra de fornecedor BR)
       msg.textContent='🔄 Buscando nos importados...'; dolarInit();
       COT_HITS=(await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD',_spec:cpSpecs(i.nome)},i));
-      if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo (ex.: "iPhone 15 128").'; return; }
+      if(!COT_HITS.length){ msg.textContent=COT_CP_BLOQUEIO?('⚠ '+COT_CP_BLOQUEIO+' Digite o preço (R$).'):'Nada encontrado. Tente outro termo (ex.: "iPhone 15 128").'; return; }
       renderProdutos();
       return;
     }
@@ -5488,7 +5507,9 @@ async function pesquisarProdutos(){
     } else {
       msg.textContent='🔄 Buscando produtos importados...'; dolarInit();
       COT_HITS = (await cpPesquisa(q)).filter(i=>i.precoUSD>0).map(i=>Object.assign({fonte:'Importados',moeda:'USD',_spec:cpSpecs(i.nome)},i));
-      if(!COT_HITS.length){ msg.textContent='Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
+      /* ⚠️ Não oferecer "cole o link" quando é bloqueio: o link cai na MESMA função
+         barrada, então seria mandar o usuário num caminho que também não funciona. */
+      if(!COT_HITS.length){ msg.textContent=COT_CP_BLOQUEIO?('⚠ '+COT_CP_BLOQUEIO+' Digite o preço (R$) ou use 🛒 Preço no Brasil.'):'Nada encontrado. Tente outro termo, cole o link ou digite o preço.'; return; }
     }
     renderProdutos();
   }catch(e){
